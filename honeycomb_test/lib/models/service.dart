@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/pages/service_details.dart';
 import 'package:honeycomb_test/utilities.dart';
+import 'package:flutter_polygon/flutter_polygon.dart';
+import 'package:flutter_polygon/flutter_polygon.dart';
 
 class Service {
   String serviceName = "";
@@ -9,19 +12,25 @@ class Service {
   String serviceAddress = "";
   String servicePopulation = "";
   String serviceStatus = "";
+  String serviceProvider = "";
   bool hasMou = false;
   bool isVerified = false;
 
-  Service(
-      {required this.serviceName,
-      required this.serviceCategory,
-      required this.hasMou,
-      required this.isVerified});
+  Service({
+    required this.serviceName,
+    required this.serviceCategory,
+    required this.hasMou,
+    required this.isVerified,
+    required this.serviceNumber,
+    required this.serviceEmail,
+    required this.serviceAddress,
+    required this.serviceProvider,
+  });
 
   Widget showMou() {
     return hasMou
         ? Container(
-            child: Text(
+            child: const Text(
               "MOU",
               style: TextStyle(
                   color: Colors.white,
@@ -39,9 +48,14 @@ class Service {
   Widget showVerified() {
     return isVerified
         ? Container(
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.yellow),
-            child: Icon(Icons.check_sharp),
+            padding: EdgeInsets.all(2),
+            decoration: const BoxDecoration(
+                color: Colors.orange, shape: BoxShape.circle),
+            child: Icon(
+              Icons.check_sharp,
+              color: Colors.white,
+              size: 20,
+            ),
           )
         : Container();
   }
@@ -59,9 +73,16 @@ class Service {
     );
   }
 
-  Widget getCard() {
+  Widget getCard(BuildContext context) {
     return Card(
       child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ServiceDetails(
+                    service: this,
+                  )),
+        ),
         child: Padding(
           padding: EdgeInsets.all(8),
           child: Row(

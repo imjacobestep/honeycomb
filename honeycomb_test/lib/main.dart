@@ -18,12 +18,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Honeycomb',
       theme: ThemeData(
         useMaterial3: true,
         primarySwatch: generateMaterialColor(color: Color(0xFFFFE93E)),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Honeycomb'),
     );
   }
 }
@@ -45,17 +45,24 @@ class _MyHomePageState extends State<MyHomePage> {
   String dropdownValue = "stock";
 
   Service testService1 = Service(
-    serviceName: 'TestService1',
-    serviceCategory: 'Shelter',
-    hasMou: true,
-    isVerified: true,
-  );
+      serviceName: 'TestService1',
+      serviceCategory: 'Shelter',
+      hasMou: true,
+      isVerified: true,
+      serviceNumber: 'xxx-xxx-xxxx',
+      serviceEmail: 'test_service@gmail.com',
+      serviceAddress: '1234 Test Street, Seattle, WA',
+      serviceProvider: "Mary's Place");
 
   Service testService2 = Service(
     serviceName: 'TestService2',
     serviceCategory: 'Legal',
     hasMou: false,
     isVerified: false,
+    serviceNumber: 'xxx-xxx-xxxx',
+    serviceEmail: 'test_service@gmail.com',
+    serviceAddress: '1234 Test Street, Seattle, WA',
+    serviceProvider: "Mary's Place",
   );
 
   List<String> labels = ["Home", "Search", "Search", "Favs", "Lists"];
@@ -126,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       default:
         {
-          return stockNav();
+          return customNav();
         }
         break;
     }
@@ -187,11 +194,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return CustomNavigationBar(
       items: items,
-      blurEffect: true,
-      opacity: 0.9,
-      iconSize: 24,
+      //blurEffect: true,
+      //opacity: 1,
+      iconSize: 26,
       isFloating: true,
-      selectedColor: Colors.white,
+      selectedColor: Colors.yellowAccent,
       strokeColor: Colors.white,
       unSelectedColor: Colors.grey[600],
       backgroundColor: Colors.black,
@@ -315,8 +322,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            testService1.getCard(),
-            testService2.getCard(),
+            testService1.getCard(context),
+            testService2.getCard(context),
             const Text(
               'Select a nav',
             ),
