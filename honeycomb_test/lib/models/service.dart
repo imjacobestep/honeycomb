@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:honeycomb_test/pages/service_details.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:flutter_polygon/flutter_polygon.dart';
-import 'package:flutter_polygon/flutter_polygon.dart';
 
 class Service {
   String serviceName = "";
@@ -30,6 +29,10 @@ class Service {
   Widget showMou() {
     return hasMou
         ? Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.circular(4)),
             child: const Text(
               "MOU",
               style: TextStyle(
@@ -37,10 +40,6 @@ class Service {
                   fontWeight: FontWeight.bold,
                   fontSize: 10),
             ),
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(4)),
           )
         : Container();
   }
@@ -48,10 +47,10 @@ class Service {
   Widget showVerified() {
     return isVerified
         ? Container(
-            padding: EdgeInsets.all(2),
+            padding: const EdgeInsets.all(2),
             decoration: const BoxDecoration(
                 color: Colors.orange, shape: BoxShape.circle),
-            child: Icon(
+            child: const Icon(
               Icons.check_sharp,
               color: Colors.white,
               size: 20,
@@ -62,14 +61,14 @@ class Service {
 
   Widget categoryLabel() {
     return Container(
-      child: Text(
-        serviceCategory,
-        style: TextStyle(
-            color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),
-      ),
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
           color: Colors.black12, borderRadius: BorderRadius.circular(4)),
+      child: Text(
+        serviceCategory,
+        style: const TextStyle(
+            color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),
+      ),
     );
   }
 
@@ -84,7 +83,7 @@ class Service {
                   )),
         ),
         child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -98,8 +97,8 @@ class Service {
                   Row(
                     children: [
                       Text(
-                        this.serviceName,
-                        style: TextStyle(fontSize: 20),
+                        serviceName,
+                        style: const TextStyle(fontSize: 20),
                       ),
                       getSpacer(4),
                       showVerified()

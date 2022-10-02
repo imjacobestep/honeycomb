@@ -4,6 +4,8 @@ import 'package:floating_navigation_bar/floating_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:honeycomb_test/models/provider.dart';
+import 'package:honeycomb_test/models/resource_list.dart';
 import 'package:honeycomb_test/models/service.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Honeycomb',
       theme: ThemeData(
-        useMaterial3: true,
+        //useMaterial3: true,
         primarySwatch: generateMaterialColor(color: Color(0xFFFFE93E)),
       ),
       home: const MyHomePage(title: 'Honeycomb'),
@@ -44,28 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> navs = ["stock", "custom", "snake", "google", "floating", "dot"];
   String dropdownValue = "stock";
 
-  Service testService1 = Service(
-      serviceName: 'TestService1',
-      serviceCategory: 'Shelter',
-      hasMou: true,
-      isVerified: true,
-      serviceNumber: 'xxx-xxx-xxxx',
-      serviceEmail: 'test_service@gmail.com',
-      serviceAddress: '1234 Test Street, Seattle, WA',
-      serviceProvider: "Mary's Place");
+  ResourceList resourceList = buildTest();
 
-  Service testService2 = Service(
-    serviceName: 'TestService2',
-    serviceCategory: 'Legal',
-    hasMou: false,
-    isVerified: false,
-    serviceNumber: 'xxx-xxx-xxxx',
-    serviceEmail: 'test_service@gmail.com',
-    serviceAddress: '1234 Test Street, Seattle, WA',
-    serviceProvider: "Mary's Place",
-  );
-
-  List<String> labels = ["Home", "Search", "Search", "Favs", "Lists"];
+  List<String> labels = ["Home", "Search", "Resource", "Favs", "Lists"];
   List<Icon> icons = [
     const Icon(Icons.home),
     const Icon(Icons.search),
@@ -198,10 +181,10 @@ class _MyHomePageState extends State<MyHomePage> {
       //opacity: 1,
       iconSize: 26,
       isFloating: true,
-      selectedColor: Colors.yellowAccent,
+      selectedColor: Theme.of(context).colorScheme.primary,
       strokeColor: Colors.white,
       unSelectedColor: Colors.grey[600],
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xFF2B2A2A),
       borderRadius: const Radius.circular(30.0),
       currentIndex: _currentIndex,
       onTap: (index) {
@@ -305,33 +288,29 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            testService1.getCard(context),
-            testService2.getCard(context),
-            const Text(
-              'Select a nav',
-            ),
-            getDropdown()
-          ],
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+        title: Text(
+          widget.title,
+          //style: TextStyle(color: Colors.white),
         ),
+        backgroundColor: const Color(0xFF2B2A2A),
+        foregroundColor: Colors.white,
       ),
-      bottomNavigationBar: getNav(),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(8),
+        shrinkWrap: true,
+        itemCount: resourceList.providerList.length,
+        itemBuilder: (BuildContext context, int index) {
+          return resourceList.providerList[index].getCard(context);
+        },
+      ),
+      bottomNavigationBar: customNav(),
       //getNav2(),
     );
   }

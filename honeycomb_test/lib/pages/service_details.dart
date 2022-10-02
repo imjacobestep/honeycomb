@@ -135,10 +135,14 @@ class ServiceDetailsState extends State<ServiceDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF2B2A2A),
+        foregroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
           )
         ],
         title: Row(
@@ -151,7 +155,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
         ),
       ),
       body: ListView(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         children: [
           getProvider(),
           detailListing("category", widget.service.serviceCategory),
