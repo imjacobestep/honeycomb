@@ -124,13 +124,24 @@ class ProviderDetailsState extends State<ProviderDetails> {
           detailListing("number", widget.provider.providerNumber),
           detailListing("email", widget.provider.providerEmail),
           detailListing("address", widget.provider.providerAddress),
-          ListView.builder(
-            padding: const EdgeInsets.all(8),
-            shrinkWrap: true,
-            itemCount: widget.provider.serviceList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return widget.provider.serviceList[index].getCard(context);
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "services",
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.provider.serviceList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return widget.provider.serviceList[index].getCard(context);
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
