@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/provider.dart';
 import 'package:honeycomb_test/utilities.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProviderDetails extends StatefulWidget {
@@ -50,8 +51,8 @@ class ProviderDetailsState extends State<ProviderDetails> {
         {
           return IconButton(
               onPressed: () {
-                launchUrl(Uri.parse(
-                    "https://maps.google.com?q=${widget.provider.providerAddress.replaceAll(RegExp(" "), "+")}"));
+                MapsLauncher.launchQuery(widget.provider.providerAddress);
+                //launchUrl(Uri.parse("https://maps.google.com?q=${widget.provider.providerAddress.replaceAll(RegExp(" "), "+")}"));
               },
               icon: Icon(Icons.map_outlined));
         }
@@ -119,11 +120,20 @@ class ProviderDetailsState extends State<ProviderDetails> {
         ),
       ),
       body: ListView(
+        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.all(8),
         children: [
           detailListing("number", widget.provider.providerNumber),
           detailListing("email", widget.provider.providerEmail),
           detailListing("address", widget.provider.providerAddress),
+          detailListing(
+              "religious affiliation", widget.provider.providerReligion),
+          Divider(
+            height: 4,
+            thickness: 2,
+            indent: 8,
+            endIndent: 8,
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -143,6 +153,17 @@ class ProviderDetailsState extends State<ProviderDetails> {
               ],
             ),
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              OutlinedButton(
+                  onPressed: () {},
+                  child: Text("Add a service"),
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(Colors.black),
+                  )),
+            ],
+          )
         ],
       ),
       //bottomNavigationBar: BottomNavigationBar(items: [],),

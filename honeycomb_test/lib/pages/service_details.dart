@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/service.dart';
 import 'package:honeycomb_test/utilities.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ServiceDetails extends StatefulWidget {
@@ -86,8 +87,8 @@ class ServiceDetailsState extends State<ServiceDetails> {
         {
           return IconButton(
               onPressed: () {
-                launchUrl(Uri.parse(
-                    "https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
+                MapsLauncher.launchQuery(widget.service.serviceAddress);
+                //launchUrl(Uri.parse("https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
               },
               icon: Icon(Icons.map_outlined));
         }

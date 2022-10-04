@@ -7,3 +7,13 @@ Widget getSpacer(double size) {
     height: size,
   );
 }
+
+List<String> categories = [
+  "Food",
+  "Shelter",
+  "Mental Health",
+  "Medical",
+  "Legal",
+  "Immigration",
+  "Domestic Violence"
+];

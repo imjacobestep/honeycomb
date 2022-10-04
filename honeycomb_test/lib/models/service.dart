@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_polygon/flutter_polygon.dart';
 import 'package:honeycomb_test/pages/service_details.dart';
 import 'package:honeycomb_test/utilities.dart';
-import 'package:flutter_polygon/flutter_polygon.dart';
 
 class Service {
   String serviceName = "";
@@ -48,8 +48,10 @@ class Service {
     return isVerified
         ? Container(
             padding: const EdgeInsets.all(2),
-            decoration: const BoxDecoration(
-                color: Colors.orange, shape: BoxShape.circle),
+            decoration: const ShapeDecoration(
+              color: Colors.orange,
+              shape: PolygonBorder(sides: 6),
+            ),
             child: const Icon(
               Icons.check_sharp,
               color: Colors.white,

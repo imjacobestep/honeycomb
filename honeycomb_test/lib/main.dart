@@ -4,9 +4,8 @@ import 'package:floating_navigation_bar/floating_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:honeycomb_test/models/provider.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
-import 'package:honeycomb_test/models/service.dart';
+import 'package:honeycomb_test/utilities.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 
 void main() {
@@ -40,7 +39,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
   int _currentIndex = 0;
 
   List<String> navs = ["stock", "custom", "snake", "google", "floating", "dot"];
@@ -120,6 +118,34 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         break;
     }
+  }
+
+  Widget filterCard(IconData icon, String label) {
+    return Container(
+      height: 100,
+      width: double.infinity,
+      child: Card(
+        child: InkWell(
+          onTap: () {},
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Icon(icon),
+                getSpacer(4),
+                Expanded(
+                  child: Text(
+                    label,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   TextStyle labelStyle = TextStyle(color: Colors.grey[600]);
@@ -297,18 +323,55 @@ class _MyHomePageState extends State<MyHomePage> {
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
         title: Text(
           widget.title,
-          //style: TextStyle(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF2B2A2A),
         foregroundColor: Colors.white,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(8),
-        shrinkWrap: true,
-        itemCount: resourceList.providerList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return resourceList.providerList[index].getCard(context);
-        },
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 8, 0, 0),
+            child: Text(
+              "Find by Category",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 3,
+            padding: EdgeInsets.all(8),
+            children: [
+              filterCard(Icons.home_work, "Shelter"),
+              filterCard(Icons.sports_kabaddi, "Domestic Violence"),
+              filterCard(Icons.psychology, "Mental Health"),
+              filterCard(Icons.food_bank, "Food"),
+              filterCard(Icons.medical_services, "Medical Help"),
+              filterCard(Icons.gavel, "Legal"),
+            ],
+          ),
+          Divider(
+            height: 4,
+            thickness: 2,
+            indent: 8,
+            endIndent: 8,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+            child: Text(
+              "Favorites",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(8),
+            shrinkWrap: true,
+            itemCount: resourceList.providerList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return resourceList.providerList[index].getCard(context);
+            },
+          ),
+        ],
       ),
       bottomNavigationBar: customNav(),
       //getNav2(),
