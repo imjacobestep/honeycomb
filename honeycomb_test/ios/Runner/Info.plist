@@ -55,5 +55,7 @@
 		<string>file</string>
 		<string>mailto</string>
 	</array>
+	<key>NSContactsUsageDescription</key>
+         <string>Exporting contact vCards</string>
 </dict>
 </plist>

@@ -68,7 +68,7 @@ class ProviderDetailsState extends State<ProviderDetails> {
 
   Widget detailListing(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8.0, 16, 8, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -79,6 +79,7 @@ class ProviderDetailsState extends State<ProviderDetails> {
                 label,
                 style: Theme.of(context).textTheme.bodyText2,
               ),
+              getSpacer(4),
               Row(
                 children: [
                   getSpacer(8),
@@ -147,7 +148,8 @@ class ProviderDetailsState extends State<ProviderDetails> {
                   shrinkWrap: true,
                   itemCount: widget.provider.serviceList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return widget.provider.serviceList[index].getCard(context);
+                    return widget.provider
+                        .getServiceCard(context, index, "provider");
                   },
                 ),
               ],

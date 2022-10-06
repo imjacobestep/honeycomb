@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/service.dart';
+import 'package:honeycomb_test/models/provider.dart';
+import 'package:honeycomb_test/pages/provider_details.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,9 +9,14 @@ import 'package:url_launcher/url_launcher.dart';
 class ServiceDetails extends StatefulWidget {
   @override
   ServiceDetailsState createState() => ServiceDetailsState();
-  Service service;
+  Provider provider;
+  int serviceIndex;
+  String previousPage;
 
-  ServiceDetails({required this.service});
+  ServiceDetails(
+      {required this.provider,
+      required this.serviceIndex,
+      required this.previousPage});
 }
 
 class ServiceDetailsState extends State<ServiceDetails> {
@@ -22,7 +28,15 @@ class ServiceDetailsState extends State<ServiceDetails> {
   Widget getProvider() {
     return Card(
       child: InkWell(
-        onTap: () {},
+        onTap: () => widget.previousPage == "provider"
+            ? Navigator.pop(context)
+            : Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProviderDetails(
+                    provider: widget.provider,
+                  ),
+                )),
         child: Padding(
           padding: EdgeInsets.all(8),
           child: Row(
@@ -39,7 +53,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                     children: [
                       getSpacer(8),
                       Text(
-                        widget.service.serviceProvider,
+                        widget.provider.providerName,
                         style: Theme.of(context).textTheme.bodyText1,
                       ),
                     ],
@@ -47,7 +61,16 @@ class ServiceDetailsState extends State<ServiceDetails> {
                 ],
               ),
               IconButton(
-                  onPressed: () {}, icon: const Icon(Icons.chevron_right_sharp))
+                  onPressed: () => widget.previousPage == "provider"
+                      ? Navigator.pop(context)
+                      : Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProviderDetails(
+                              provider: widget.provider,
+                            ),
+                          )),
+                  icon: const Icon(Icons.chevron_right_sharp))
             ],
           ),
         ),
@@ -87,7 +110,8 @@ class ServiceDetailsState extends State<ServiceDetails> {
         {
           return IconButton(
               onPressed: () {
-                MapsLauncher.launchQuery(widget.service.serviceAddress);
+                MapsLauncher.launchQuery(widget
+                    .provider.serviceList[widget.serviceIndex].serviceAddress);
                 //launchUrl(Uri.parse("https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
               },
               icon: Icon(Icons.map_outlined));
@@ -104,7 +128,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   Widget detailListing(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8.0, 16, 8, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -115,6 +139,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                 label,
                 style: Theme.of(context).textTheme.bodyText2,
               ),
+              getSpacer(4),
               Row(
                 children: [
                   getSpacer(8),
@@ -142,16 +167,18 @@ class ServiceDetailsState extends State<ServiceDetails> {
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              serviceToContact(widget.provider, widget.serviceIndex);
+            },
             icon: const Icon(Icons.edit),
           )
         ],
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(widget.service.serviceName),
+            Text(widget.provider.serviceList[widget.serviceIndex].serviceName),
             getSpacer(4),
-            widget.service.showVerified()
+            widget.provider.serviceList[widget.serviceIndex].showVerified()
           ],
         ),
       ),
@@ -159,10 +186,14 @@ class ServiceDetailsState extends State<ServiceDetails> {
         padding: const EdgeInsets.all(8),
         children: [
           getProvider(),
-          detailListing("category", widget.service.serviceCategory),
-          detailListing("number", widget.service.serviceNumber),
-          detailListing("email", widget.service.serviceEmail),
-          detailListing("address", widget.service.serviceAddress),
+          detailListing("category",
+              widget.provider.serviceList[widget.serviceIndex].serviceCategory),
+          detailListing("number",
+              widget.provider.serviceList[widget.serviceIndex].serviceNumber),
+          detailListing("email",
+              widget.provider.serviceList[widget.serviceIndex].serviceEmail),
+          detailListing("address",
+              widget.provider.serviceList[widget.serviceIndex].serviceAddress),
           detailListing("notes", "Just some example notes")
         ],
       ),

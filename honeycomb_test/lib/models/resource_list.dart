@@ -1,5 +1,8 @@
-import 'package:honeycomb_test/models/service.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/provider.dart';
+import 'package:honeycomb_test/models/service.dart';
+import 'package:honeycomb_test/pages/list_details.dart';
 
 class ResourceList {
   String listName = "";
@@ -7,6 +10,33 @@ class ResourceList {
   List<Provider> providerList = [];
 
   ResourceList({required this.listName, required this.providerList});
+
+  Widget getCard(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ListDetails(
+                      resourceList: this,
+                    ))),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                listName,
+                style: const TextStyle(fontSize: 20),
+              ),
+              IconButton(
+                  onPressed: () {}, icon: const Icon(Icons.chevron_right_sharp))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 ResourceList buildTest() {
@@ -77,7 +107,7 @@ ResourceList buildTest() {
       serviceList: [testService4],
       hasMou: false);
 
-  ResourceList ret =
-      ResourceList(listName: "test", providerList: [marysPlace, gix, safeway]);
+  ResourceList ret = ResourceList(
+      listName: "test list", providerList: [marysPlace, gix, safeway]);
   return ret;
 }

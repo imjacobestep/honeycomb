@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.honeycomb_test">
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
    <application
-        android:label="honeycomb_test"
+        android:label="Honeycomb"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
@@ -30,6 +32,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyC1hEwGPXOck5HeY0ziBFtNGZ7GJGa5HAs"/>
     </application>
     <queries>
         <!-- If your app checks for SMS support -->
