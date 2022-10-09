@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoder2/geocoder2.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/models/provider.dart';
 import 'package:honeycomb_test/pages/provider_details.dart';
 import 'package:honeycomb_test/utilities.dart';
@@ -12,6 +16,7 @@ class ServiceDetails extends StatefulWidget {
   Provider provider;
   int serviceIndex;
   String previousPage;
+  //var locData;
 
   ServiceDetails(
       {required this.provider,
@@ -22,8 +27,20 @@ class ServiceDetails extends StatefulWidget {
 class ServiceDetailsState extends State<ServiceDetails> {
   @override
   void initState() {
+    var locData = Geocoder2.getDataFromAddress(
+        address:
+            widget.provider.serviceList[widget.serviceIndex].serviceAddress,
+        googleMapApiKey: "AIzaSyC1hEwGPXOck5HeY0ziBFtNGZ7GJGa5HAs");
     super.initState();
   }
+
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(47.621527688800185, -122.17670223058742),
+    //target: LatLng(locData.latitude, locData.longitude),
+    zoom: 17.4746,
+  );
+
+  final Completer<GoogleMapController> _controller = Completer();
 
   Widget getProvider() {
     return Card(
@@ -114,7 +131,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                     .provider.serviceList[widget.serviceIndex].serviceAddress);
                 //launchUrl(Uri.parse("https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
               },
-              icon: Icon(Icons.map_outlined));
+              icon: Icon(Icons.directions_outlined));
         }
         break;
 
@@ -128,7 +145,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   Widget detailListing(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 16, 8, 16),
+      padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -159,6 +176,8 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   @override
   Widget build(BuildContext context) {
+    //_kGooglePlex = getCamera(widget.provider.serviceList[widget.serviceIndex].serviceAddress);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B2A2A),
@@ -194,6 +213,21 @@ class ServiceDetailsState extends State<ServiceDetails> {
               widget.provider.serviceList[widget.serviceIndex].serviceEmail),
           detailListing("address",
               widget.provider.serviceList[widget.serviceIndex].serviceAddress),
+          Container(
+            foregroundDecoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.black12, width: 2),
+            ),
+            height: 200,
+            width: double.infinity,
+            child: GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: _kGooglePlex,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+            ),
+          ),
           detailListing("notes", "Just some example notes")
         ],
       ),

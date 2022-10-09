@@ -54,7 +54,7 @@ class ProviderDetailsState extends State<ProviderDetails> {
                 MapsLauncher.launchQuery(widget.provider.providerAddress);
                 //launchUrl(Uri.parse("https://maps.google.com?q=${widget.provider.providerAddress.replaceAll(RegExp(" "), "+")}"));
               },
-              icon: Icon(Icons.map_outlined));
+              icon: Icon(Icons.directions_outlined));
         }
         break;
 
@@ -68,7 +68,7 @@ class ProviderDetailsState extends State<ProviderDetails> {
 
   Widget detailListing(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 16, 8, 16),
+      padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

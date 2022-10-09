@@ -48,6 +48,8 @@ dependencies:
   google_maps_flutter: ^2.2.1
   flutter_contacts: ^1.1.5
   share_plus: ^4.5.2
+  cross_file: ^0.3.3+2
+  geocoder2: ^1.4.0
 
 dev_dependencies:
   flutter_test:

@@ -25,6 +25,7 @@ class Provider {
       required this.hasMou});
 
   Widget showMou() {
+    return Container();
     return hasMou
         ? Container(
             padding: const EdgeInsets.all(4),

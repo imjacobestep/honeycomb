@@ -65,7 +65,7 @@ packages:
     source: hosted
     version: "1.16.0"
   cross_file:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: cross_file
       url: "https://pub.dartlang.org"
@@ -177,6 +177,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geocoder2:
+    dependency: "direct main"
+    description:
+      name: geocoder2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.4.0"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -212,6 +219,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.6"
+  http:
+    dependency: transitive
+    description:
+      name: http
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.13.5"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   image:
     dependency: transitive
     description:
