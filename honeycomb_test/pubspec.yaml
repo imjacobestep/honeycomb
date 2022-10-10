@@ -50,6 +50,9 @@ dependencies:
   share_plus: ^4.5.2
   cross_file: ^0.3.3+2
   geocoder2: ^1.4.0
+  firebase_core: ^1.6.0
+  cloud_firestore: ^2.5.1
+
 
 dev_dependencies:
   flutter_test:
