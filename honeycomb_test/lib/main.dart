@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
-import 'package:honeycomb_test/pages/bottomNav/lists.dart';
-import 'package:honeycomb_test/pages/bottomNav/search.dart';
+import 'package:honeycomb_test/pages/bottomNav/clients.dart';
+import 'package:honeycomb_test/pages/bottomNav/map.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 
 void main() {
@@ -45,13 +45,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   ResourceList resourceList = buildTest();
 
-  List<String> labels = ["Home", "Search", "Resource", "Favs", "Lists"];
+  List<String> labels = ["Home", "Map", "Resources", "Favs", "Clients"];
   List<Icon> icons = [
-    const Icon(Icons.home),
-    const Icon(Icons.search),
-    const Icon(Icons.add_to_photos),
-    const Icon(Icons.star),
-    const Icon(Icons.list)
+    const Icon(Icons.home_outlined),
+    const Icon(Icons.map_outlined),
+    const Icon(Icons.list),
+    const Icon(Icons.star_outline),
+    const Icon(Icons.people_alt_outlined)
   ];
 
   PreferredSizeWidget navAppBar(int index) {
