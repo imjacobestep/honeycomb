@@ -1,14 +1,13 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/utilities.dart';
 
-class Search {
+class MainList {
   BuildContext context;
 
-  Search({required this.context});
+  MainList({required this.context});
 
   PreferredSizeWidget getAppBar() {
     return AppBar(
@@ -20,14 +19,14 @@ class Search {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: ElevatedButton(
                 onPressed: () {},
                 child: Row(
                   children: [
-                    const Icon(Icons.location_on_outlined),
+                    const Icon(Icons.search_outlined),
                     getSpacer(4),
-                    const Text("my location")
+                    const Text("Search")
                   ],
                 )),
           ),
@@ -40,9 +39,9 @@ class Search {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    const Text("Filters"),
+                    const Text("Add"),
                     getSpacer(4),
-                    const Icon(Icons.filter_list)
+                    const Icon(Icons.add_circle_outline)
                   ],
                 )),
           )
@@ -61,12 +60,8 @@ class Search {
   Completer<GoogleMapController> _controller = Completer();
 
   Widget getBody() {
-    return GoogleMap(
-      mapType: MapType.normal,
-      initialCameraPosition: _kGooglePlex,
-      onMapCreated: (GoogleMapController controller) {
-        _controller.complete(controller);
-      },
+    return Center(
+      child: Text("here are resources!"),
     );
   }
 }

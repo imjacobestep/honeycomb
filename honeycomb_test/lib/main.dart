@@ -5,6 +5,7 @@ import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
 import 'package:honeycomb_test/pages/bottomNav/map.dart';
+import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 
 void main() {
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Honeycomb',
       theme: ThemeData(
         //useMaterial3: true,
-        primarySwatch: generateMaterialColor(color: Color(0xFFFFE93E)),
+        primarySwatch: generateMaterialColor(color: const Color(0xFFFFE93E)),
       ),
       home: const MyHomePage(title: 'Honeycomb'),
     );
@@ -58,9 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<PreferredSizeWidget> bars = [
       Home(context: context).getAppBar(),
       Search(context: context).getAppBar(),
-      AppBar(
-        title: Text("New Provider"),
-      ),
+      MainList(context: context).getAppBar(),
       Favs(context: context).getAppBar(),
       Lists(context: context).getAppBar(),
     ];
@@ -71,9 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Widget> bodies = [
       Home(context: context).getBody(resourceList),
       Search(context: context).getBody(),
-      Center(
-        child: Text("add new provider"),
-      ),
+      MainList(context: context).getBody(),
       Favs(context: context).getBody(resourceList),
       Lists(context: context).getBody(resourceList),
     ];
@@ -124,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
       selectedColor: Theme.of(context).colorScheme.primary,
       strokeColor: Colors.white,
       unSelectedColor: Colors.grey[600],
-      backgroundColor: Color(0xFF2B2A2A),
+      backgroundColor: const Color(0xFF2B2A2A),
       borderRadius: const Radius.circular(30.0),
       currentIndex: _currentIndex,
       onTap: (index) {
