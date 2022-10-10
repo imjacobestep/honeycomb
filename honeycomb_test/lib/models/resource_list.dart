@@ -108,6 +108,6 @@ ResourceList buildTest() {
       hasMou: false);
 
   ResourceList ret = ResourceList(
-      listName: "test list", providerList: [marysPlace, gix, safeway]);
+      listName: "Test Client", providerList: [marysPlace, gix, safeway]);
   return ret;
 }
