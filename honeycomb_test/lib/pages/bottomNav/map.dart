@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:honeycomb_test/utilities.dart';
 
 class Search {
   BuildContext context;
@@ -14,12 +15,30 @@ class Search {
       toolbarHeight: 100,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
-      title: Column(
+      title: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            "Search",
-          ),
-          ElevatedButton(onPressed: () {}, child: Icon(Icons.search)),
+          Expanded(
+            flex: 1,
+            child: ElevatedButton(
+              onPressed: () {},
+              child: Row(
+                children: [
+                  Icon(Icons.search_outlined),
+                  getSpacer(4),
+                  Text("Search")
+                ],
+              )),)
+          ElevatedButton(
+              onPressed: () {},
+              child: Row(
+                children: [
+                  Text("Add"),
+                  getSpacer(4),
+                  Icon(Icons.add_circle_outline)
+                ],
+              ))
         ],
       ),
       backgroundColor: const Color(0xFF2B2A2A),

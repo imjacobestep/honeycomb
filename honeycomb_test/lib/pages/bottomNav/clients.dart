@@ -14,7 +14,7 @@ class Lists {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
       title: const Text(
-        "Lists",
+        "Clients",
       ),
       backgroundColor: const Color(0xFF2B2A2A),
       foregroundColor: Colors.white,
