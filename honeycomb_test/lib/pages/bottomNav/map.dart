@@ -19,9 +19,7 @@ class Search {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 1,
-            child: ElevatedButton(
+          ElevatedButton(
               onPressed: () {},
               child: Row(
                 children: [
@@ -29,7 +27,7 @@ class Search {
                   getSpacer(4),
                   Text("Search")
                 ],
-              )),)
+              )),
           ElevatedButton(
               onPressed: () {},
               child: Row(
