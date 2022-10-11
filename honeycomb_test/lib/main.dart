@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   PreferredSizeWidget navAppBar(int index) {
     List<PreferredSizeWidget> bars = [
       Home(context: context).getAppBar(),
-      Search(context: context).getAppBar(),
+      Map(context: context).getAppBar(),
       MainList(context: context).getAppBar(),
       Favs(context: context).getAppBar(),
       Lists(context: context).getAppBar(),
@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget navBody(int index) {
     List<Widget> bodies = [
       Home(context: context).getBody(resourceList),
-      Search(context: context).getBody(),
+      Map(context: context).getBody(),
       MainList(context: context).getBody(),
       Favs(context: context).getBody(resourceList),
       Lists(context: context).getBody(resourceList),

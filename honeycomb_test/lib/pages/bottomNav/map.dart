@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/utilities.dart';
 
-class Search {
+class Map {
   BuildContext context;
 
-  Search({required this.context});
+  Map({required this.context});
 
   PreferredSizeWidget getAppBar() {
     return AppBar(
@@ -53,20 +53,51 @@ class Search {
     );
   }
 
+  static const LatLng center =
+      const LatLng(47.621527688800185, -122.17670223058742);
+
   static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(47.621527688800185, -122.17670223058742),
+    target: center,
     zoom: 17.4746,
   );
 
+  final Set<Marker> markers = {
+    Marker(
+        markerId: MarkerId(center.toString()),
+        position: center,
+        infoWindow: InfoWindow(title: "Testing..."),
+        icon: BitmapDescriptor.defaultMarker)
+  };
+  LatLng lastPosition = center;
+
   Completer<GoogleMapController> _controller = Completer();
 
+  void onCameraMove(CameraPosition position) {
+    lastPosition = position.target;
+    onAddMarker();
+  }
+
+  void onAddMarker() {
+    markers.add(Marker(
+        markerId: MarkerId(lastPosition.toString()),
+        position: lastPosition,
+        infoWindow: InfoWindow(title: "Testing..."),
+        icon: BitmapDescriptor.defaultMarker));
+  }
+
   Widget getBody() {
-    return GoogleMap(
-      mapType: MapType.normal,
-      initialCameraPosition: _kGooglePlex,
-      onMapCreated: (GoogleMapController controller) {
-        _controller.complete(controller);
-      },
+    return Stack(
+      children: [
+        GoogleMap(
+          mapType: MapType.normal,
+          markers: markers,
+          initialCameraPosition: _kGooglePlex,
+          onCameraMove: onCameraMove,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+        )
+      ],
     );
   }
 }
