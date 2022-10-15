@@ -736,7 +736,6 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_contacts (from `.symlinks/plugins/flutter_contacts/ios`)
   - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
-  - GoogleMaps (= 7.1.0)
   - maps_launcher (from `.symlinks/plugins/maps_launcher/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -804,6 +803,6 @@ SPEC CHECKSUMS:
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
 
-PODFILE CHECKSUM: 5532e8487008a801cae504dbb9d5340ea3e6982c
+PODFILE CHECKSUM: e17fb51c6ebf7a3a7419e7743fb2fa4e690ca86c
 
 COCOAPODS: 1.11.3
