@@ -1,12 +1,11 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/pages/bottomNav/clients.dart';
 import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
-import 'package:honeycomb_test/pages/bottomNav/clients.dart';
-import 'package:honeycomb_test/pages/bottomNav/map.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
-import 'package:material_color_generator/material_color_generator.dart';
+import 'package:honeycomb_test/pages/bottomNav/map.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,8 +20,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Honeycomb',
       theme: ThemeData(
-        //useMaterial3: true,
-        primarySwatch: generateMaterialColor(color: const Color(0xFFFFE93E)),
+        useMaterial3: true,
+        //primarySwatch: generateMaterialColor(color: const Color(0xFFEEBB02)),
+        //primarySwatch: Colors.orange
       ),
       home: const MyHomePage(title: 'Honeycomb'),
     );

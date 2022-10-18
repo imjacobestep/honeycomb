@@ -46,14 +46,15 @@ class Home {
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(8),
           shrinkWrap: true,
-          itemCount: resourceList.providerList.length,
+          itemCount: resourceList.resources.length,
           itemBuilder: (BuildContext context, int index) {
-            return resourceList.providerList[index].getCard(context);
+            return resourceList.resources[index]
+                .getServiceCard(context, "home");
           },
         ),
         getDivider(context),
         sectionHeader("Recent Lists", context),
-        ListView.builder(
+        /*ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(8),
           shrinkWrap: true,
@@ -61,7 +62,7 @@ class Home {
           itemBuilder: (BuildContext context, int index) {
             return resourceList.getCard(context);
           },
-        ),
+        ),*/
       ],
     );
   }

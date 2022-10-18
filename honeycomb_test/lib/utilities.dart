@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:honeycomb_test/models/provider.dart';
+import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/models/resource_model.dart';
 import 'package:share_plus/share_plus.dart';
 
 Widget getSpacer(double size) {
@@ -34,27 +35,17 @@ Future<CameraPosition> getCamera(String address) async {
   return ret;
 }
 
-void serviceToContact(Provider provider, int index) async {
+void serviceToContact(Resource_Model resource, int index) async {
   final newContact = Contact()
-    ..name.first = provider.serviceList[index].serviceName
-    ..organizations = [
-      Organization(company: provider.serviceList[index].serviceProvider)
-    ]
-    ..addresses = [
-      Address(provider.serviceList[index].serviceAddress),
-      Address(provider.providerAddress)
-    ]
+    ..name.first = resource.name
+    ..addresses = [Address(resource.address)]
     ..emails = [
-      Email(provider.serviceList[index].serviceEmail),
-      Email(provider.providerEmail)
+      Email(resource.email),
     ]
-    ..phones = [
-      Phone(provider.serviceList[index].serviceNumber),
-      Phone(provider.providerNumber)
-    ];
+    ..phones = [Phone(resource.phoneNumbers["primary"])];
   await newContact.insert();
 
-  String filename = provider.serviceList[index].serviceName + ".vcf";
+  String filename = "${resource.name}.vcf";
 
   var file = File(filename);
   await file.writeAsString(newContact.toVCard(includeDate: true));
@@ -114,3 +105,19 @@ List<String> categories = [
   "Immigration",
   "Domestic Violence"
 ];
+
+var filters = {
+  "Shelter": false,
+  "Domestic Violence": false,
+  "Mental Health": false,
+  "Food": false,
+  "Medical Help": false,
+  "Legal": false
+};
+
+//ResourceList mainList = ResourceList(listName: "mainList", resources: resources)
+
+ResourceList applyFilters(ResourceList inputList) {
+  ResourceList ret = ResourceList(listName: "Test Client", resources: []);
+  return ret;
+}

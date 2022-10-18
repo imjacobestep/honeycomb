@@ -52,6 +52,7 @@ dependencies:
   geocoder2: ^1.4.0
   firebase_core: ^1.6.0
   cloud_firestore: ^2.5.1
+  sliding_up_panel: ^2.0.0+1
 
 
 dev_dependencies:

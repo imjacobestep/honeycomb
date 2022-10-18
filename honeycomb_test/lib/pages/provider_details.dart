@@ -144,14 +144,6 @@ class ProviderDetailsState extends State<ProviderDetails> {
                   "services",
                   style: Theme.of(context).textTheme.bodyText2,
                 ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: widget.provider.serviceList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return widget.provider
-                        .getServiceCard(context, index, "provider");
-                  },
-                ),
               ],
             ),
           ),

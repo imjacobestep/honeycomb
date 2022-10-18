@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/provider.dart';
-import 'package:honeycomb_test/models/service.dart';
+import 'package:honeycomb_test/models/resource_model.dart';
 import 'package:honeycomb_test/pages/list_details.dart';
 
 class ResourceList {
   String listName = "";
 
-  List<Provider> providerList = [];
+  //List<Provider> providerList = [];
+  List<Resource_Model> resources = [];
 
-  ResourceList({required this.listName, required this.providerList});
+  ResourceList({required this.listName, required this.resources});
 
   Widget getCard(BuildContext context) {
     return Card(
@@ -40,74 +40,72 @@ class ResourceList {
 }
 
 ResourceList buildTest() {
-  Service testService1 = Service(
-      serviceName: 'TestService1',
-      serviceCategory: 'Shelter',
-      hasMou: true,
-      isVerified: true,
-      serviceNumber: 'xxx-xxx-xxxx',
-      serviceEmail: 'test_service@gmail.com',
-      serviceAddress: '1234 Test Street, Seattle, WA',
-      serviceProvider: "Mary's Place");
+  //RESOURCE 1
+  Resource_Model testService1 = Resource_Model(
+    name: 'TestService1',
+  );
+  testService1.enrich(
+      {"primary": "012-345-6789"},
+      "test_service@gmail.com",
+      "1234 Test Street, Seattle, WA",
+      "98005",
+      "honeycomb.com",
+      ["Shelter", "Legal"],
+      ["English"],
+      ["Families"],
+      ["Wheelchair-accessible"],
+      "Template notes to show what an Outreach Specialist might write");
 
-  Service testService2 = Service(
-      serviceName: 'TestService2',
-      serviceCategory: 'Legal',
-      hasMou: false,
-      isVerified: false,
-      serviceNumber: 'xxx-xxx-xxxx',
-      serviceEmail: 'test_service@gmail.com',
-      serviceAddress: '1234 Test Street, Seattle, WA',
-      serviceProvider: "Mary's Place");
+  //RESOURCE 1
+  Resource_Model testService2 = Resource_Model(
+    name: 'TestService2',
+  );
+  testService2.enrich(
+      {"primary": "012-345-6789"},
+      "test_service@gmail.com",
+      "1234 Test Street, Seattle, WA",
+      "98005",
+      "honeycomb.com",
+      ["Shelter", "Legal"],
+      ["English"],
+      ["Families"],
+      ["Wheelchair-accessible"],
+      "Template notes to show what an Outreach Specialist might write");
 
-  Service testService3 = Service(
-      serviceName: 'TestService2',
-      serviceCategory: 'Professional',
-      hasMou: false,
-      isVerified: false,
-      serviceNumber: 'xxx-xxx-xxxx',
-      serviceEmail: 'test_service@gmail.com',
-      serviceAddress: '1234 Test Street, Seattle, WA',
-      serviceProvider: "GIX");
+  //RESOURCE 3
+  Resource_Model testService3 = Resource_Model(
+    name: 'TestService3',
+  );
+  testService1.enrich(
+      {"primary": "012-345-6789"},
+      "test_service@gmail.com",
+      "1234 Test Street, Seattle, WA",
+      "98005",
+      "honeycomb.com",
+      ["Shelter", "Legal"],
+      ["English"],
+      ["Families"],
+      ["Wheelchair-accessible"],
+      "Template notes to show what an Outreach Specialist might write");
 
-  Service testService4 = Service(
-      serviceName: 'TestService2',
-      serviceCategory: 'Food',
-      hasMou: false,
-      isVerified: false,
-      serviceNumber: 'xxx-xxx-xxxx',
-      serviceEmail: 'test_service@gmail.com',
-      serviceAddress: '1234 Test Street, Seattle, WA',
-      serviceProvider: "Safeway");
-
-  Provider marysPlace = Provider(
-      providerName: "Mary's Place",
-      providerEmail: 'test_service@gmail.com',
-      providerAddress: '1234 Test Street, Seattle, WA',
-      providerNumber: 'xxx-xxx-xxxx',
-      providerReligion: 'none',
-      serviceList: [testService1, testService2],
-      hasMou: true);
-
-  Provider gix = Provider(
-      providerName: "GIX",
-      providerEmail: 'test_service@gmail.com',
-      providerAddress: '1234 Test Street, Seattle, WA',
-      providerNumber: 'xxx-xxx-xxxx',
-      providerReligion: 'none',
-      serviceList: [testService3],
-      hasMou: true);
-
-  Provider safeway = Provider(
-      providerName: "Safeway",
-      providerEmail: 'test_service@gmail.com',
-      providerAddress: '1234 Test Street, Seattle, WA',
-      providerNumber: 'xxx-xxx-xxxx',
-      providerReligion: 'none',
-      serviceList: [testService4],
-      hasMou: false);
+  //RESOURCE 4
+  Resource_Model testService4 = Resource_Model(
+    name: 'TestService4',
+  );
+  testService1.enrich(
+      {"primary": "012-345-6789"},
+      "test_service@gmail.com",
+      "1234 Test Street, Seattle, WA",
+      "98005",
+      "honeycomb.com",
+      ["Shelter", "Legal"],
+      ["English"],
+      ["Families"],
+      ["Wheelchair-accessible"],
+      "Template notes to show what an Outreach Specialist might write");
 
   ResourceList ret = ResourceList(
-      listName: "Test Client", providerList: [marysPlace, gix, safeway]);
+      listName: "Test Client",
+      resources: [testService1, testService2, testService3]);
   return ret;
 }

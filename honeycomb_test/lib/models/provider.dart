@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/service.dart';
+import 'package:honeycomb_test/models/resource_model.dart';
 import 'package:honeycomb_test/pages/provider_details.dart';
 import 'package:honeycomb_test/utilities.dart';
-
-import '../pages/service_details.dart';
 
 class Provider {
   String providerName = "";
@@ -13,7 +11,7 @@ class Provider {
   String providerReligion = "none";
   bool hasMou = false;
 
-  List<Service> serviceList = [];
+  List<Resource_Model> serviceList = [];
 
   Provider(
       {required this.providerName,
@@ -69,55 +67,6 @@ class Provider {
                         providerName,
                         style: const TextStyle(fontSize: 20),
                       ),
-                    ],
-                  )
-                ],
-              ),
-              IconButton(
-                  onPressed: () {}, icon: const Icon(Icons.chevron_right_sharp))
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget getServiceCard(BuildContext context, int index, String currentPage) {
-    return Card(
-      child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ServiceDetails(
-                    provider: this,
-                    serviceIndex: index,
-                    previousPage: currentPage,
-                  )),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      serviceList[index].categoryLabel(),
-                      getSpacer(4),
-                      showMou()
-                    ],
-                  ),
-                  getSpacer(4),
-                  Row(
-                    children: [
-                      Text(
-                        serviceList[index].serviceName,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      getSpacer(4),
-                      serviceList[index].showVerified()
                     ],
                   )
                 ],

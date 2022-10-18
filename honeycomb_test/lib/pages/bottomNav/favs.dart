@@ -29,9 +29,9 @@ class Favs {
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(8),
       shrinkWrap: true,
-      itemCount: favs.providerList.length,
+      itemCount: favs.resources.length,
       itemBuilder: (BuildContext context, int index) {
-        return favs.providerList[index].getCard(context);
+        return favs.resources[index].getServiceCard(context, "favs");
       },
     );
   }

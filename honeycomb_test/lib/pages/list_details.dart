@@ -73,9 +73,10 @@ class ListDetailsState extends State<ListDetails> {
         physics: NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(8),
         shrinkWrap: true,
-        itemCount: widget.resourceList.providerList.length,
+        itemCount: widget.resourceList.resources.length,
         itemBuilder: (BuildContext context, int index) {
-          return widget.resourceList.providerList[index].getCard(context);
+          return widget.resourceList.resources[index]
+              .getServiceCard(context, "client");
         },
       ),
       //bottomNavigationBar: BottomNavigationBar(items: [],),
