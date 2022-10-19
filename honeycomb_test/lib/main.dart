@@ -1,4 +1,8 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart'
+    hide EmailAuthProvider, PhoneAuthProvider;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
@@ -7,7 +11,13 @@ import 'package:honeycomb_test/pages/bottomNav/home.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/map.dart';
 
-void main() {
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -17,6 +27,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final providers = [EmailAuthProvider()];
     return MaterialApp(
       title: 'Honeycomb',
       theme: ThemeData(
@@ -24,7 +35,45 @@ class MyApp extends StatelessWidget {
         //primarySwatch: generateMaterialColor(color: const Color(0xFFEEBB02)),
         //primarySwatch: Colors.orange
       ),
-      home: const MyHomePage(title: 'Honeycomb'),
+      initialRoute:
+          FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
+      routes: {
+        '/sign-in': (context) {
+          return SignInScreen(
+            providers: providers,
+            actions: [
+              AuthStateChangeAction<SignedIn>((context, state) {
+                Navigator.pushReplacementNamed(context, '/home');
+              }),
+            ],
+          );
+        },
+        '/home': (context) {
+          return MyHomePage(title: "Honeycomb");
+        },
+        '/profile': (context) {
+          return ProfileScreen(
+            appBar: AppBar(
+              title: Text("Account Settings"),
+              centerTitle: true,
+              automaticallyImplyLeading: true,
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            ),
+            providers: providers,
+            actions: [
+              SignedOutAction((context) {
+                Navigator.pushReplacementNamed(context, '/sign-in');
+              }),
+            ],
+          );
+        },
+      },
+      //home: const MyHomePage(title: 'Honeycomb'),
     );
   }
 }

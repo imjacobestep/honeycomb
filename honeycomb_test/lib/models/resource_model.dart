@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_polygon/flutter_polygon.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../pages/service_details.dart';
@@ -85,14 +84,6 @@ class Resource_Model {
         "$diff days",
       ),
     );
-
-    return Container(
-        padding: const EdgeInsets.all(2),
-        decoration: const ShapeDecoration(
-          color: Colors.orange,
-          shape: PolygonBorder(sides: 6),
-        ),
-        child: Text("$diff days ago"));
   }
 
   Widget cardCategoryLabel(BuildContext context, String category) {

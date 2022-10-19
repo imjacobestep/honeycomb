@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
@@ -10,15 +11,24 @@ class Home {
   Home({required this.context});
 
   PreferredSizeWidget getAppBar() {
+    String? userEmail = FirebaseAuth.instance.currentUser?.email;
+    String? displayName = FirebaseAuth.instance.currentUser?.displayName;
+    String userName = displayName != null ? displayName : "";
+
     return AppBar(
       centerTitle: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
-      title: const Text(
-        "Honeycomb",
-      ),
-      backgroundColor: const Color(0xFF2B2A2A),
-      foregroundColor: Colors.white,
+      title: Text("Hello, $userName"),
+      actions: [
+        IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/profile');
+            },
+            icon: Icon(Icons.account_circle_outlined))
+      ],
+      //backgroundColor: const Color(0xFF2B2A2A),
+      //foregroundColor: Colors.white,
     );
   }
 
@@ -42,6 +52,16 @@ class Home {
           ],
         ),
         getDivider(context),
+        sectionHeader("Recent Clients", context),
+        ListView.builder(
+          padding: const EdgeInsets.all(8),
+          shrinkWrap: true,
+          itemCount: 1,
+          itemBuilder: (BuildContext context, int index) {
+            return resourceList.getCard(context);
+          },
+        ),
+        getDivider(context),
         sectionHeader("Favorites", context),
         ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
@@ -53,17 +73,6 @@ class Home {
                 .getServiceCard(context, "home");
           },
         ),
-        getDivider(context),
-        sectionHeader("Recent Lists", context),
-        /*ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(8),
-          shrinkWrap: true,
-          itemCount: 1,
-          itemBuilder: (BuildContext context, int index) {
-            return resourceList.getCard(context);
-          },
-        ),*/
       ],
     );
   }
