@@ -1,7 +1,6 @@
-import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:honeycomb_test/models/resource_list.dart';
 import 'package:honeycomb_test/utilities.dart';
 
 class MainList {
@@ -52,16 +51,16 @@ class MainList {
     );
   }
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(47.621527688800185, -122.17670223058742),
-    zoom: 17.4746,
-  );
-
-  Completer<GoogleMapController> _controller = Completer();
-
-  Widget getBody() {
-    return Center(
-      child: Text("here are resources!"),
+  Widget getBody(ResourceList resourceList) {
+    ResourceList mainList = applyFilters(resourceList);
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(8),
+      shrinkWrap: true,
+      itemCount: mainList.resources.length,
+      itemBuilder: (BuildContext context, int index) {
+        return mainList.resources[index].getServiceCard(context, "home");
+      },
     );
   }
 }

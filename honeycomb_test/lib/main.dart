@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Widget> bodies = [
       Home(context: context).getBody(resourceList),
       Map(context: context).getBody(),
-      MainList(context: context).getBody(),
+      MainList(context: context).getBody(resourceList),
       Favs(context: context).getBody(resourceList),
       Lists(context: context).getBody(resourceList),
     ];

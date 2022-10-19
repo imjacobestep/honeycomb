@@ -66,7 +66,9 @@ Widget sectionHeader(String header, BuildContext context) {
 Widget filterCard(IconData icon, String label) {
   return Card(
     child: InkWell(
-      onTap: () {},
+      onTap: () {
+        all_filters[label] = !all_filters[label]!;
+      },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -119,5 +121,11 @@ var all_filters = {
 
 ResourceList applyFilters(ResourceList inputList) {
   ResourceList ret = ResourceList(listName: "Test Client", resources: []);
+  for (Resource_Model resource in inputList.resources) {
+    if ((all_filters["Shelter"] == true) &&
+        resource.categories.contains("Shelter")) {
+      ret.resources.add(resource);
+    }
+  }
   return ret;
 }
