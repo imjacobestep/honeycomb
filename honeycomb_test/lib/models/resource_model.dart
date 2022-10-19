@@ -64,17 +64,27 @@ class Resource_Model {
     notes = n;
   }
 
-  Widget showRecency() {
+  Widget showRecency(BuildContext context) {
     int diff = updatedStamp.difference(DateTime.now()).inDays;
     Color recencyColor;
 
     if (diff < 14) {
-      recencyColor = Colors.green;
+      recencyColor = Colors.greenAccent;
     } else if ((diff > 14) && (diff < 30)) {
-      recencyColor = Colors.orange;
+      recencyColor = Colors.orangeAccent;
     } else {
-      recencyColor = Colors.red;
+      recencyColor = Colors.redAccent;
     }
+
+    return Chip(
+      labelPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+      labelStyle: Theme.of(context).textTheme.labelSmall,
+      visualDensity: VisualDensity.compact,
+      backgroundColor: recencyColor,
+      label: Text(
+        "$diff days",
+      ),
+    );
 
     return Container(
         padding: const EdgeInsets.all(2),
@@ -85,26 +95,34 @@ class Resource_Model {
         child: Text("$diff days ago"));
   }
 
-  Widget cardCategoryLabel() {
+  Widget cardCategoryLabel(BuildContext context, String category) {
     return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-          color: Colors.black12, borderRadius: BorderRadius.circular(4)),
-      child: Text(
-        categories.first,
-        style: const TextStyle(
-            color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),
+      margin: const EdgeInsets.all(2),
+      child: Chip(
+        labelPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+        labelStyle: Theme.of(context).textTheme.labelSmall,
+        visualDensity: VisualDensity.compact,
+        label: Text(
+          category,
+        ),
       ),
     );
   }
 
-  Widget detailsCategoryLabel(BuildContext context) {
+  Widget detailsCategoryLabel(BuildContext context, String category) {
     return Container(
+      margin: const EdgeInsets.all(4),
+      child: Chip(
+        label: Text(category),
+      ),
+    );
+
+    return Container(
+      margin: const EdgeInsets.all(4),
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
           color: Colors.black12, borderRadius: BorderRadius.circular(8)),
-      child:
-          Text(categories.first, style: Theme.of(context).textTheme.labelLarge),
+      child: Text(category, style: Theme.of(context).textTheme.labelLarge),
     );
   }
 
@@ -129,7 +147,8 @@ class Resource_Model {
                 children: [
                   Row(
                     children: [
-                      cardCategoryLabel(),
+                      for (String category in categories)
+                        cardCategoryLabel(context, category)
                     ],
                   ),
                   getSpacer(4),
@@ -140,7 +159,7 @@ class Resource_Model {
                         style: const TextStyle(fontSize: 20),
                       ),
                       getSpacer(4),
-                      showRecency()
+                      showRecency(context)
                     ],
                   )
                 ],

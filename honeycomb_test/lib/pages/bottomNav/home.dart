@@ -11,6 +11,7 @@ class Home {
 
   PreferredSizeWidget getAppBar() {
     return AppBar(
+      centerTitle: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
       title: const Text(

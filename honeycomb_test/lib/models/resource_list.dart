@@ -42,7 +42,7 @@ class ResourceList {
 ResourceList buildTest() {
   //RESOURCE 1
   Resource_Model testService1 = Resource_Model(
-    name: 'TestService1',
+    name: 'Allen Family Center',
   );
   testService1.enrich(
       {"primary": "012-345-6789"},
@@ -58,7 +58,7 @@ ResourceList buildTest() {
 
   //RESOURCE 1
   Resource_Model testService2 = Resource_Model(
-    name: 'TestService2',
+    name: "Mary's Place Regrade",
   );
   testService2.enrich(
       {"primary": "012-345-6789"},
@@ -74,9 +74,9 @@ ResourceList buildTest() {
 
   //RESOURCE 3
   Resource_Model testService3 = Resource_Model(
-    name: 'TestService3',
+    name: "Mary's Place Burien",
   );
-  testService1.enrich(
+  testService3.enrich(
       {"primary": "012-345-6789"},
       "test_service@gmail.com",
       "1234 Test Street, Seattle, WA",
@@ -90,9 +90,9 @@ ResourceList buildTest() {
 
   //RESOURCE 4
   Resource_Model testService4 = Resource_Model(
-    name: 'TestService4',
+    name: "Mary's Place Bellevue",
   );
-  testService1.enrich(
+  testService4.enrich(
       {"primary": "012-345-6789"},
       "test_service@gmail.com",
       "1234 Test Street, Seattle, WA",
@@ -106,6 +106,6 @@ ResourceList buildTest() {
 
   ResourceList ret = ResourceList(
       listName: "Test Client",
-      resources: [testService1, testService2, testService3]);
+      resources: [testService1, testService2, testService3, testService4]);
   return ret;
 }

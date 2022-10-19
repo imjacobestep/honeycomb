@@ -262,6 +262,13 @@ class ServiceDetailsState extends State<ServiceDetails> {
     }
   }
 
+  Widget detailsCategory(List<String> categories, BuildContext context) {
+    return Wrap(children: [
+      for (String category in categories)
+        widget.resource.detailsCategoryLabel(context, category)
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     //_kGooglePlex = getCamera(widget.provider.serviceList[widget.serviceIndex].serviceAddress);
@@ -319,7 +326,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                 children: [
                   Text(
                     widget.resource.name,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   IconButton(
                     onPressed: () {},
@@ -343,7 +350,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                   )
             ],
           ),
-          Row(children: [widget.resource.detailsCategoryLabel(context)]),
+          detailsCategory(widget.resource.categories, context),
           getSpacer(8),
           getDivider(context),
           getSpacer(8),

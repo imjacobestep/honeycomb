@@ -96,7 +96,7 @@ Widget getDivider(BuildContext context) {
   );
 }
 
-List<String> categories = [
+List<String> all_categories = [
   "Food",
   "Shelter",
   "Mental Health",
@@ -106,7 +106,7 @@ List<String> categories = [
   "Domestic Violence"
 ];
 
-var filters = {
+var all_filters = {
   "Shelter": false,
   "Domestic Violence": false,
   "Mental Health": false,
