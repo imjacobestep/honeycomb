@@ -154,30 +154,35 @@ void resetFilters() {
 
 ResourceList applyFilters(ResourceList inputList) {
   ResourceList ret = ResourceList(listName: "Test Client", resources: []);
+  bool add = false;
   for (Resource_Model resource in inputList.resources) {
     category_filters.forEach((filter, value) {
       if (value && resource.categories.contains(filter)) {
-        ret.resources.add(resource);
+        add = true;
       }
     });
     accessibility_filters.forEach((filter, value) {
       if (value && resource.accessibility.contains(filter)) {
-        ret.resources.add(resource);
+        add = true;
       }
     });
     eligibility_filters.forEach((filter, value) {
       if (value && resource.eligibility.contains(filter)) {
-        ret.resources.add(resource);
+        add = true;
       }
     });
     if (misc_filters["Multilingual"] == true && resource.languages.length > 1) {
-      ret.resources.add(resource);
+      add = true;
     }
     ;
     if (misc_filters["Active"] == true && resource.isActive) {
-      ret.resources.add(resource);
+      add = true;
     }
     ;
+    if (add) {
+      ret.resources.add(resource);
+    }
+    print(resource.toString());
   }
   return ret;
 }
