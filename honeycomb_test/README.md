@@ -1,16 +1,7 @@
-# honeycomb_test
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Before building:
+Make sure to get the AndroidManifext.xml, secrets.dart, and AppDelegate.swift files from the "sensitive dev files" folder on our shared drive
+make sure you have the repo cloned to your computer
+copy the xml to honeycomb/honeycomb_test/android/app/src/main
+copy secrets.dart into honeycomb/honeycomb_test/lib
+copy the swift to honeycomb/honeycomb_test/ios/Runner
+these are kept off the github because they contain api keys
