@@ -7,3 +7,4 @@ honeycomb_test/ios/Runner/AppDelegate.swift
 honeycomb_test/android/app/src/main/AndroidManifest.xml
 honeycomb_test/ios/Podfile
 honeycomb_test/ios/Podfile.lock
+honeycomb_test/lib/secrets.dart

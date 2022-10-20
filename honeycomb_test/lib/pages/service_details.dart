@@ -7,7 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:honeycomb_test/secrets.dart';
 import '../models/resource_model.dart';
 
 class ServiceDetails extends StatefulWidget {
@@ -24,8 +24,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
   @override
   void initState() {
     var locData = Geocoder2.getDataFromAddress(
-        address: widget.resource.address,
-        googleMapApiKey: "AIzaSyC1hEwGPXOck5HeY0ziBFtNGZ7GJGa5HAs");
+        address: widget.resource.address, googleMapApiKey: "$hcMapsKey");
     super.initState();
   }
 
