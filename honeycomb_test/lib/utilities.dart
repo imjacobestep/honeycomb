@@ -67,7 +67,7 @@ Widget filterCard(IconData icon, String label) {
   return Card(
     child: InkWell(
       onTap: () {
-        all_filters[label] = !all_filters[label]!;
+        category_filters[label] = !category_filters[label]!;
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -108,7 +108,7 @@ List<String> all_categories = [
   "Domestic Violence"
 ];
 
-var all_filters = {
+var category_filters = {
   "Shelter": false,
   "Domestic Violence": false,
   "Mental Health": false,
@@ -116,16 +116,50 @@ var all_filters = {
   "Medical Help": false,
   "Legal": false
 };
+var accessibility_filters = {
+  "Shelter": false,
+  "Domestic Violence": false,
+  "Mental Health": false,
+  "Food": false,
+  "Medical Help": false,
+  "Legal": false
+};
+var eligibility_filters = {
+  "Women Only": false,
+  "Minors Only": false,
+  "Adult Only": false,
+  "Family": false,
+  "Individual": false
+};
 
-//ResourceList mainList = ResourceList(listName: "mainList", resources: resources)
+var misc_filters = {"Multilingual": false, "Active": false};
 
 ResourceList applyFilters(ResourceList inputList) {
   ResourceList ret = ResourceList(listName: "Test Client", resources: []);
   for (Resource_Model resource in inputList.resources) {
-    if ((all_filters["Shelter"] == true) &&
-        resource.categories.contains("Shelter")) {
+    category_filters.forEach((filter, value) {
+      if (value && resource.categories.contains(filter)) {
+        ret.resources.add(resource);
+      }
+    });
+    accessibility_filters.forEach((filter, value) {
+      if (value && resource.accessibility.contains(filter)) {
+        ret.resources.add(resource);
+      }
+    });
+    eligibility_filters.forEach((filter, value) {
+      if (value && resource.eligibility.contains(filter)) {
+        ret.resources.add(resource);
+      }
+    });
+    if (misc_filters["Multilingual"] == true && resource.languages.length > 1) {
       ret.resources.add(resource);
     }
+    ;
+    if (misc_filters["Active"] == true && resource.isActive) {
+      ret.resources.add(resource);
+    }
+    ;
   }
   return ret;
 }
