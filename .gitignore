@@ -2,3 +2,8 @@ GoogleService-Info.plist
 google-services.json
 firebase_options.dart
 firebase_app_id_file.json
+honeycomb_test/ios/Runner/AppDelegate.swift
+honeycomb_test/ios/Runner/AppDelegate.swift
+honeycomb_test/android/app/src/main/AndroidManifest.xml
+honeycomb_test/ios/Podfile
+honeycomb_test/ios/Podfile.lock
