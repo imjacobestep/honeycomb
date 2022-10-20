@@ -69,6 +69,9 @@ Widget filterCard(IconData icon, String label) {
       onTap: () {
         category_filters[label] = !category_filters[label]!;
       },
+      onLongPress: () {
+        resetFilters();
+      },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -133,6 +136,21 @@ var eligibility_filters = {
 };
 
 var misc_filters = {"Multilingual": false, "Active": false};
+
+void resetFilters() {
+  category_filters.forEach((key, value) {
+    value = false;
+  });
+  accessibility_filters.forEach((key, value) {
+    value = false;
+  });
+  eligibility_filters.forEach((key, value) {
+    value = false;
+  });
+  misc_filters.forEach((key, value) {
+    value = false;
+  });
+}
 
 ResourceList applyFilters(ResourceList inputList) {
   ResourceList ret = ResourceList(listName: "Test Client", resources: []);
