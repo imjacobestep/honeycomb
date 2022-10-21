@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   ResourceList resourceList = buildTest();
 
-  List<String> labels = ["Home", "Map", "Resources", "Favs", "Clients"];
+  List<String> labels = ["Home", "Map", "List", "Favs", "Clients"];
   List<Icon> icons = [
     const Icon(Icons.home_outlined),
     const Icon(Icons.map_outlined),

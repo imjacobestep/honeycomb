@@ -18,7 +18,7 @@ class MainList {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            flex: 3,
+            flex: 24,
             child: ElevatedButton(
                 onPressed: () {},
                 child: Row(
@@ -29,9 +29,13 @@ class MainList {
                   ],
                 )),
           ),
-          getSpacer(8),
           Expanded(
             flex: 1,
+            child: getSpacer(8),
+          ),
+          //getSpacer(8),
+          Expanded(
+            flex: 10,
             child: ElevatedButton(
                 onPressed: () {},
                 child: Row(
@@ -51,16 +55,67 @@ class MainList {
     );
   }
 
+  Widget getActiveFilters() {
+    List<String> active_filters = [];
+    category_filters.forEach((key, value) {
+      if (value) {
+        active_filters.add(key);
+      }
+    });
+    accessibility_filters.forEach((key, value) {
+      if (value) {
+        active_filters.add(key);
+      }
+    });
+    eligibility_filters.forEach((key, value) {
+      if (value) {
+        active_filters.add(key);
+      }
+    });
+    misc_filters.forEach((key, value) {
+      if (value) {
+        active_filters.add(key);
+      }
+    });
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Wrap(
+        spacing: 8,
+        children: [
+          for (String label in active_filters)
+            Chip(
+              padding: EdgeInsets.fromLTRB(0, 2, 2, 2),
+              label: Text(label),
+              deleteIcon: Icon(Icons.close),
+              onDeleted: () {
+                category_filters[label] = !category_filters[label]!;
+                active_filters.removeWhere((element) => element == label);
+              },
+            )
+        ],
+      ),
+    );
+  }
+
   Widget getBody(ResourceList resourceList) {
     ResourceList mainList = applyFilters(resourceList);
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(8),
-      shrinkWrap: true,
-      itemCount: mainList.resources.length,
-      itemBuilder: (BuildContext context, int index) {
-        return mainList.resources[index].getServiceCard(context, "home");
-      },
+    return ListView(
+      children: [
+        Container(
+          //width: MediaQuery.of(context).size.width - 50,
+          child: getActiveFilters(),
+        ),
+        ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(8),
+          shrinkWrap: true,
+          itemCount: mainList.resources.length,
+          itemBuilder: (BuildContext context, int index) {
+            return mainList.resources[index].getServiceCard(context, "home");
+          },
+        )
+      ],
     );
   }
 }

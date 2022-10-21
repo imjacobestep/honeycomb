@@ -55,6 +55,7 @@ class Home {
         sectionHeader("Recent Clients", context),
         ListView.builder(
           padding: const EdgeInsets.all(8),
+          physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: 1,
           itemBuilder: (BuildContext context, int index) {
