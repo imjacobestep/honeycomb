@@ -161,6 +161,12 @@ class _MyHomePageState extends State<MyHomePage> {
           )),
     ];
 
+    void goToNav(index) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+
     return CustomNavigationBar(
       items: items,
       //blurEffect: true,
@@ -174,9 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
       borderRadius: const Radius.circular(30.0),
       currentIndex: _currentIndex,
       onTap: (index) {
-        setState(() {
-          _currentIndex = index;
-        });
+        goToNav(index);
       },
     );
   }

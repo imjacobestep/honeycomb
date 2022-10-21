@@ -63,35 +63,6 @@ Widget sectionHeader(String header, BuildContext context) {
   );
 }
 
-Widget filterCard(IconData icon, String label) {
-  return Card(
-    child: InkWell(
-      onTap: () {
-        category_filters[label] = !category_filters[label]!;
-      },
-      onLongPress: () {
-        resetFilters();
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Icon(icon),
-            getSpacer(10),
-            Expanded(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 3,
-              ),
-            )
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
 Widget getDivider(BuildContext context) {
   return const Divider(
     height: 4,
