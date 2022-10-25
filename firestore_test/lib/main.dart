@@ -46,8 +46,12 @@ void main() async {
   //   proxy.upsert(item);
   // }
 
-  final b = await proxy.get('resources', '1');
-  print(b);
+  final searchResult = await proxy.searchResources('tgh');
+
+  print('searchResult');
+  for (var item in searchResult) {
+    print(item.id);
+  }
 
   final filtered = await proxy.filter('resources', {
     'categories': ['456'],
