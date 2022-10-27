@@ -23,16 +23,8 @@ class ServiceDetails extends StatefulWidget {
 class ServiceDetailsState extends State<ServiceDetails> {
   @override
   void initState() {
-    var locData = Geocoder2.getDataFromAddress(
-        address: widget.resource.address, googleMapApiKey: "$hcMapsKey");
     super.initState();
   }
-
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(47.621527688800185, -122.17670223058742),
-    //target: LatLng(locData.latitude, locData.longitude),
-    zoom: 17.4746,
-  );
 
   final Completer<GoogleMapController> _controller = Completer();
 
@@ -271,14 +263,17 @@ class ServiceDetailsState extends State<ServiceDetails> {
   @override
   Widget build(BuildContext context) {
     //_kGooglePlex = getCamera(widget.provider.serviceList[widget.serviceIndex].serviceAddress);
+    CameraPosition _kGooglePlex = CameraPosition(
+      target: widget.resource.coords,
+      //target: LatLng(locData.latitude, locData.longitude),
+      zoom: 17.4746,
+    );
 
     final Set<Marker> markers = {
       Marker(
           markerId: MarkerId(_kGooglePlex.toString()),
           position: _kGooglePlex.target,
-          infoWindow: InfoWindow(
-              title: widget.resource.name,
-              snippet: widget.resource.categories.first),
+          infoWindow: InfoWindow(title: widget.resource.name, snippet: ""),
           icon: BitmapDescriptor.defaultMarker)
     };
 

@@ -50,6 +50,9 @@ dependencies:
   firebase_auth: ^4.0.1
   firebase_ui_auth: ^1.0.0-dev.0
   modal_bottom_sheet: ^2.1.2
+  bloc: ^8.1.0
+  equatable: ^2.0.5
+  bottom_sheet_bar: ^2.3.8
 
 
 dev_dependencies:

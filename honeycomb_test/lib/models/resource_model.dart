@@ -5,16 +5,6 @@ import '../pages/service_details.dart';
 import '../utilities.dart';
 
 class Resource_Model {
-  /*String serviceName = "";
-  String serviceCategory = "";
-  String serviceNumber = "";
-  String serviceEmail = "";
-  String serviceAddress = "";
-  String servicePopulation = "";
-  String serviceStatus = "";
-  String serviceProvider = "";
-  bool hasMou = false;
-  bool isVerified = false;*/
   //MAIN ATTRIBUTES
   String name = "";
   Map phoneNumbers = {"primary": ""};
@@ -37,31 +27,56 @@ class Resource_Model {
   String updatedBy = "";
   DateTime updatedStamp = DateTime.now();
 
-  Resource_Model({required this.name});
-
-  void enrich(
-    Map pN,
-    String e,
-    String a,
-    String zC,
-    String w,
-    List<String> c,
-    List<String> l,
-    List<String> eG,
-    List<String> aC,
-    String n,
-  ) {
-    phoneNumbers = pN;
-    email = e;
-    address = a;
-    zip_code = zC;
-    website = w;
-    categories = c;
-    languages = l;
-    eligibility = eG;
-    accessibility = aC;
-    notes = n;
+  Resource_Model(
+      name,
+      phoneNumbers,
+      email,
+      address,
+      zip_code,
+      coords,
+      website,
+      categories,
+      accessibility,
+      languages,
+      eligibility,
+      notes,
+      isActive,
+      createdBy,
+      createdStamp,
+      updatedBy,
+      updatedStamp) {
+    this.name = name;
+    this.phoneNumbers = phoneNumbers;
+    this.email = email;
+    this.address = address;
+    this.zip_code = zip_code;
+    this.coords = coords;
+    this.website = website;
+    this.categories = categories;
+    this.accessibility = accessibility;
+    this.languages = languages;
+    this.notes = notes;
+    this.isActive = isActive;
+    this.createdBy = createdBy;
+    this.createdStamp = createdStamp;
+    this.updatedBy = updatedBy;
+    this.updatedStamp = updatedStamp;
   }
+
+  Map toJson() => {
+        'name': name,
+        'numbers': phoneNumbers.toString(),
+        'email': email,
+        'address': address,
+        'zip': zip_code,
+        'web': website,
+        'categories': categories,
+        'languages': languages,
+        'eligibility': eligibility,
+        'accessibility': accessibility,
+        'notes': notes,
+        'activity': isActive ? "active" : "inactive",
+      };
 
   Widget showRecency(BuildContext context) {
     int diff = updatedStamp.difference(DateTime.now()).inDays;

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
@@ -121,6 +122,26 @@ void resetFilters() {
   misc_filters.forEach((key, value) {
     value = false;
   });
+}
+
+ResourceList applySearch(ResourceList inputList, String searchTerms) {
+  ResourceList ret = ResourceList(listName: "Test Client", resources: []);
+
+  const fillers = ["in", "near", "at", "close"];
+
+  searchTerms = searchTerms.toLowerCase();
+  var words = searchTerms.split(" ");
+  words.removeWhere((element) => fillers.contains(element));
+
+  for (Resource_Model resource in inputList.resources) {
+    for (String word in words) {
+      if (jsonEncode(resource).contains(word)) {
+        ret.resources.add(resource);
+      }
+    }
+  }
+
+  return ret;
 }
 
 ResourceList applyFilters(ResourceList inputList) {

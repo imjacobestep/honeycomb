@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/models/resource_model.dart';
 import 'package:honeycomb_test/pages/list_details.dart';
 
@@ -40,69 +43,86 @@ class ResourceList {
 }
 
 ResourceList buildTest() {
+  String? userEmail = FirebaseAuth.instance.currentUser?.email;
   //RESOURCE 1
   Resource_Model testService1 = Resource_Model(
-    name: 'Allen Family Center',
-  );
-  testService1.enrich(
+      'Allen Family Center',
       {"primary": "012-345-6789"},
       "test_service@gmail.com",
       "1234 Test Street, Seattle, WA",
       "98005",
+      LatLng(47.621527688800188, -122.17670223058742),
       "honeycomb.com",
-      ["Shelter", "Legal"],
+      ["Shelter", "Clothing"],
       ["English"],
       ["Families"],
       ["Wheelchair-accessible"],
-      "Template notes to show what an Outreach Specialist might write");
+      "Template notes to show what an Outreach Specialist might write",
+      true,
+      userEmail ?? "user",
+      DateTime.now(),
+      userEmail ?? "user",
+      DateTime.now());
 
-  //RESOURCE 1
+  //RESOURCE 2
   Resource_Model testService2 = Resource_Model(
-    name: "Mary's Place Regrade",
-  );
-  testService2.enrich(
+      "Mary's Place Regrade",
       {"primary": "012-345-6789"},
       "test_service@gmail.com",
       "1234 Test Street, Seattle, WA",
       "98005",
+      LatLng(47.621527688800182, -122.17670223058742),
       "honeycomb.com",
-      ["Food", "Legal"],
+      ["Shelter", "Clothing"],
       ["English"],
       ["Families"],
       ["Wheelchair-accessible"],
-      "Template notes to show what an Outreach Specialist might write");
+      "Template notes to show what an Outreach Specialist might write",
+      true,
+      userEmail ?? "user",
+      DateTime.now(),
+      userEmail ?? "user",
+      DateTime.now());
 
   //RESOURCE 3
   Resource_Model testService3 = Resource_Model(
-    name: "Mary's Place Burien",
-  );
-  testService3.enrich(
+      "Mary's Place Burien",
       {"primary": "012-345-6789"},
       "test_service@gmail.com",
       "1234 Test Street, Seattle, WA",
       "98005",
+      LatLng(47.621527688800186, -122.17670223058740),
       "honeycomb.com",
-      ["Food", "Legal"],
+      ["Shelter", "Clothing"],
       ["English"],
       ["Families"],
       ["Wheelchair-accessible"],
-      "Template notes to show what an Outreach Specialist might write");
+      "Template notes to show what an Outreach Specialist might write",
+      true,
+      userEmail ?? "user",
+      DateTime.now(),
+      userEmail ?? "user",
+      DateTime.now());
 
   //RESOURCE 4
   Resource_Model testService4 = Resource_Model(
-    name: "Mary's Place Bellevue",
-  );
-  testService4.enrich(
+      "Mary's Place Bellevue",
       {"primary": "012-345-6789"},
       "test_service@gmail.com",
       "1234 Test Street, Seattle, WA",
       "98005",
+      LatLng(47.62184778890019, -122.176702255875),
       "honeycomb.com",
-      ["Food", "Legal"],
+      ["Shelter", "Clothing"],
       ["English"],
       ["Families"],
       ["Wheelchair-accessible"],
-      "Template notes to show what an Outreach Specialist might write");
+      "Template notes to show what an Outreach Specialist might write",
+      true,
+      userEmail ?? "user",
+      DateTime.now(),
+      userEmail ?? "user",
+      DateTime.now());
 
   ResourceList ret = ResourceList(
       listName: "Test Client",

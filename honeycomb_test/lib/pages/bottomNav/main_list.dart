@@ -1,80 +1,25 @@
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 
-class MainList {
-  BuildContext context;
+class ResourcesPage extends StatefulWidget {
+  @override
+  ResourcesPageState createState() => ResourcesPageState();
+  ResourceList mainList;
+  BottomSheetBarController sheetCont = BottomSheetBarController();
 
-  MainList({required this.context});
+  ResourcesPage({required this.mainList});
+}
 
-  PreferredSizeWidget getAppBar() {
-    return AppBar(
-      toolbarHeight: 80,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
-      title: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            flex: 10,
-            child: ElevatedButton(
-                onPressed: () {},
-                child: Row(
-                  children: [
-                    const Icon(Icons.search_outlined),
-                    getSpacer(4),
-                    const Text("Search")
-                  ],
-                )),
-          ),
-          Expanded(
-            flex: 1,
-            child: getSpacer(8),
-          ),
-          //getSpacer(8),
-          Expanded(
-            flex: 10,
-            child: ElevatedButton(
-                onPressed: () async {
-                  await filterSheet();
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    const Text("Filters"),
-                    getSpacer(4),
-                    const Icon(Icons.filter_list_outlined)
-                  ],
-                )),
-          ),
-          Expanded(
-            flex: 1,
-            child: getSpacer(8),
-          ),
-          //getSpacer(8),
-          Expanded(
-            flex: 10,
-            child: ElevatedButton(
-                onPressed: () {},
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    const Text("Add"),
-                    getSpacer(4),
-                    const Icon(Icons.add_circle_outline)
-                  ],
-                )),
-          )
-        ],
-      ),
-      backgroundColor: const Color(0xFF2B2A2A),
-      foregroundColor: Colors.white,
-    );
+class ResourcesPageState extends State<ResourcesPage> {
+  @override
+  void initState() {
+    //BottomSheetBarController sheetCont;
+    super.initState();
   }
 
   Widget filterChip(String label, bool value) {
@@ -82,6 +27,7 @@ class MainList {
       return InkWell(
         onTap: () {
           category_filters[label] = false;
+          filterSheet(true);
         },
         child: Chip(
           label: Text(label),
@@ -111,46 +57,80 @@ class MainList {
     return ret;
   }
 
-  Future filterSheet() {
+  filterSheet2() {
+    return BottomSheetBar(
+      locked: false,
+      controller: widget.sheetCont,
+      body: getList(
+          widget.mainList, applyFilters(widget.mainList), getActiveFilters()),
+      expandedBuilder: (scrollController) => ListView.builder(
+        controller: scrollController,
+        itemBuilder: (context, index) =>
+            ListTile(title: Text(index.toString())),
+        itemCount: 50,
+      ),
+      collapsed: TextButton(
+        child: Text("Open Sheet"),
+        onPressed: () {
+          widget.sheetCont.expand();
+        },
+      ),
+    );
+  }
+
+  Future filterSheet(bool refresh) {
     return showMaterialModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      expand: false,
       context: context,
+      duration: Duration(milliseconds: refresh ? 0 : 400),
       builder: (context) => ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
-          Text("Categories"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(onPressed: () {}, icon: const Icon(Icons.close))
+            ],
+          ),
+          const Text("Categories"),
           Wrap(
             children: filterType(category_filters),
           ),
-          Text("Accessibility"),
+          const Text("Accessibility"),
           Wrap(
             children: filterType(accessibility_filters),
           ),
-          Text("Elegibility Requirements"),
+          const Text("Elegibility Requirements"),
           Wrap(
             children: filterType(eligibility_filters),
           ),
-          Text("Other"),
+          const Text("Other"),
           Wrap(
             children: filterType(misc_filters),
           ),
+          ElevatedButton(onPressed: () {}, child: const Text("Apply Filters"))
         ],
       ),
     );
   }
 
-  Widget showActiveFilters(List<String> active_filters) {
+  Widget showActiveFilters(List<String> activeFilters) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Wrap(
         spacing: 8,
         children: [
-          for (String label in active_filters)
+          for (String label in activeFilters)
             Chip(
               padding: EdgeInsets.fromLTRB(0, 2, 2, 2),
               label: Text(label),
               deleteIcon: Icon(Icons.close),
               onDeleted: () {
                 category_filters[label] = !category_filters[label]!;
-                active_filters.removeWhere((element) => element == label);
+                activeFilters.removeWhere((element) => element == label);
               },
             )
         ],
@@ -159,38 +139,38 @@ class MainList {
   }
 
   List<String> getActiveFilters() {
-    List<String> active_filters = [];
+    List<String> activeFilters = [];
     category_filters.forEach((key, value) {
       if (value) {
-        active_filters.add(key);
+        activeFilters.add(key);
       }
     });
     accessibility_filters.forEach((key, value) {
       if (value) {
-        active_filters.add(key);
+        activeFilters.add(key);
       }
     });
     eligibility_filters.forEach((key, value) {
       if (value) {
-        active_filters.add(key);
+        activeFilters.add(key);
       }
     });
     misc_filters.forEach((key, value) {
       if (value) {
-        active_filters.add(key);
+        activeFilters.add(key);
       }
     });
-    return active_filters;
+    return activeFilters;
   }
 
   Widget getList(ResourceList unfiltered, ResourceList filtered,
-      List<String> active_filters) {
+      List<String> activeFilters) {
     //cases: no filters, filteres with resources, filters with no resources
-    if (filtered.resources.length == 0 && active_filters.length > 0) {
-      return Center(
+    if (filtered.resources.isEmpty && activeFilters.isNotEmpty) {
+      return const Center(
         child: Text("no values, change filters"),
       );
-    } else if (filtered.resources.length > 0 && active_filters.length > 0) {
+    } else if (filtered.resources.isNotEmpty && activeFilters.isNotEmpty) {
       return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(8),
@@ -213,17 +193,77 @@ class MainList {
     }
   }
 
-  Widget getBody(ResourceList resourceList) {
-    List<String> active_filters = getActiveFilters();
-    ResourceList mainList = applyFilters(resourceList);
-    return ListView(
-      children: [
-        Container(
-          //width: MediaQuery.of(context).size.width - 50,
-          child: showActiveFilters(active_filters),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 80,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
+        title: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              flex: 20,
+              child: TextField(
+                decoration: InputDecoration(
+                  constraints: BoxConstraints(maxHeight: 50),
+                  filled: true,
+                  hintText: "Search...",
+                  prefixIcon: Icon(Icons.search_outlined),
+                  fillColor: Theme.of(context).canvasColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: getSpacer(4),
+            ),
+            //getSpacer(8),
+            Expanded(
+              flex: 8,
+              child: ElevatedButton(
+                  onPressed: () {},
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      SizedBox(
+                          height: 50, child: Center(child: const Text("Add"))),
+                      //getSpacer(2),
+                      const Icon(Icons.add_circle_outline)
+                    ],
+                  )),
+            )
+          ],
         ),
-        getList(resourceList, mainList, active_filters)
-      ],
+        backgroundColor: const Color(0xFF2B2A2A),
+        foregroundColor: Colors.white,
+      ),
+      body: getList(
+          widget.mainList, applyFilters(widget.mainList), getActiveFilters()),
+      //body: filterSheet2(),
+      floatingActionButton: ElevatedButton(
+          onPressed: () async {
+            await filterSheet(false);
+          },
+          /*onPressed: () {
+                    widget.sheetCont.expand();
+                  },*/
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Filters"),
+              getSpacer(4),
+              const Icon(Icons.filter_list_outlined)
+            ],
+          )),
+      bottomNavigationBar: customNav(context, 2),
     );
   }
 }

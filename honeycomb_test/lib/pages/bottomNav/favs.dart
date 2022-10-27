@@ -1,38 +1,44 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 
-import '../../models/resource_list.dart';
+class FavsPage extends StatefulWidget {
+  @override
+  FavsPageState createState() => FavsPageState();
+  ResourceList mainList;
 
-class Favs {
-  BuildContext context;
+  FavsPage({required this.mainList});
+}
 
-  Favs({required this.context});
-
-  PreferredSizeWidget getAppBar() {
-    return AppBar(
-      backgroundColor: const Color(0xFF2B2A2A),
-      foregroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.edit),
-        )
-      ],
-      title: Text("Favorites"),
-    );
+class FavsPageState extends State<FavsPage> {
+  @override
+  void initState() {
+    super.initState();
   }
 
-  Widget getBody(ResourceList favs) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(8),
-      shrinkWrap: true,
-      itemCount: favs.resources.length,
-      itemBuilder: (BuildContext context, int index) {
-        return favs.resources[index].getServiceCard(context, "favs");
-      },
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+        title: const Text(
+          "Favs",
+        ),
+        backgroundColor: const Color(0xFF2B2A2A),
+        foregroundColor: Colors.white,
+      ),
+      body: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(8),
+        shrinkWrap: true,
+        itemCount: widget.mainList.resources.length,
+        itemBuilder: (BuildContext context, int index) {
+          return widget.mainList.resources[index]
+              .getServiceCard(context, "favs");
+        },
+      ),
+      bottomNavigationBar: customNav(context, 3),
     );
   }
 }
