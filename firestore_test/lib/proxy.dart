@@ -158,4 +158,31 @@ class Proxy {
       return users;
     }
   }
+
+  Future<Iterable<dynamic>> searchResources(String key) async {
+    final resources = await list('resources');
+    final keyLower = key.toLowerCase();
+
+    return resources.where((resource) {
+      final map = resource.toFirestore();
+
+      for (var value in map.values) {
+        if (value is String) {
+          if (value.toLowerCase().contains(keyLower)) {
+            return true;
+          }
+        } else if (value is Map) {
+          for (var innerKey in value.keys) {
+            if (value[innerKey] == true) {
+              if (innerKey.toLowerCase().contains(keyLower)) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+
+      return false;
+    });
+  }
 }
