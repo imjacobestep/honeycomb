@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:honeycomb_test/models/resource_model.dart';
+import 'package:honeycomb_test/models_old/resource_model.dart';
 import 'package:honeycomb_test/pages/list_details.dart';
 
 class ResourceList {

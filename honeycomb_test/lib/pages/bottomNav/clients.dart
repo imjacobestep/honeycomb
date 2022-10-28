@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 
 class ClientsPage extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
 import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';

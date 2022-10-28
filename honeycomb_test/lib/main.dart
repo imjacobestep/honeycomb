@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
 
 import 'firebase_options.dart';

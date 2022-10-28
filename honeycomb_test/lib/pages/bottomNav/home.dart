@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/models_old/resource_list.dart';
 import '../../utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';

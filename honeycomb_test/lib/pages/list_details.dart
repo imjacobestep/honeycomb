@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/utilities.dart';
 
 class ListDetails extends StatefulWidget {

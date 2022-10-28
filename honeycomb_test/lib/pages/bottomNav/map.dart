@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:honeycomb_test/models/resource_model.dart';
+import 'package:honeycomb_test/models_old/resource_model.dart';
 import 'package:honeycomb_test/pages/service_details.dart';
 import 'package:honeycomb_test/utilities.dart';
 
-import 'package:honeycomb_test/models/resource_list.dart';
+import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 
 class MapPage extends StatefulWidget {

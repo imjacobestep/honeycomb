@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models/resource_model.dart';
+import 'package:honeycomb_test/models_old/resource_model.dart';
 import 'package:honeycomb_test/pages/provider_details.dart';
 import 'package:honeycomb_test/utilities.dart';
 

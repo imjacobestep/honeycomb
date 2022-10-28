@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/resource_model.dart';
+import '../models_old/resource_model.dart';
 
 class ServiceDetails extends StatefulWidget {
   @override

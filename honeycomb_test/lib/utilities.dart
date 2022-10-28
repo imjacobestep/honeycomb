@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:honeycomb_test/models/resource_list.dart';
-import 'package:honeycomb_test/models/resource_model.dart';
+import 'package:honeycomb_test/models_old/resource_list.dart';
+import 'package:honeycomb_test/models_old/resource_model.dart';
 import 'package:share_plus/share_plus.dart';
 
 Widget getSpacer(double size) {
