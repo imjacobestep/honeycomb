@@ -1,16 +1,10 @@
-import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     hide EmailAuthProvider, PhoneAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
-import 'package:honeycomb_test/pages/bottomNav/clients.dart';
-import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
-import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
-import 'package:honeycomb_test/pages/bottomNav/map.dart';
-import 'package:honeycomb_test/utilities.dart';
 
 import 'firebase_options.dart';
 

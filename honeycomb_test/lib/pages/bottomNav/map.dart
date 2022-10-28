@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/models/resource_model.dart';
 import 'package:honeycomb_test/pages/service_details.dart';
 import 'package:honeycomb_test/utilities.dart';
 
-import 'package:flutter/material.dart';
 import 'package:honeycomb_test/models/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 
@@ -25,10 +23,9 @@ class MapPageState extends State<MapPage> {
     super.initState();
   }
 
-  static const LatLng center =
-      const LatLng(47.621527688800185, -122.17670223058742);
+  static const LatLng center = LatLng(47.621527688800185, -122.17670223058742);
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
+  static const CameraPosition _kGooglePlex = CameraPosition(
     target: center,
     zoom: 17.4746,
   );
@@ -37,12 +34,12 @@ class MapPageState extends State<MapPage> {
     Marker(
         markerId: MarkerId(center.toString()),
         position: center,
-        infoWindow: InfoWindow(title: "Testing..."),
-        icon: BitmapDescriptor.defaultMarker)
+        infoWindow: const InfoWindow(title: "Your location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue))
   };
   LatLng lastPosition = center;
 
-  Completer<GoogleMapController> _controller = Completer();
+  final Completer<GoogleMapController> _controller = Completer();
 
   void onCameraMove(CameraPosition position) {
     lastPosition = position.target;
@@ -53,8 +50,9 @@ class MapPageState extends State<MapPage> {
     markers.add(Marker(
         markerId: MarkerId(lastPosition.toString()),
         position: lastPosition,
-        infoWindow: InfoWindow(title: "Testing..."),
-        icon: BitmapDescriptor.defaultMarker));
+        infoWindow: const InfoWindow(title: "Testing..."),
+        icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange)));
   }
 
   @override

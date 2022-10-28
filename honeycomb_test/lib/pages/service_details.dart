@@ -1,13 +1,9 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:honeycomb_test/secrets.dart';
 import '../models/resource_model.dart';
 
 class ServiceDetails extends StatefulWidget {
@@ -39,7 +35,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                   path: value,
                 ));
               },
-              icon: Icon(Icons.call_outlined));
+              icon: const Icon(Icons.call_outlined));
         }
         break;
 
@@ -52,7 +48,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                   path: value,
                 ));
               },
-              icon: Icon(Icons.mail_outlined));
+              icon: const Icon(Icons.mail_outlined));
         }
         break;
 
@@ -63,7 +59,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
                 MapsLauncher.launchQuery(widget.resource.address);
                 //launchUrl(Uri.parse("https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
               },
-              icon: Icon(Icons.directions_outlined));
+              icon: const Icon(Icons.directions_outlined));
         }
         break;
 
@@ -128,7 +124,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.call_outlined),
+                  const Icon(Icons.call_outlined),
                   getSpacer(4),
                   Text(
                     label,
@@ -156,7 +152,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.mail_outline),
+                  const Icon(Icons.mail_outline),
                   getSpacer(4),
                   Text(
                     label,
@@ -181,7 +177,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.directions_outlined),
+                  const Icon(Icons.directions_outlined),
                   getSpacer(4),
                   Text(
                     label,
@@ -206,7 +202,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.language_outlined),
+                  const Icon(Icons.language_outlined),
                   getSpacer(4),
                   Text(
                     label,
@@ -232,7 +228,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_add_outlined),
+                  const Icon(Icons.person_add_outlined),
                   getSpacer(4),
                   Text(
                     label,
@@ -279,10 +275,58 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
     return Scaffold(
       appBar: AppBar(
+        //toolbarHeight: 80,
         //backgroundColor: const Color(0xFF2B2A2A),
         //backgroundColor: Colors.transparent,
         elevation: 0,
         //foregroundColor: Colors.white,
+        actions: [
+          ConstrainedBox(
+            constraints: const BoxConstraints.tightFor(width: 120, height: 40),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(80, 40),
+                ),
+                onPressed: () {},
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Text("Edit"),
+                    Icon(Icons.edit_outlined),
+                  ],
+                )),
+          ),
+          getSpacer(8),
+          ConstrainedBox(
+            constraints: const BoxConstraints.tightFor(width: 120, height: 40),
+            child: ElevatedButton(
+                onPressed: () {},
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Text("Favorites"),
+                    Icon(Icons.star_border_outlined),
+                  ],
+                )),
+          ),
+          /* ElevatedButton(
+              onPressed: () {},
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Favorite"),
+                  getSpacer(4),
+                  const Icon(Icons.star_border),
+                ],
+              )
+              //icon: const Icon(Icons.edit_outlined),
+              //iconSize: 30,
+              ) */
+        ],
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
       ),
@@ -298,8 +342,8 @@ class ServiceDetailsState extends State<ServiceDetails> {
               borderRadius: BorderRadius.all(Radius.circular(16)),
             ),
             clipBehavior: Clip.antiAlias,
-            height: 300,
-            margin: EdgeInsets.only(bottom: 16),
+            height: 250,
+            margin: const EdgeInsets.only(bottom: 16),
             child: GoogleMap(
               //liteModeEnabled: true,
               mapToolbarEnabled: false,
@@ -322,26 +366,15 @@ class ServiceDetailsState extends State<ServiceDetails> {
                     widget.resource.name,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  IconButton(
+                  ElevatedButton(
+                      onPressed: () {}, child: Icon(Icons.star_border_outlined))
+                  /* IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.star_border_outlined),
                     iconSize: 30,
-                  )
+                  ) */
                 ],
               ),
-              ElevatedButton(
-                  onPressed: () {},
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text("Edit"),
-                      getSpacer(4),
-                      const Icon(Icons.edit_outlined),
-                    ],
-                  )
-                  //icon: const Icon(Icons.edit_outlined),
-                  //iconSize: 30,
-                  )
             ],
           ),
           detailsCategory(widget.resource.categories, context),
