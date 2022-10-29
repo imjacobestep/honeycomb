@@ -12,7 +12,7 @@ class Proxy {
     // [START add_data_custom_objects]
     final String collection;
     switch (item.runtimeType) {
-      case User:
+      case MPUser:
         collection = 'users';
         break;
       case Client:
@@ -51,7 +51,7 @@ class Proxy {
               SnapshotOptions? options) {
             switch (collection) {
               case 'users':
-                return User.fromFirestore(snapshot, options);
+                return MPUser.fromFirestore(snapshot, options);
               case 'clients':
                 return Client.fromFirestore(snapshot, options);
               case 'resources':
@@ -112,11 +112,11 @@ class Proxy {
     // [END add_data_custom_objects]
   }
 
-  Future<Iterable<dynamic>> listUserFavorites(User user) async {
+  Future<Iterable<dynamic>> listUserFavorites(MPUser user) async {
     return await listByIds('resources', user.favorites ?? []);
   }
 
-  Future<Iterable<dynamic>> listUserClients(User user) async {
+  Future<Iterable<dynamic>> listUserClients(MPUser user) async {
     return await listByIds('clients', user.clients ?? []);
   }
 
@@ -152,7 +152,7 @@ class Proxy {
     var users = await get('users', id);
 
     if (users == null) {
-      final user = User(id: id, favorites: [], clients: []);
+      final user = MPUser(id: id, favorites: [], clients: []);
       return await upsert(user);
     } else {
       return users;

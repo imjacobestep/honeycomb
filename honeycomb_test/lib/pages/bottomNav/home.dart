@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/models_old/resource_list.dart';
+import '../../proxy.dart';
 import '../../utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
@@ -8,6 +10,9 @@ import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 class HomePage extends StatefulWidget {
   @override
   HomePageState createState() => HomePageState();
+  Proxy proxyModel = Proxy();
+  String userID = FirebaseAuth.instance.currentUser!.uid;
+  MPUser? user;
   ResourceList mainList;
   BottomSheetBarController sheetCont = BottomSheetBarController();
 
@@ -16,7 +21,8 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   @override
-  void initState() {
+  Future<void> initState() async {
+    widget.user = await widget.proxyModel.getUser(widget.userID) as MPUser;
     super.initState();
   }
 
@@ -51,9 +57,12 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    String? userEmail = FirebaseAuth.instance.currentUser?.email;
-    String? displayName = FirebaseAuth.instance.currentUser?.displayName;
-    String userName = displayName ?? "";
+    //String? userEmail = FirebaseAuth.instance.currentUser?.email;
+    //String? displayName = FirebaseAuth.instance.currentUser?.displayName;
+    // User? user = widget.user;
+
+    String? userName = widget.user!.name;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

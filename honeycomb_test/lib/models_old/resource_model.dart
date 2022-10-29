@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../pages/service_details.dart';
+import '../pages/resource_details.dart';
 import '../utilities.dart';
 
 class Resource_Model {
