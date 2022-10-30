@@ -1,6 +1,5 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
 import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
@@ -55,43 +54,23 @@ Widget customNav(context, currentIndex) {
     switch (index) {
       case 0:
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => HomePage(
-                      mainList: buildTest(),
-                    )));
+            context, MaterialPageRoute(builder: (context) => HomePage()));
         break;
       case 1:
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MapPage(
-                      mainList: buildTest(),
-                    )));
+            context, MaterialPageRoute(builder: (context) => MapPage()));
         break;
       case 2:
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ResourcesPage(
-                      mainList: buildTest(),
-                    )));
+            context, MaterialPageRoute(builder: (context) => ResourcesPage()));
         break;
       case 3:
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => FavsPage(
-                      mainList: buildTest(),
-                    )));
+            context, MaterialPageRoute(builder: (context) => FavsPage()));
         break;
       case 4:
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ClientsPage(
-                      mainList: buildTest(),
-                    )));
+            context, MaterialPageRoute(builder: (context) => ClientsPage()));
         break;
       default:
     }

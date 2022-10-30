@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:honeycomb_test/models_old/resource_list.dart';
-import 'package:honeycomb_test/models_old/resource_model.dart';
+import 'package:honeycomb_test/model/resource.dart';
 import 'package:share_plus/share_plus.dart';
 
 Widget getSpacer(double size) {
@@ -36,14 +33,14 @@ Future<CameraPosition> getCamera(String address) async {
   return ret;
 }
 
-void serviceToContact(Resource_Model resource, int index) async {
+void serviceToContact(Resource resource, int index) async {
   final newContact = Contact()
-    ..name.first = resource.name
-    ..addresses = [Address(resource.address)]
+    ..name.first = resource.name!
+    ..addresses = [Address(resource.address!)]
     ..emails = [
-      Email(resource.email),
+      Email(resource.email!),
     ]
-    ..phones = [Phone(resource.phoneNumbers["primary"])];
+    ..phones = [Phone(resource.phoneNumbers!["primary"])];
   await newContact.insert();
 
   String filename = "${resource.name}.vcf";
@@ -122,59 +119,4 @@ void resetFilters() {
   misc_filters.forEach((key, value) {
     value = false;
   });
-}
-
-ResourceList applySearch(ResourceList inputList, String searchTerms) {
-  ResourceList ret = ResourceList(listName: "Test Client", resources: []);
-
-  const fillers = ["in", "near", "at", "close"];
-
-  searchTerms = searchTerms.toLowerCase();
-  var words = searchTerms.split(" ");
-  words.removeWhere((element) => fillers.contains(element));
-
-  for (Resource_Model resource in inputList.resources) {
-    for (String word in words) {
-      if (jsonEncode(resource).contains(word)) {
-        ret.resources.add(resource);
-      }
-    }
-  }
-
-  return ret;
-}
-
-ResourceList applyFilters(ResourceList inputList) {
-  ResourceList ret = ResourceList(listName: "Test Client", resources: []);
-  bool add = false;
-  for (Resource_Model resource in inputList.resources) {
-    category_filters.forEach((filter, value) {
-      if (value && resource.categories.contains(filter)) {
-        add = true;
-      }
-    });
-    accessibility_filters.forEach((filter, value) {
-      if (value && resource.accessibility.contains(filter)) {
-        add = true;
-      }
-    });
-    eligibility_filters.forEach((filter, value) {
-      if (value && resource.eligibility.contains(filter)) {
-        add = true;
-      }
-    });
-    if (misc_filters["Multilingual"] == true && resource.languages.length > 1) {
-      add = true;
-    }
-    ;
-    if (misc_filters["Active"] == true && resource.isActive) {
-      add = true;
-    }
-    ;
-    if (add) {
-      ret.resources.add(resource);
-    }
-    print(resource.toString());
-  }
-  return ret;
 }

@@ -1,7 +1,8 @@
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
+import 'package:honeycomb_test/proxy.dart';
+import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
@@ -9,15 +10,19 @@ import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 class ResourcesPage extends StatefulWidget {
   @override
   ResourcesPageState createState() => ResourcesPageState();
-  ResourceList mainList;
   BottomSheetBarController sheetCont = BottomSheetBarController();
+  Proxy proxyModel = Proxy();
+  Iterable? unfilteredList;
+  Iterable? filteredList;
 
-  ResourcesPage({required this.mainList});
+  ResourcesPage();
 }
 
 class ResourcesPageState extends State<ResourcesPage> {
   @override
-  void initState() {
+  Future<void> initState() async {
+    widget.unfilteredList = await widget.proxyModel.list('resources');
+    widget.filteredList = await widget.proxyModel.list('resources');
     //BottomSheetBarController sheetCont;
     super.initState();
   }
@@ -41,7 +46,7 @@ class ResourcesPageState extends State<ResourcesPage> {
         child: Chip(
           label: Text(label),
           backgroundColor: Colors.transparent,
-          side: BorderSide(color: Colors.black12, width: 1),
+          side: const BorderSide(color: Colors.black12, width: 1),
         ),
       );
     }
@@ -61,8 +66,7 @@ class ResourcesPageState extends State<ResourcesPage> {
     return BottomSheetBar(
       locked: false,
       controller: widget.sheetCont,
-      body: getList(
-          widget.mainList, applyFilters(widget.mainList), getActiveFilters()),
+      body: getList(getActiveFilters()),
       expandedBuilder: (scrollController) => ListView.builder(
         controller: scrollController,
         itemBuilder: (context, index) =>
@@ -70,7 +74,7 @@ class ResourcesPageState extends State<ResourcesPage> {
         itemCount: 50,
       ),
       collapsed: TextButton(
-        child: Text("Open Sheet"),
+        child: const Text("Open Sheet"),
         onPressed: () {
           widget.sheetCont.expand();
         },
@@ -125,9 +129,9 @@ class ResourcesPageState extends State<ResourcesPage> {
         children: [
           for (String label in activeFilters)
             Chip(
-              padding: EdgeInsets.fromLTRB(0, 2, 2, 2),
+              padding: const EdgeInsets.fromLTRB(0, 2, 2, 2),
               label: Text(label),
-              deleteIcon: Icon(Icons.close),
+              deleteIcon: const Icon(Icons.close),
               onDeleted: () {
                 category_filters[label] = !category_filters[label]!;
                 activeFilters.removeWhere((element) => element == label);
@@ -163,21 +167,20 @@ class ResourcesPageState extends State<ResourcesPage> {
     return activeFilters;
   }
 
-  Widget getList(ResourceList unfiltered, ResourceList filtered,
-      List<String> activeFilters) {
+  Widget getList(List<String> activeFilters) {
     //cases: no filters, filteres with resources, filters with no resources
-    if (filtered.resources.isEmpty && activeFilters.isNotEmpty) {
+    if (widget.filteredList!.isEmpty && activeFilters.isNotEmpty) {
       return const Center(
         child: Text("no values, change filters"),
       );
-    } else if (filtered.resources.isNotEmpty && activeFilters.isNotEmpty) {
+    } else if (widget.filteredList!.isNotEmpty && activeFilters.isNotEmpty) {
       return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(8),
         shrinkWrap: true,
-        itemCount: filtered.resources.length,
+        itemCount: widget.filteredList!.length,
         itemBuilder: (BuildContext context, int index) {
-          return filtered.resources[index].getServiceCard(context, "home");
+          return resourceCard(context, widget.unfilteredList!.elementAt(index));
         },
       );
     } else {
@@ -185,9 +188,9 @@ class ResourcesPageState extends State<ResourcesPage> {
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(8),
         shrinkWrap: true,
-        itemCount: unfiltered.resources.length,
+        itemCount: widget.unfilteredList!.length,
         itemBuilder: (BuildContext context, int index) {
-          return unfiltered.resources[index].getServiceCard(context, "home");
+          return resourceCard(context, widget.unfilteredList!.elementAt(index));
         },
       );
     }
@@ -208,12 +211,12 @@ class ResourcesPageState extends State<ResourcesPage> {
               flex: 20,
               child: TextField(
                 decoration: InputDecoration(
-                  constraints: BoxConstraints(maxHeight: 50),
+                  constraints: const BoxConstraints(maxHeight: 50),
                   filled: true,
                   hintText: "Search...",
-                  prefixIcon: Icon(Icons.search_outlined),
+                  prefixIcon: const Icon(Icons.search_outlined),
                   fillColor: Theme.of(context).canvasColor,
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(30)),
                   ),
                 ),
@@ -232,11 +235,10 @@ class ResourcesPageState extends State<ResourcesPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.max,
-                    children: [
-                      SizedBox(
-                          height: 50, child: Center(child: const Text("Add"))),
+                    children: const [
+                      SizedBox(height: 50, child: Center(child: Text("Add"))),
                       //getSpacer(2),
-                      const Icon(Icons.add_circle_outline)
+                      Icon(Icons.add_circle_outline)
                     ],
                   )),
             )
@@ -245,8 +247,7 @@ class ResourcesPageState extends State<ResourcesPage> {
         backgroundColor: const Color(0xFF2B2A2A),
         foregroundColor: Colors.white,
       ),
-      body: getList(
-          widget.mainList, applyFilters(widget.mainList), getActiveFilters()),
+      body: getList(getActiveFilters()),
       //body: filterSheet2(),
       floatingActionButton: ElevatedButton(
           onPressed: () async {

@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/user.dart';
-import 'package:honeycomb_test/models_old/resource_list.dart';
+import 'package:honeycomb_test/ui_components/clients_ui.dart';
+import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import '../../proxy.dart';
 import '../../utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
@@ -13,16 +14,19 @@ class HomePage extends StatefulWidget {
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
   MPUser? user;
-  ResourceList mainList;
+  Iterable? favs;
+  Iterable? clients;
   BottomSheetBarController sheetCont = BottomSheetBarController();
 
-  HomePage({required this.mainList});
+  HomePage();
 }
 
 class HomePageState extends State<HomePage> {
   @override
   Future<void> initState() async {
     widget.user = await widget.proxyModel.getUser(widget.userID) as MPUser;
+    widget.favs = await widget.proxyModel.listUserFavorites(widget.user!);
+    widget.clients = await widget.proxyModel.listUserClients(widget.user!);
     super.initState();
   }
 
@@ -103,9 +107,9 @@ class HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(8),
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: 1,
+            itemCount: 3,
             itemBuilder: (BuildContext context, int index) {
-              return widget.mainList.getCard(context);
+              return clientCard(context, widget.clients!.elementAt(index));
             },
           ),
           getDivider(context),
@@ -114,10 +118,9 @@ class HomePageState extends State<HomePage> {
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.all(8),
             shrinkWrap: true,
-            itemCount: widget.mainList.resources.length,
+            itemCount: widget.favs!.length,
             itemBuilder: (BuildContext context, int index) {
-              return widget.mainList.resources[index]
-                  .getServiceCard(context, "home");
+              return resourceCard(context, widget.favs!.elementAt(index));
             },
           ),
         ],

@@ -4,16 +4,17 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models_old/resource_model.dart';
+import '../model/resource.dart';
+import '../ui_components/resource_ui.dart';
 
 class ServiceDetails extends StatefulWidget {
   @override
   ServiceDetailsState createState() => ServiceDetailsState();
-  String previousPage;
-  Resource_Model resource;
+  //String previousPage;
+  Resource resource;
   //var locData;
 
-  ServiceDetails({required this.resource, required this.previousPage});
+  ServiceDetails({required this.resource});
 }
 
 class ServiceDetailsState extends State<ServiceDetails> {
@@ -37,7 +38,6 @@ class ServiceDetailsState extends State<ServiceDetails> {
               },
               icon: const Icon(Icons.call_outlined));
         }
-        break;
 
       case "email":
         {
@@ -50,24 +50,21 @@ class ServiceDetailsState extends State<ServiceDetails> {
               },
               icon: const Icon(Icons.mail_outlined));
         }
-        break;
 
       case "address":
         {
           return IconButton(
               onPressed: () {
-                MapsLauncher.launchQuery(widget.resource.address);
+                MapsLauncher.launchQuery(widget.resource.address!);
                 //launchUrl(Uri.parse("https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
               },
               icon: const Icon(Icons.directions_outlined));
         }
-        break;
 
       default:
         {
           return Container();
         }
-        break;
     }
   }
 
@@ -135,7 +132,6 @@ class ServiceDetailsState extends State<ServiceDetails> {
             ),
           );
         }
-        break;
 
       case "Email":
         {
@@ -163,13 +159,12 @@ class ServiceDetailsState extends State<ServiceDetails> {
             ),
           );
         }
-        break;
 
       case "Directions":
         {
           return InkWell(
             onTap: () {
-              MapsLauncher.launchQuery(widget.resource.address);
+              MapsLauncher.launchQuery(widget.resource.address!);
             },
             child: SizedBox(
               height: size,
@@ -188,13 +183,12 @@ class ServiceDetailsState extends State<ServiceDetails> {
             ),
           );
         }
-        break;
 
       case "Web":
         {
           return InkWell(
             onTap: () {
-              MapsLauncher.launchQuery(widget.resource.address);
+              MapsLauncher.launchQuery(widget.resource.address!);
             },
             child: SizedBox(
               height: size,
@@ -213,13 +207,12 @@ class ServiceDetailsState extends State<ServiceDetails> {
             ),
           );
         }
-        break;
 
       case "Client":
         {
           return InkWell(
             onTap: () {
-              MapsLauncher.launchQuery(widget.resource.address);
+              MapsLauncher.launchQuery(widget.resource.address!);
               //launchUrl(Uri.parse("https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
             },
             child: SizedBox(
@@ -239,36 +232,35 @@ class ServiceDetailsState extends State<ServiceDetails> {
             ),
           );
         }
-        break;
 
       default:
         {
           return Container();
         }
-        break;
     }
   }
 
-  Widget detailsCategory(List<String> categories, BuildContext context) {
+  Widget detailsCategory(
+      Map<dynamic, dynamic> categories, BuildContext context) {
     return Wrap(children: [
-      for (String category in categories)
-        widget.resource.detailsCategoryLabel(context, category)
+      for (String category in categories.values)
+        detailsCategoryLabel(context, category)
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
     //_kGooglePlex = getCamera(widget.provider.serviceList[widget.serviceIndex].serviceAddress);
-    CameraPosition _kGooglePlex = CameraPosition(
-      target: widget.resource.coords,
+    CameraPosition kGooglePlex = CameraPosition(
+      target: widget.resource.coords!,
       //target: LatLng(locData.latitude, locData.longitude),
       zoom: 17.4746,
     );
 
     final Set<Marker> markers = {
       Marker(
-          markerId: MarkerId(_kGooglePlex.toString()),
-          position: _kGooglePlex.target,
+          markerId: MarkerId(kGooglePlex.toString()),
+          position: kGooglePlex.target,
           infoWindow: InfoWindow(title: widget.resource.name, snippet: ""),
           icon: BitmapDescriptor.defaultMarker)
     };
@@ -285,7 +277,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
             constraints: const BoxConstraints.tightFor(width: 120, height: 40),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(80, 40),
+                  fixedSize: const Size(80, 40),
                 ),
                 onPressed: () {},
                 child: Row(
@@ -349,7 +341,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               mapToolbarEnabled: false,
               mapType: MapType.normal,
               markers: markers,
-              initialCameraPosition: _kGooglePlex,
+              initialCameraPosition: kGooglePlex,
               myLocationEnabled: true,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
@@ -363,11 +355,12 @@ class ServiceDetailsState extends State<ServiceDetails> {
               Row(
                 children: [
                   Text(
-                    widget.resource.name,
+                    widget.resource.name!,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   ElevatedButton(
-                      onPressed: () {}, child: Icon(Icons.star_border_outlined))
+                      onPressed: () {},
+                      child: const Icon(Icons.star_border_outlined))
                   /* IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.star_border_outlined),
@@ -377,7 +370,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               ),
             ],
           ),
-          detailsCategory(widget.resource.categories, context),
+          detailsCategory(widget.resource.categories!, context),
           getSpacer(8),
           getDivider(context),
           getSpacer(8),
@@ -385,24 +378,24 @@ class ServiceDetailsState extends State<ServiceDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
             children: [
-              getAction2("Directions", widget.resource.address),
-              getAction2("Call", widget.resource.phoneNumbers['primary']),
-              getAction2("Email", widget.resource.email),
-              getAction2("Web", widget.resource.website),
-              getAction2("Client", widget.resource.website),
+              getAction2("Directions", widget.resource.address!),
+              getAction2("Call", widget.resource.phoneNumbers!['primary']),
+              getAction2("Email", widget.resource.email!),
+              getAction2("Web", widget.resource.website!),
+              getAction2("Client", widget.resource.website!),
             ],
           ),
           getSpacer(8),
           getDivider(context),
           getSpacer(8),
-          detailListing("notes", widget.resource.notes),
+          detailListing("notes", widget.resource.notes!),
           getSpacer(8),
           getDivider(context),
           getSpacer(8),
-          detailListing("number", widget.resource.phoneNumbers["primary"]),
-          detailListing("email", widget.resource.email),
-          detailListing("address", widget.resource.address),
-          detailListing("website", widget.resource.website)
+          detailListing("number", widget.resource.phoneNumbers!["primary"]),
+          detailListing("email", widget.resource.email!),
+          detailListing("address", widget.resource.address!),
+          detailListing("website", widget.resource.website!)
         ],
       ),
       //bottomNavigationBar: BottomNavigationBar(items: [],),

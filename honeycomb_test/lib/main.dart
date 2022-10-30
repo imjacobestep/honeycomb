@@ -3,9 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
-import 'package:honeycomb_test/proxy.dart';
 
 import 'firebase_options.dart';
 
@@ -44,21 +42,19 @@ class MyApp extends StatelessWidget {
           );
         },
         '/home': (context) {
-          return HomePage(
-            mainList: buildTest(),
-          );
+          return HomePage();
         },
         '/profile': (context) {
           return ProfileScreen(
             appBar: AppBar(
-              title: Text("Account Settings"),
+              title: const Text("Account Settings"),
               centerTitle: true,
               automaticallyImplyLeading: true,
               leading: IconButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
               ),
             ),
             providers: providers,

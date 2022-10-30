@@ -1,19 +1,24 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/models_old/resource_list.dart';
+import 'package:honeycomb_test/proxy.dart';
+import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
+
+import '../model/client.dart';
 
 class ListDetails extends StatefulWidget {
   @override
   ListDetailsState createState() => ListDetailsState();
-  ResourceList resourceList;
-
-  ListDetails({required this.resourceList});
+  Proxy proxyModel = Proxy();
+  Client client;
+  Iterable? resources;
+  ListDetails({required this.client});
 }
 
 class ListDetailsState extends State<ListDetails> {
   @override
-  void initState() {
+  Future<void> initState() async {
+    widget.resources =
+        await widget.proxyModel.listClientResources(widget.client);
     super.initState();
   }
 
@@ -64,19 +69,18 @@ class ListDetailsState extends State<ListDetails> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(widget.resourceList.listName),
+            Text(widget.client.alias!),
             //getSpacer(4),
           ],
         ),
       ),
       body: ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(8),
         shrinkWrap: true,
-        itemCount: widget.resourceList.resources.length,
+        itemCount: widget.resources!.length,
         itemBuilder: (BuildContext context, int index) {
-          return widget.resourceList.resources[index]
-              .getServiceCard(context, "client");
+          return resourceCard(context, widget.resources!.elementAt(index));
         },
       ),
       //bottomNavigationBar: BottomNavigationBar(items: [],),

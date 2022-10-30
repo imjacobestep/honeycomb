@@ -2,24 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:honeycomb_test/models_old/resource_model.dart';
+import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/resource_details.dart';
+import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
-
-import 'package:honeycomb_test/models_old/resource_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 
 class MapPage extends StatefulWidget {
   @override
   MapPageState createState() => MapPageState();
-  ResourceList mainList;
+  //ResourceList mainList;
+  Proxy proxyModel = Proxy();
+  Iterable? unfilteredList;
+  Iterable? filteredList;
 
-  MapPage({required this.mainList});
+  MapPage();
 }
 
 class MapPageState extends State<MapPage> {
   @override
-  void initState() {
+  Future<void> initState() async {
+    widget.unfilteredList = await widget.proxyModel.list('resources');
+
     super.initState();
   }
 
@@ -57,10 +61,10 @@ class MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    for (Resource_Model resource in widget.mainList.resources) {
+    for (Resource resource in widget.unfilteredList!) {
       markers.add(Marker(
-          markerId: MarkerId(resource.name),
-          position: resource.coords,
+          markerId: MarkerId(resource.name!),
+          position: resource.coords!,
           infoWindow: InfoWindow(
               title: resource.name,
               onTap: () {
@@ -69,7 +73,6 @@ class MapPageState extends State<MapPage> {
                     MaterialPageRoute(
                         builder: (context) => ServiceDetails(
                               resource: resource,
-                              previousPage: "map",
                             )));
               }),
           icon: BitmapDescriptor.defaultMarkerWithHue(
