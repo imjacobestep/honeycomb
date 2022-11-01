@@ -39,7 +39,7 @@ class GeoHelper {
 
   Future<Map> parseAddress(String address, String zipCode) async {
     try {
-      final suffix = parseZipCode(zipCode);
+      final suffix = await parseZipCode(zipCode);
 
       final fullAddress = '$address, $suffix';
 
