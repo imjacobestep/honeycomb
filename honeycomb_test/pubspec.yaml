@@ -53,6 +53,7 @@ dependencies:
   bloc: ^8.1.0
   equatable: ^2.0.5
   bottom_sheet_bar: ^2.3.8
+  location: ^4.4.0
 
 
 dev_dependencies:

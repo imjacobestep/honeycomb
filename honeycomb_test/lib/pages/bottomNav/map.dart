@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/resource.dart';
@@ -7,77 +8,127 @@ import 'package:honeycomb_test/pages/resource_details.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
+import 'package:location/location.dart';
 
 class MapPage extends StatefulWidget {
   @override
   MapPageState createState() => MapPageState();
   //ResourceList mainList;
   Proxy proxyModel = Proxy();
-  Iterable? unfilteredList;
-  Iterable? filteredList;
+  Future<Iterable>? resourceList;
+  Location location = new Location();
+  Future<LocationData>? loc;
 
   MapPage();
 }
 
 class MapPageState extends State<MapPage> {
   @override
-  Future<void> initState() async {
-    widget.unfilteredList = await widget.proxyModel.list('resources');
-
+  void initState() {
+    //widget.unfilteredList = await widget.proxyModel.list('resources');
+    widget.resourceList = widget.proxyModel.list("resources");
+    widget.loc = widget.location.getLocation();
     super.initState();
   }
 
-  static const LatLng center = LatLng(47.621527688800185, -122.17670223058742);
-
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: center,
-    zoom: 17.4746,
-  );
-
   final Set<Marker> markers = {
-    Marker(
-        markerId: MarkerId(center.toString()),
-        position: center,
-        infoWindow: const InfoWindow(title: "Your location"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue))
+    Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
-  LatLng lastPosition = center;
+
+  void addMarker(LatLng position, String markerId, String title, String info) {
+    BitmapDescriptor icon = markerId == "current"
+        ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)
+        : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+    markers.add(Marker(
+        markerId: MarkerId(markerId),
+        position: position,
+        infoWindow: InfoWindow(title: title, snippet: info),
+        icon: icon));
+  }
 
   final Completer<GoogleMapController> _controller = Completer();
 
-  void onCameraMove(CameraPosition position) {
-    lastPosition = position.target;
-    onAddMarker();
+  String getCategories(Resource resource) {
+    //String ret = "";
+    if (resource.categories != null) {
+      return resource.categories!.keys.toString();
+    } else
+      return "";
   }
 
-  void onAddMarker() {
-    markers.add(Marker(
-        markerId: MarkerId(lastPosition.toString()),
-        position: lastPosition,
-        infoWindow: const InfoWindow(title: "Testing..."),
+  void resourceToMarker(Resource resource) {
+    addMarker(resource.coords!, resource.name!, resource.name!,
+        getCategories(resource));
+    /* markers.add(Marker(
+        markerId: MarkerId(resource.name!),
+        position: resource.coords!,
+        infoWindow: InfoWindow(
+            title: resource.name,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ServiceDetails(
+                            resource: resource,
+                          )));
+            }),
         icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange)));
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange))); */
+  }
+
+  Widget getMap() {
+    return FutureBuilder(
+      future: widget.resourceList,
+      builder: (BuildContext context, AsyncSnapshot<Iterable> snapshot) {
+        List<Widget> children = [];
+        if (snapshot.hasData && snapshot.data != null) {
+          Iterable testList = snapshot.data!;
+          for (Resource resource in testList) {
+            resourceToMarker(resource);
+          }
+        } else {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text("No Results"),
+          );
+        }
+        return FutureBuilder(
+            future: widget.loc,
+            builder:
+                (BuildContext context, AsyncSnapshot<LocationData> snapshot2) {
+              CameraPosition cam;
+              LatLng location;
+              if (snapshot2.hasData &&
+                  (snapshot2.data!.latitude != null &&
+                      snapshot2.data!.longitude != null)) {
+                location = LatLng(
+                    snapshot2.data!.latitude!, snapshot2.data!.longitude!);
+                cam = CameraPosition(
+                  target: location,
+                  zoom: 17.4746,
+                );
+                addMarker(location, "current", "You Are Here", "");
+                return GoogleMap(
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  mapType: MapType.normal,
+                  markers: markers,
+                  initialCameraPosition: cam,
+                  //onCameraMove: onCameraMove,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                );
+              } else {
+                return LoadingIndicator(size: 50, borderWidth: 5);
+              }
+            });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    for (Resource resource in widget.unfilteredList!) {
-      markers.add(Marker(
-          markerId: MarkerId(resource.name!),
-          position: resource.coords!,
-          infoWindow: InfoWindow(
-              title: resource.name,
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ServiceDetails(
-                              resource: resource,
-                            )));
-              }),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueOrange)));
-    }
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
@@ -170,19 +221,7 @@ class MapPageState extends State<MapPage> {
         foregroundColor: Colors.white,
       ),*/
       body: Stack(
-        children: [
-          GoogleMap(
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            mapType: MapType.normal,
-            markers: markers,
-            initialCameraPosition: _kGooglePlex,
-            //onCameraMove: onCameraMove,
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
-          )
-        ],
+        children: [getMap()],
       ),
       bottomNavigationBar: customNav(context, 1),
     );

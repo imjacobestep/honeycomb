@@ -19,20 +19,6 @@ void shareContact(String contact) {
   Share.share(contact);
 }
 
-Future<CameraPosition> getCamera(String address) async {
-  GeoData locData = await Geocoder2.getDataFromAddress(
-      address: address,
-      googleMapApiKey: "AIzaSyC1hEwGPXOck5HeY0ziBFtNGZ7GJGa5HAs");
-
-  CameraPosition ret = CameraPosition(
-    //target: LatLng(47.621527688800185, -122.17670223058742),
-    target: LatLng(locData.latitude, locData.longitude),
-    zoom: 17.4746,
-  );
-
-  return ret;
-}
-
 void serviceToContact(Resource resource, int index) async {
   final newContact = Contact()
     ..name.first = resource.name!
@@ -70,53 +56,39 @@ Widget getDivider(BuildContext context) {
   );
 }
 
-List<String> all_categories = [
-  "Food",
-  "Shelter",
-  "Mental Health",
-  "Medical",
-  "Legal",
-  "Immigration",
-  "Domestic Violence"
-];
-
-var category_filters = {
-  "Shelter": false,
-  "Domestic Violence": false,
-  "Mental Health": false,
-  "Food": false,
-  "Medical Help": false,
-  "Legal": false
+Map<String, Map<String, bool>> filters = {
+  "Categories": {
+    "Shelter": false,
+    "Domestic Violence": false,
+    "Housing": false,
+    "Food": false,
+    "Medical": false,
+    "Mental Health": false,
+    "Clothing": false,
+    "Education": false,
+    "Translation": false,
+    "Legal": false,
+    "Employment": false,
+  },
+  "Requirements": {
+    "None": false,
+    "Women Only": false,
+    "Minors Only": false,
+    "Adult Only": false,
+    "Family": false,
+    "Individual": false
+  },
+  "Accessibility": {
+    "Wheelchair": false,
+    "Sign Language": false,
+  },
+  "Other Filters": {"Multilingual": false, "Active": false},
 };
-var accessibility_filters = {
-  "Shelter": false,
-  "Domestic Violence": false,
-  "Mental Health": false,
-  "Food": false,
-  "Medical Help": false,
-  "Legal": false
-};
-var eligibility_filters = {
-  "Women Only": false,
-  "Minors Only": false,
-  "Adult Only": false,
-  "Family": false,
-  "Individual": false
-};
-
-var misc_filters = {"Multilingual": false, "Active": false};
 
 void resetFilters() {
-  category_filters.forEach((key, value) {
-    value = false;
-  });
-  accessibility_filters.forEach((key, value) {
-    value = false;
-  });
-  eligibility_filters.forEach((key, value) {
-    value = false;
-  });
-  misc_filters.forEach((key, value) {
-    value = false;
+  filters.forEach((key, value) {
+    value.forEach((key, value) {
+      value = false;
+    });
   });
 }

@@ -59,5 +59,7 @@
 	</array>
 	<key>NSContactsUsageDescription</key>
          <string>Exporting contact vCards</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+         <string>Using user location to find nearby resources in map view</string>
 </dict>
 </plist>

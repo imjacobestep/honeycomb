@@ -1,5 +1,6 @@
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
@@ -20,9 +21,8 @@ class ResourcesPage extends StatefulWidget {
 
 class ResourcesPageState extends State<ResourcesPage> {
   @override
-  Future<void> initState() async {
-    widget.unfilteredList = await widget.proxyModel.list('resources');
-    widget.filteredList = await widget.proxyModel.list('resources');
+  void initState() {
+    //loadData();
     //BottomSheetBarController sheetCont;
     super.initState();
   }
@@ -31,8 +31,9 @@ class ResourcesPageState extends State<ResourcesPage> {
     if (value) {
       return InkWell(
         onTap: () {
-          category_filters[label] = false;
-          filterSheet(true);
+          filters["Categories"]![label] = false;
+          setState(() {});
+          //filterSheet(true);
         },
         child: Chip(
           label: Text(label),
@@ -41,7 +42,8 @@ class ResourcesPageState extends State<ResourcesPage> {
     } else {
       return InkWell(
         onTap: () {
-          category_filters[label] = true;
+          filters["Categories"]![label] = true;
+          setState(() {});
         },
         child: Chip(
           label: Text(label),
@@ -82,6 +84,28 @@ class ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
+  List<Widget> getFilters() {
+    List<Widget> ret = [];
+    ret.add(
+      Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [IconButton(onPressed: () {}, icon: const Icon(Icons.close))],
+      ),
+    );
+    filters.forEach((key, value) {
+      ret.add(Text(key));
+      ret.add(Wrap(
+        children: filterType(value),
+      ));
+    });
+    ret.add(ElevatedButton(
+        onPressed: () {
+          setState(() {});
+        },
+        child: const Text("Apply Filters")));
+    return ret;
+  }
+
   Future filterSheet(bool refresh) {
     return showMaterialModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -92,31 +116,7 @@ class ResourcesPageState extends State<ResourcesPage> {
       builder: (context) => ListView(
         shrinkWrap: true,
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.close))
-            ],
-          ),
-          const Text("Categories"),
-          Wrap(
-            children: filterType(category_filters),
-          ),
-          const Text("Accessibility"),
-          Wrap(
-            children: filterType(accessibility_filters),
-          ),
-          const Text("Elegibility Requirements"),
-          Wrap(
-            children: filterType(eligibility_filters),
-          ),
-          const Text("Other"),
-          Wrap(
-            children: filterType(misc_filters),
-          ),
-          ElevatedButton(onPressed: () {}, child: const Text("Apply Filters"))
-        ],
+        children: getFilters(),
       ),
     );
   }
@@ -133,8 +133,15 @@ class ResourcesPageState extends State<ResourcesPage> {
               label: Text(label),
               deleteIcon: const Icon(Icons.close),
               onDeleted: () {
-                category_filters[label] = !category_filters[label]!;
+                filters.forEach((key, value) {
+                  value.forEach((key, value) {
+                    if (key == label) {
+                      value = !value;
+                    }
+                  });
+                });
                 activeFilters.removeWhere((element) => element == label);
+                setState(() {});
               },
             )
         ],
@@ -144,32 +151,49 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   List<String> getActiveFilters() {
     List<String> activeFilters = [];
-    category_filters.forEach((key, value) {
-      if (value) {
-        activeFilters.add(key);
-      }
-    });
-    accessibility_filters.forEach((key, value) {
-      if (value) {
-        activeFilters.add(key);
-      }
-    });
-    eligibility_filters.forEach((key, value) {
-      if (value) {
-        activeFilters.add(key);
-      }
-    });
-    misc_filters.forEach((key, value) {
-      if (value) {
-        activeFilters.add(key);
-      }
+
+    filters.forEach((key, value) {
+      value.forEach((key, value) {
+        if (value) {
+          activeFilters.add(key);
+        }
+      });
     });
     return activeFilters;
   }
 
+  Widget getList2(List<String> activeFilters, Future<Iterable> unfilteredList) {
+    return FutureBuilder(
+      future: unfilteredList,
+      builder: (BuildContext context, AsyncSnapshot<Iterable> snapshot) {
+        List<Widget> children = [];
+        if (snapshot.hasData && snapshot.data != null) {
+          //print(snapshot.data.runtimeType);
+          Iterable testList = snapshot.data!;
+          for (Resource resource in testList) {
+            children.add(resourceCard(context, resource));
+          }
+          //children = <Widget>[resourceCard(context, snapshot.data as Resource)];
+        } else {
+          children = <Widget>[
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text("No Results"),
+            )
+          ];
+        }
+        return ListView(
+          children: children,
+        );
+      },
+    );
+  }
+
   Widget getList(List<String> activeFilters) {
     //cases: no filters, filteres with resources, filters with no resources
-    if (widget.filteredList!.isEmpty && activeFilters.isNotEmpty) {
+    if (widget.filteredList != null &&
+        widget.filteredList!.isEmpty &&
+        activeFilters.isNotEmpty) {
       return const Center(
         child: Text("no values, change filters"),
       );
@@ -247,11 +271,14 @@ class ResourcesPageState extends State<ResourcesPage> {
         backgroundColor: const Color(0xFF2B2A2A),
         foregroundColor: Colors.white,
       ),
-      body: getList(getActiveFilters()),
+      //body: getList2(getActiveFilters(), widget.proxyModel.list('resources')),
+      body: getList2(
+          getActiveFilters(), widget.proxyModel.filter('resources', filters)),
       //body: filterSheet2(),
       floatingActionButton: ElevatedButton(
           onPressed: () async {
             await filterSheet(false);
+            setState(() {});
           },
           /*onPressed: () {
                     widget.sheetCont.expand();

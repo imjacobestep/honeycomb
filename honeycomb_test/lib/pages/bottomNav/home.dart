@@ -23,18 +23,80 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   @override
-  Future<void> initState() async {
+  void initState() {
+    //loadData();
+    Future.delayed(Duration.zero, () async {
+      String var1 = await testfunction();
+      //here is the async code, you can execute any async code here
+      print(var1);
+    });
+    super.initState();
+  }
+
+  Future<String> testfunction() async {
     widget.user = await widget.proxyModel.getUser(widget.userID) as MPUser;
     widget.favs = await widget.proxyModel.listUserFavorites(widget.user!);
     widget.clients = await widget.proxyModel.listUserClients(widget.user!);
-    super.initState();
+    print("This is test function");
+    return Future(() => "abc");
+  }
+
+  loadData() async {
+    widget.user = await widget.proxyModel.getUser(widget.userID);
+    widget.favs = await widget.proxyModel.listUserFavorites(widget.user!);
+    widget.clients = await widget.proxyModel.listUserClients(widget.user!);
+    setState(() {});
+  }
+
+  Widget clientsList() {
+    if (widget.clients == null) {
+      return Center(
+        child: Text("no clients yet"),
+      );
+    } else {
+      return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: widget.clients!.isEmpty ? 0 : 3,
+        itemBuilder: (BuildContext context, int index) {
+          if (widget.clients!.isEmpty) {
+            return Container();
+          } else {
+            return clientCard(context, widget.clients!.elementAt(index));
+          }
+        },
+      );
+    }
+  }
+
+  Widget favsList() {
+    if (widget.favs == null) {
+      return Center(
+        child: Text("no favs yet"),
+      );
+    } else {
+      return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: widget.favs!.isEmpty ? 0 : 3,
+        itemBuilder: (BuildContext context, int index) {
+          if (widget.favs!.isEmpty) {
+            return Container();
+          } else {
+            return resourceCard(context, widget.favs!.elementAt(index));
+          }
+        },
+      );
+    }
   }
 
   Widget filterCard(IconData icon, String label) {
     return Card(
       child: InkWell(
         onTap: () {
-          category_filters[label] = !category_filters[label]!;
+          filters["Categories"]![label] = !filters["Categories"]![label]!;
         },
         onLongPress: () {
           resetFilters();
@@ -65,7 +127,8 @@ class HomePageState extends State<HomePage> {
     //String? displayName = FirebaseAuth.instance.currentUser?.displayName;
     // User? user = widget.user;
 
-    String? userName = widget.user!.name;
+    String? userName = widget.user != null ? widget.user?.name : "u";
+    //String? userName = "u";
 
     return Scaffold(
       appBar: AppBar(
@@ -103,26 +166,10 @@ class HomePageState extends State<HomePage> {
           ),
           getDivider(context),
           sectionHeader("Recent Clients", context),
-          ListView.builder(
-            padding: const EdgeInsets.all(8),
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: 3,
-            itemBuilder: (BuildContext context, int index) {
-              return clientCard(context, widget.clients!.elementAt(index));
-            },
-          ),
+          clientsList(),
           getDivider(context),
           sectionHeader("Favorites", context),
-          ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(8),
-            shrinkWrap: true,
-            itemCount: widget.favs!.length,
-            itemBuilder: (BuildContext context, int index) {
-              return resourceCard(context, widget.favs!.elementAt(index));
-            },
-          ),
+          favsList(),
         ],
       ),
       bottomNavigationBar: customNav(context, 0),

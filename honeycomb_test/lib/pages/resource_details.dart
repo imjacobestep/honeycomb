@@ -27,7 +27,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   Widget getAction(String label, String value) {
     switch (label) {
-      case "number":
+      case "Phone Number":
         {
           return IconButton(
               onPressed: () {
@@ -39,7 +39,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               icon: const Icon(Icons.call_outlined));
         }
 
-      case "email":
+      case "Email Address":
         {
           return IconButton(
               onPressed: () {
@@ -51,7 +51,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
               icon: const Icon(Icons.mail_outlined));
         }
 
-      case "address":
+      case "Street Address":
         {
           return IconButton(
               onPressed: () {
@@ -61,6 +61,15 @@ class ServiceDetailsState extends State<ServiceDetails> {
               icon: const Icon(Icons.directions_outlined));
         }
 
+      case "Website":
+        {
+          return IconButton(
+              onPressed: () {
+                launchUrl(Uri.parse(widget.resource.website!));
+              },
+              icon: const Icon(Icons.language));
+        }
+
       default:
         {
           return Container();
@@ -68,37 +77,58 @@ class ServiceDetailsState extends State<ServiceDetails> {
     }
   }
 
+  bool isAction(String label) {
+    switch (label) {
+      case "Phone Number":
+        return true;
+      case "Email Address":
+        return true;
+      case "Street Address":
+        return true;
+      case "Website":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   Widget detailListing(String label, String value) {
+    List<Widget> children = [
+      Expanded(
+        flex: 9,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            getSpacer(4),
+            Container(
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width - 50),
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(
+                value,
+                maxLines: 10,
+                softWrap: true,
+                textWidthBasis: TextWidthBasis.parent,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+          ],
+        ),
+      )
+    ];
+    if (isAction(label)) {
+      children.add(Expanded(flex: 1, child: getAction(label, value)));
+    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
-              getSpacer(4),
-              Container(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width - 50),
-                padding: const EdgeInsets.only(left: 8),
-                child: Text(
-                  value,
-                  maxLines: 10,
-                  softWrap: true,
-                  textWidthBasis: TextWidthBasis.parent,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-            ],
-          ),
-          getAction(label, value)
-        ],
+        children: children,
       ),
     );
   }
@@ -243,7 +273,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
   Widget detailsCategory(
       Map<dynamic, dynamic> categories, BuildContext context) {
     return Wrap(children: [
-      for (String category in categories.values)
+      for (String category in categories.keys)
         detailsCategoryLabel(context, category)
     ]);
   }
@@ -264,6 +294,26 @@ class ServiceDetailsState extends State<ServiceDetails> {
           infoWindow: InfoWindow(title: widget.resource.name, snippet: ""),
           icon: BitmapDescriptor.defaultMarker)
     };
+
+    List<Widget> quickActions() {
+      List<Widget> ret = [];
+      if (widget.resource.address != null) {
+        ret.add(getAction2("Directions", widget.resource.address!));
+      } //directions
+      if (widget.resource.phoneNumbers != null &&
+          widget.resource.phoneNumbers!["primary"] != null) {
+        ret.add(getAction2("Call", widget.resource.phoneNumbers!['primary']));
+      } //phone
+      if (widget.resource.email != null) {
+        ret.add(getAction2("Email", widget.resource.email!));
+      } //email
+      if (widget.resource.website != null) {
+        ret.add(getAction2("Web", widget.resource.website!));
+      }
+      ret.add(getAction2("Client", widget.resource.address!)); //web
+      //client
+      return ret;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -377,13 +427,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
-            children: [
-              getAction2("Directions", widget.resource.address!),
-              getAction2("Call", widget.resource.phoneNumbers!['primary']),
-              getAction2("Email", widget.resource.email!),
-              getAction2("Web", widget.resource.website!),
-              getAction2("Client", widget.resource.website!),
-            ],
+            children: quickActions(),
           ),
           getSpacer(8),
           getDivider(context),
@@ -392,10 +436,11 @@ class ServiceDetailsState extends State<ServiceDetails> {
           getSpacer(8),
           getDivider(context),
           getSpacer(8),
-          detailListing("number", widget.resource.phoneNumbers!["primary"]),
-          detailListing("email", widget.resource.email!),
-          detailListing("address", widget.resource.address!),
-          detailListing("website", widget.resource.website!)
+          detailListing(
+              "Phone Number", widget.resource.phoneNumbers!["primary"]),
+          detailListing("Email Address", widget.resource.email!),
+          detailListing("Street Address", widget.resource.address!),
+          detailListing("Website", widget.resource.website!)
         ],
       ),
       //bottomNavigationBar: BottomNavigationBar(items: [],),

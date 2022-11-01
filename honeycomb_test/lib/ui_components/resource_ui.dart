@@ -70,7 +70,7 @@ Widget resourceCard(BuildContext context, Resource resource) {
               children: [
                 Row(
                   children: [
-                    for (String category in resource.categories!.values)
+                    for (String category in resource.categories!.keys)
                       cardCategoryLabel(context, category)
                   ],
                 ),
@@ -82,7 +82,7 @@ Widget resourceCard(BuildContext context, Resource resource) {
                       style: const TextStyle(fontSize: 20),
                     ),
                     getSpacer(4),
-                    showRecency(context, resource)
+                    //showRecency(context, resource)
                   ],
                 )
               ],

@@ -54,9 +54,9 @@ class Resource {
     return Resource(
       id: snapshot.id,
       name: data?['name'],
-      phoneNumbers: data?['phoneNumbers'],
+      phoneNumbers: data?['phoneNumber'],
       email: data?['email'],
-      address: data?['address'],
+      address: data?['streetAddress'],
       zipCode: data?['zipCode'],
       coords: data?['coords'] is GeoPoint
           ? LatLng(data?['coords'].latitude, data?['coords'].longitude)
