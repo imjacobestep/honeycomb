@@ -31,19 +31,39 @@ class MapPageState extends State<MapPage> {
     super.initState();
   }
 
+// VARIABLES
   final Set<Marker> markers = {
-    Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
+    const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
-
-  void addMarker(LatLng position, String markerId, String title, String info) {
-    BitmapDescriptor icon = markerId == "current"
-        ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)
-        : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+// FUNCTIONS
+  void currentMarker(LatLng position) {
     markers.add(Marker(
-        markerId: MarkerId(markerId),
+        onTap: () {},
+        markerId: const MarkerId("current"),
         position: position,
-        infoWindow: InfoWindow(title: title, snippet: info),
-        icon: icon));
+        infoWindow: const InfoWindow(title: "You Are Here"),
+        icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange)));
+  }
+
+  void addMarker(Resource resource) {
+    markers.add(Marker(
+        markerId: MarkerId(resource.name!),
+        position: resource.coords!,
+        infoWindow: InfoWindow(
+          title: resource.name!,
+          snippet: getCategories(resource),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ServiceDetails(
+                          resource: resource,
+                        )));
+          },
+        ),
+        icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)));
   }
 
   final Completer<GoogleMapController> _controller = Completer();
@@ -52,30 +72,12 @@ class MapPageState extends State<MapPage> {
     //String ret = "";
     if (resource.categories != null) {
       return resource.categories!.keys.toString();
-    } else
+    } else {
       return "";
+    }
   }
 
-  void resourceToMarker(Resource resource) {
-    addMarker(resource.coords!, resource.name!, resource.name!,
-        getCategories(resource));
-    /* markers.add(Marker(
-        markerId: MarkerId(resource.name!),
-        position: resource.coords!,
-        infoWindow: InfoWindow(
-            title: resource.name,
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ServiceDetails(
-                            resource: resource,
-                          )));
-            }),
-        icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange))); */
-  }
-
+// UI WIDGETS
   Widget getMap() {
     return FutureBuilder(
       future: widget.resourceList,
@@ -84,7 +86,7 @@ class MapPageState extends State<MapPage> {
         if (snapshot.hasData && snapshot.data != null) {
           Iterable testList = snapshot.data!;
           for (Resource resource in testList) {
-            resourceToMarker(resource);
+            addMarker(resource);
           }
         } else {
           return const Padding(
@@ -107,7 +109,7 @@ class MapPageState extends State<MapPage> {
                   target: location,
                   zoom: 17.4746,
                 );
-                addMarker(location, "current", "You Are Here", "");
+                currentMarker(location);
                 return GoogleMap(
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
@@ -120,7 +122,7 @@ class MapPageState extends State<MapPage> {
                   },
                 );
               } else {
-                return LoadingIndicator(size: 50, borderWidth: 5);
+                return const LoadingIndicator(size: 50, borderWidth: 5);
               }
             });
       },
