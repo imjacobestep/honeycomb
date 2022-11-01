@@ -149,7 +149,7 @@ class MapPageState extends State<MapPage> {
           CameraPosition cam;
           LatLng location;
           if (loc.hasData) {
-            //print(loc.data);
+            print(loc.data);
             if (loc.data!['lat'] != null && loc.data!['lng'] != null) {
               location = LatLng(loc.data!['lat']!, loc.data!['lng']!);
               cam = CameraPosition(

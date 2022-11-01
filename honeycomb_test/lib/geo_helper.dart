@@ -1,9 +1,9 @@
 import 'dart:convert';
-
+import "package:honeycomb_test/secrets.dart";
 import 'package:http/http.dart' as http;
 
 class GeoHelper {
-  final apiKey = '';
+  final apiKey = hcMapsKey;
 
   GeoHelper();
 
@@ -39,7 +39,7 @@ class GeoHelper {
 
   Future<Map> parseAddress(String address, String zipCode) async {
     try {
-      final suffix = parseZipCode(zipCode);
+      final suffix = await parseZipCode(zipCode);
 
       final fullAddress = '$address, $suffix';
 
