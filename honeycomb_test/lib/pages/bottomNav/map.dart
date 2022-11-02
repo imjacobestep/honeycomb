@@ -40,8 +40,8 @@ class MapPageState extends State<MapPage> {
     /* widget.typedLocation =
         widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode); */
     widget.typedLocation =
-        widget.geo.parseAddress("12280 NE District Wy", "98005");
-    widget.useCurrentLocation = true;
+        widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode);
+    //widget.useCurrentLocation = true;
     widget.useCurrentLocation = false;
     super.initState();
   }
@@ -149,14 +149,14 @@ class MapPageState extends State<MapPage> {
           CameraPosition cam;
           LatLng location;
           if (loc.hasData) {
-            print(loc.data);
+            //print(loc.data);
             if (loc.data!['lat'] != null && loc.data!['lng'] != null) {
               location = LatLng(loc.data!['lat']!, loc.data!['lng']!);
               cam = CameraPosition(
                 target: location,
                 zoom: 17.4746,
               );
-              //currentMarker(location);
+              currentMarker(location);
               return getMap(cam);
             } else {
               return const Center(
@@ -199,8 +199,11 @@ class MapPageState extends State<MapPage> {
       onSubmitted: (text) {
         setState(() {
           final split = text.split(',');
+
           widget.typedAddress = split[0];
           widget.typedZipCode = split[split.length - 1];
+          widget.typedLocation =
+              widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode);
           widget.useCurrentLocation = false;
           widget._controller = Completer();
           widget.showReturnLocation = false;
