@@ -12,7 +12,7 @@ class Proxy {
     // [START add_data_custom_objects]
     final String collection;
     switch (item.runtimeType) {
-      case User:
+      case MPUser:
         collection = 'users';
         break;
       case Client:
@@ -51,7 +51,7 @@ class Proxy {
               SnapshotOptions? options) {
             switch (collection) {
               case 'users':
-                return User.fromFirestore(snapshot, options);
+                return MPUser.fromFirestore(snapshot, options);
               case 'clients':
                 return Client.fromFirestore(snapshot, options);
               case 'resources':
@@ -112,16 +112,45 @@ class Proxy {
     // [END add_data_custom_objects]
   }
 
-  Future<Iterable<dynamic>> listUserFavorites(User user) async {
+  Future<Iterable<dynamic>> listUserFavorites(MPUser user) async {
     return await listByIds('resources', user.favorites ?? []);
   }
 
-  Future<Iterable<dynamic>> listUserClients(User user) async {
+  Future<Iterable<dynamic>> listUserClients(MPUser user) async {
     return await listByIds('clients', user.clients ?? []);
   }
 
   Future<Iterable<dynamic>> listClientResources(Client client) async {
     return await listByIds('resources', client.resources ?? []);
+  }
+
+  Iterable<dynamic> sort(
+      Iterable<dynamic> items, String field, bool ascending) {
+    if (ascending) {
+      if (field == 'name') {
+        return items.toList()..sort((a, b) => a.name!.compareTo(b.name!));
+      } else if (field == 'createdStamp') {
+        return items.toList()
+          ..sort((a, b) => a.createdStamp!.compareTo(b.createdStamp!));
+      } else if (field == 'updatedStamp') {
+        return items.toList()
+          ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
+      } else {
+        throw Exception('Unknown field');
+      }
+    } else {
+      if (field == 'name') {
+        return items.toList()..sort((a, b) => b.name!.compareTo(a.name!));
+      } else if (field == 'createdStamp') {
+        return items.toList()
+          ..sort((a, b) => b.createdStamp!.compareTo(a.createdStamp!));
+      } else if (field == 'updatedStamp') {
+        return items.toList()
+          ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
+      } else {
+        throw Exception('Unknown field');
+      }
+    }
   }
 
   // Future<User> getUser(String id) async {
@@ -152,7 +181,7 @@ class Proxy {
     var users = await get('users', id);
 
     if (users == null) {
-      final user = User(id: id, favorites: [], clients: []);
+      final user = MPUser(id: id, favorites: [], clients: []);
       return await upsert(user);
     } else {
       return users;

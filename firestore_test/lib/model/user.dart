@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class User {
+class MPUser {
   final String? id;
   String? name;
   String? email;
@@ -9,7 +9,7 @@ class User {
   DateTime? createdStamp;
   DateTime? updatedStamp;
 
-  User({
+  MPUser({
     this.id,
     this.name,
     this.email,
@@ -19,13 +19,13 @@ class User {
     this.updatedStamp,
   });
 
-  factory User.fromFirestore(
+  factory MPUser.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
     final data = snapshot.data();
     // print(snapshot.id);
-    return User(
+    return MPUser(
       id: snapshot.id,
       name: data?['name'],
       email: data?['email'],
