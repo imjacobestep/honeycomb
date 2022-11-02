@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../model/resource.dart';
 import '../model/user.dart';
 import '../ui_components/resource_ui.dart';
+import 'package:intl/intl.dart';
 
 class ServiceDetails extends StatefulWidget {
   @override
@@ -318,7 +319,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
   }
 
   Widget tagsBuilder(Map<dynamic, dynamic> categories, BuildContext context) {
-    return Wrap(children: [
+    return Wrap(spacing: 4, runSpacing: 4, children: [
       for (String category in categories.keys)
         detailsCategoryLabel(context, category)
     ]);
@@ -329,8 +330,25 @@ class ServiceDetailsState extends State<ServiceDetails> {
     if (widget.resource.multilingual != null && widget.resource.multilingual!) {
       miscDetails["Multilingual"] = true;
     }
+    if (widget.resource.accessibility != null &&
+        widget.resource.accessibility!) {
+      miscDetails["Wheelchair Accessible"] = true;
+    }
+    if (widget.resource.isActive != null && widget.resource.isActive!) {
+      miscDetails["Active"] = true;
+    }
+    if (widget.resource.isActive != null && !widget.resource.isActive!) {
+      miscDetails["Inactive"] = true;
+    }
 
     return tagsBuilder(miscDetails, context);
+  }
+
+  bool miscTest() {
+    if (widget.resource.multilingual != null && widget.resource.multilingual!) {
+      return true;
+    }
+    return false;
   }
 
   Widget editButton() {
@@ -490,13 +508,26 @@ class ServiceDetailsState extends State<ServiceDetails> {
   }
 
   Widget resourceHeader() {
+    DateFormat formatter = DateFormat('MM-dd-yyyy');
+    String updatedTime = widget.resource.updatedStamp != null
+        ? formatter.format(widget.resource.updatedStamp!).toString()
+        : "unknown time";
+    String updatedUser = widget.resource.updatedBy != null
+        ? widget.resource.updatedBy!.toString()
+        : "unknown user";
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          widget.resource.name!,
-          style: Theme.of(context).textTheme.headlineSmall,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.resource.name!,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Text("updated $updatedTime by $updatedUser")
+          ],
         ),
         userBuilder()
       ],
@@ -545,7 +576,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
       ));
       children.add(getDivider(context));
     }
-    if (widget.resource.eligibility != null) {
+    if (miscTest()) {
       children.add(Padding(
         padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
         child: Column(

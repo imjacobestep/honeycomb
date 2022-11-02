@@ -129,7 +129,7 @@ class HomePageState extends State<HomePage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
-      toolbarHeight: 100,
+      toolbarHeight: 80,
       leadingWidth: 80,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),

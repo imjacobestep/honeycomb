@@ -43,7 +43,7 @@ Widget cardCategoryLabel(BuildContext context, String category) {
 
 Widget detailsCategoryLabel(BuildContext context, String category) {
   return Container(
-    margin: const EdgeInsets.all(4),
+    margin: const EdgeInsets.all(0),
     child: Chip(
       label: Text(category),
     ),
