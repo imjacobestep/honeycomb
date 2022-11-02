@@ -68,23 +68,17 @@ Widget resourceCard(BuildContext context, Resource resource) {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Text(
+                  resource.name!,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                //getSpacer(2),
+                Wrap(
                   children: [
                     for (String category in resource.categories!.keys)
                       cardCategoryLabel(context, category)
                   ],
                 ),
-                getSpacer(4),
-                Row(
-                  children: [
-                    Text(
-                      resource.name!,
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    getSpacer(4),
-                    //showRecency(context, resource)
-                  ],
-                )
               ],
             ),
             IconButton(

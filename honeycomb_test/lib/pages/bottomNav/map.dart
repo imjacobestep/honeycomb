@@ -24,8 +24,11 @@ class MapPage extends StatefulWidget {
   bool? useCurrentLocation;
   String typedAddress = "12280 NE District Wy";
   String typedZipCode = "98005";
-  Completer<GoogleMapController>? _controller;
+  GoogleMapController? mapController;
   bool showReturnLocation = false;
+  Set<Marker> markers = {
+    const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
+  };
 
   MapPage();
 }
@@ -33,26 +36,20 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   @override
   void initState() {
-    widget._controller = Completer();
-    //widget.unfilteredList = await widget.proxyModel.list('resources');
+    //widget._controller = GoogleMapController;
     widget.resourceList = widget.proxyModel.list("resources");
     widget.currentLocation = widget.location.getLocation();
-    /* widget.typedLocation =
-        widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode); */
     widget.typedLocation =
         widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode);
-    //widget.useCurrentLocation = true;
-    widget.useCurrentLocation = false;
+    widget.useCurrentLocation = true;
     super.initState();
   }
 
-// VARIABLES
-  final Set<Marker> markers = {
-    const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
-  };
+  LatLng lastLocation = LatLng(0, 0);
+
 // FUNCTIONS
   void currentMarker(LatLng position) {
-    markers.add(Marker(
+    widget.markers.add(Marker(
         onTap: () {},
         markerId: const MarkerId("current"),
         position: position,
@@ -62,7 +59,7 @@ class MapPageState extends State<MapPage> {
   }
 
   void addMarker(Resource resource) {
-    markers.add(Marker(
+    widget.markers.add(Marker(
         markerId: MarkerId(resource.name!),
         position: resource.coords!,
         infoWindow: InfoWindow(
@@ -109,11 +106,17 @@ class MapPageState extends State<MapPage> {
       myLocationEnabled: true,
       myLocationButtonEnabled: widget.showReturnLocation,
       mapType: MapType.normal,
-      markers: markers,
+      markers: widget.markers,
       initialCameraPosition: cam,
       onMapCreated: (GoogleMapController controller) {
-        widget._controller!.complete(controller);
+        setState(() {
+          widget.mapController = controller;
+        });
+        //widget.mapController = controller;
       },
+      /* onMapCreated: (GoogleMapController controller) {
+        widget._controller!.complete(controller);
+      }, */
     );
   }
 
@@ -126,9 +129,10 @@ class MapPageState extends State<MapPage> {
           if (loc.hasData &&
               (loc.data!.latitude != null && loc.data!.longitude != null)) {
             location = LatLng(loc.data!.latitude!, loc.data!.longitude!);
+            lastLocation = location;
             cam = CameraPosition(
               target: location,
-              zoom: 17.4746,
+              zoom: 17.5,
             );
             //currentMarker(location);
             return getMap(cam);
@@ -154,7 +158,7 @@ class MapPageState extends State<MapPage> {
               location = LatLng(loc.data!['lat']!, loc.data!['lng']!);
               cam = CameraPosition(
                 target: location,
-                zoom: 17.4746,
+                zoom: 17.5,
               );
               currentMarker(location);
               return getMap(cam);
@@ -205,8 +209,9 @@ class MapPageState extends State<MapPage> {
           widget.typedLocation =
               widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode);
           widget.useCurrentLocation = false;
-          widget._controller = Completer();
+          //widget._controller = Completer();
           widget.showReturnLocation = false;
+          widget.markers.clear();
         });
       },
       decoration: InputDecoration(
@@ -227,11 +232,17 @@ class MapPageState extends State<MapPage> {
   Widget headerButton() {
     return ElevatedButton(
         onPressed: () {
-          setState(() {
-            widget.useCurrentLocation = true;
-            widget._controller = Completer();
-            widget.showReturnLocation = true;
-          });
+          if (widget.useCurrentLocation!) {
+            widget.mapController!.animateCamera(CameraUpdate.newCameraPosition(
+                CameraPosition(target: lastLocation, zoom: 17.5)));
+          } else {
+            setState(() {
+              widget.useCurrentLocation = true;
+              //widget._controller = Completer();
+              widget.showReturnLocation = true;
+              widget.markers.clear();
+            });
+          }
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

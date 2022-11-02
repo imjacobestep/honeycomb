@@ -85,10 +85,28 @@ Map<String, Map<String, bool>> filters = {
   "Other Filters": {"Multilingual": false, "Active": false},
 };
 
+bool ifAnyFilters() {
+  bool ret = false;
+  filters.forEach((key, value) {
+    value.forEach((key2, value2) {
+      if (value2) {
+        ret = true;
+      }
+    });
+  });
+  return ret;
+}
+
+void setFilter(String inKey, bool inVal) {
+  filters.forEach((key, value) {
+    if (value.containsKey(inKey)) {
+      value[inKey] = inVal;
+    }
+  });
+}
+
 void resetFilters() {
   filters.forEach((key, value) {
-    value.forEach((key, value) {
-      value = false;
-    });
+    setFilter(key, false);
   });
 }

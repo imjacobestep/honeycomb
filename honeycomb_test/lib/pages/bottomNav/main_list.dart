@@ -6,15 +6,12 @@ import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 
 class ResourcesPage extends StatefulWidget {
   @override
   ResourcesPageState createState() => ResourcesPageState();
-  BottomSheetBarController sheetCont = BottomSheetBarController();
   Proxy proxyModel = Proxy();
-  Iterable? unfilteredList;
-  Iterable? filteredList;
+  Future<Iterable>? resourceList;
 
   ResourcesPage();
 }
@@ -22,103 +19,150 @@ class ResourcesPage extends StatefulWidget {
 class ResourcesPageState extends State<ResourcesPage> {
   @override
   void initState() {
-    //loadData();
-    //BottomSheetBarController sheetCont;
+    widget.resourceList = widget.proxyModel.list("resources");
     super.initState();
   }
 
-  Widget filterChip(String label, bool value) {
-    if (value) {
-      return InkWell(
-        onTap: () {
-          filters["Categories"]![label] = false;
-          setState(() {});
-          //filterSheet(true);
-        },
-        child: Chip(
-          label: Text(label),
-        ),
-      );
-    } else {
-      return InkWell(
-        onTap: () {
-          filters["Categories"]![label] = true;
-          setState(() {});
-        },
-        child: Chip(
-          label: Text(label),
-          backgroundColor: Colors.transparent,
-          side: const BorderSide(color: Colors.black12, width: 1),
-        ),
-      );
-    }
-  }
+  // VARIABLES
 
-  List<Widget> filterType(Map map) {
-    List<Widget> ret = [];
-    for (var key in map.keys) {
-      if (map[key] != null) {
-        ret.add(filterChip(key, map[key]!));
-      }
-    }
-    return ret;
-  }
+  // FUNCTIONS
 
-  filterSheet2() {
-    return BottomSheetBar(
-      locked: false,
-      controller: widget.sheetCont,
-      body: getList(getActiveFilters()),
-      expandedBuilder: (scrollController) => ListView.builder(
-        controller: scrollController,
-        itemBuilder: (context, index) =>
-            ListTile(title: Text(index.toString())),
-        itemCount: 50,
-      ),
-      collapsed: TextButton(
-        child: const Text("Open Sheet"),
-        onPressed: () {
-          widget.sheetCont.expand();
-        },
-      ),
-    );
-  }
+  // WIDGETS
 
-  List<Widget> getFilters() {
+  List<Widget> getFilters(Map map) {
     List<Widget> ret = [];
     ret.add(
       Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [IconButton(onPressed: () {}, icon: const Icon(Icons.close))],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ElevatedButton(
+              onPressed: () {
+                resetFilters();
+              },
+              child: const Text("clear filters")),
+          IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.close))
+        ],
       ),
     );
-    filters.forEach((key, value) {
-      ret.add(Text(key));
-      ret.add(Wrap(
-        children: filterType(value),
-      ));
-    });
+    ret.add(getSpacer(8));
+
     ret.add(ElevatedButton(
         onPressed: () {
           setState(() {});
+          Navigator.pop(context);
         },
         child: const Text("Apply Filters")));
     return ret;
   }
 
-  Future filterSheet(bool refresh) {
-    return showMaterialModalBottomSheet(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-      expand: false,
-      context: context,
-      duration: Duration(milliseconds: refresh ? 0 : 400),
-      builder: (context) => ListView(
+  Widget sheetBuilder() {
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setSheetState) {
+      Widget filterChip(String label, bool value) {
+        return InkWell(
+            borderRadius: BorderRadius.circular(35),
+            enableFeedback: true,
+            onTap: () {
+              setFilter(label, !value);
+              setSheetState(() {});
+            },
+            child: !value
+                ? Chip(
+                    label: Text(label),
+                    backgroundColor: Colors.transparent,
+                    side: const BorderSide(color: Colors.black12, width: 1),
+                  )
+                : Chip(
+                    side: const BorderSide(color: Colors.transparent, width: 1),
+                    backgroundColor: Colors.black,
+                    label: Text(
+                      label,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ));
+      }
+
+      List<Widget> filterSection(Map map) {
+        List<Widget> ret = [];
+        for (var key in map.keys) {
+          if (map[key] != null) {
+            ret.add(filterChip(key, map[key]));
+          }
+        }
+        return ret;
+      }
+
+      Widget filterHeader() {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  filters.forEach(
+                    (key, value) {
+                      value.forEach((key, value) {
+                        setFilter(key, false);
+                      });
+                    },
+                  );
+                  setSheetState(() {});
+                },
+                child: const Text("clear filters")),
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.close))
+          ],
+        );
+      }
+
+      Widget applyButton() {
+        return ElevatedButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.pop(context);
+            },
+            child: const Text("Apply Filters"));
+      }
+
+      List<Widget> buildList() {
+        List<Widget> children = [];
+        children.add(filterHeader());
+        children.add(getSpacer(8));
+        filters.forEach((key, value) {
+          children.add(Text(key));
+          children.add(Wrap(
+            spacing: 4,
+            children: filterSection(value),
+          ));
+        });
+        children.add(applyButton());
+        return children;
+      }
+
+      return ListView(
         shrinkWrap: true,
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        children: getFilters(),
-      ),
-    );
+        children: buildList(),
+      );
+    });
+  }
+
+  Future filterSheet() {
+    return showMaterialModalBottomSheet(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+        expand: false,
+        isDismissible: false,
+        context: context,
+        builder: (context) {
+          return sheetBuilder();
+        });
   }
 
   Widget showActiveFilters(List<String> activeFilters) {
@@ -162,21 +206,27 @@ class ResourcesPageState extends State<ResourcesPage> {
     return activeFilters;
   }
 
-  Widget getList2(List<String> activeFilters, Future<Iterable> unfilteredList) {
+  Widget getResourceList() {
     return FutureBuilder(
-      future: unfilteredList,
+      future: !ifAnyFilters()
+          ? widget.resourceList
+          : widget.proxyModel.filter("resources", filters),
       builder: (BuildContext context, AsyncSnapshot<Iterable> snapshot) {
         List<Widget> children = [];
         if (snapshot.hasData && snapshot.data != null) {
-          //print(snapshot.data.runtimeType);
           Iterable testList = snapshot.data!;
-          for (Resource resource in testList) {
-            children.add(resourceCard(context, resource));
+          if (testList.isEmpty) {
+            return const Center(
+              child: Text("No Results"),
+            );
+          } else {
+            for (Resource resource in testList) {
+              children.add(resourceCard(context, resource));
+            }
           }
-          //children = <Widget>[resourceCard(context, snapshot.data as Resource)];
         } else {
           children = <Widget>[
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(16),
               child: Text("No Results"),
             )
@@ -189,100 +239,81 @@ class ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
-  Widget getList(List<String> activeFilters) {
-    //cases: no filters, filteres with resources, filters with no resources
-    if (widget.filteredList != null &&
-        widget.filteredList!.isEmpty &&
-        activeFilters.isNotEmpty) {
-      return const Center(
-        child: Text("no values, change filters"),
-      );
-    } else if (widget.filteredList!.isNotEmpty && activeFilters.isNotEmpty) {
-      return ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(8),
-        shrinkWrap: true,
-        itemCount: widget.filteredList!.length,
-        itemBuilder: (BuildContext context, int index) {
-          return resourceCard(context, widget.unfilteredList!.elementAt(index));
-        },
-      );
-    } else {
-      return ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(8),
-        shrinkWrap: true,
-        itemCount: widget.unfilteredList!.length,
-        itemBuilder: (BuildContext context, int index) {
-          return resourceCard(context, widget.unfilteredList!.elementAt(index));
-        },
-      );
-    }
+  Widget searchBar() {
+    return TextField(
+      maxLines: 1,
+      textAlignVertical: TextAlignVertical.center,
+      onSubmitted: (text) {
+        setState(() {
+          if (text == "") {
+            widget.resourceList = widget.proxyModel.list("resources");
+          } else {
+            widget.resourceList = widget.proxyModel.searchResources("text");
+          }
+        });
+      },
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.all(0),
+        isDense: true,
+        constraints: const BoxConstraints(maxHeight: 50),
+        filled: true,
+        hintText: "Search resources...",
+        prefixIcon: const Icon(Icons.search_outlined),
+        fillColor: Theme.of(context).canvasColor,
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+        ),
+      ),
+    );
+  }
+
+  Widget headerButton() {
+    return ElevatedButton(
+        onPressed: () {},
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: const [
+            SizedBox(height: 50, child: Center(child: Text("Add"))),
+            //getSpacer(2),
+            Icon(Icons.add_circle)
+          ],
+        ));
+  }
+
+  PreferredSizeWidget topHeader() {
+    return AppBar(
+      toolbarHeight: 80,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
+      title: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(flex: 20, child: searchBar()),
+          Expanded(
+            flex: 1,
+            child: getSpacer(4),
+          ),
+          Expanded(flex: 8, child: headerButton())
+        ],
+      ),
+      backgroundColor: const Color(0xFF2B2A2A),
+      foregroundColor: Colors.white,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 80,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
-        title: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              flex: 20,
-              child: TextField(
-                decoration: InputDecoration(
-                  constraints: const BoxConstraints(maxHeight: 50),
-                  filled: true,
-                  hintText: "Search...",
-                  prefixIcon: const Icon(Icons.search_outlined),
-                  fillColor: Theme.of(context).canvasColor,
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: getSpacer(4),
-            ),
-            //getSpacer(8),
-            Expanded(
-              flex: 8,
-              child: ElevatedButton(
-                  onPressed: () {},
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: const [
-                      SizedBox(height: 50, child: Center(child: Text("Add"))),
-                      //getSpacer(2),
-                      Icon(Icons.add_circle_outline)
-                    ],
-                  )),
-            )
-          ],
-        ),
-        backgroundColor: const Color(0xFF2B2A2A),
-        foregroundColor: Colors.white,
-      ),
-      //body: getList2(getActiveFilters(), widget.proxyModel.list('resources')),
-      body: getList2(
-          getActiveFilters(), widget.proxyModel.filter('resources', filters)),
-      //body: filterSheet2(),
+      appBar: topHeader(),
+      body: getResourceList(),
       floatingActionButton: ElevatedButton(
           onPressed: () async {
-            await filterSheet(false);
+            await filterSheet();
             setState(() {});
           },
-          /*onPressed: () {
-                    widget.sheetCont.expand();
-                  },*/
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

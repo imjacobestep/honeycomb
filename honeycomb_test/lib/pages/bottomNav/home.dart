@@ -132,6 +132,11 @@ class HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Image.asset("lib/assets/icon/icon.png"),
+        ),
+        //leading: Image(image: AssetImage('../lib/assets/icon/icon.png')),
         centerTitle: true,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),

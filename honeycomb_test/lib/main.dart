@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
+import 'package:material_color_generator/material_color_generator.dart';
 
 import 'firebase_options.dart';
 
@@ -25,10 +26,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Honeycomb',
       theme: ThemeData(
-        useMaterial3: true,
-        //primarySwatch: generateMaterialColor(color: const Color(0xFFEEBB02)),
-        //primarySwatch: Colors.orange
-      ),
+          useMaterial3: true,
+          primarySwatch: generateMaterialColor(color: const Color(0xFFFFE93E)),
+          //primarySwatch: Colors.orange
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Color(0xFFFFE93E)),
+          )),
       initialRoute:
           FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
