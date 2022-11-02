@@ -12,9 +12,9 @@ class Resource {
   String? website;
   //LIST ATTRIBUTES
   Map? categories;
-  Map? languages;
+  bool? multilingual;
   Map? eligibility;
-  Map? accessibility;
+  bool? accessibility;
   //EXTRA ATTRIBUTES
   String? notes;
   bool? isActive;
@@ -34,7 +34,7 @@ class Resource {
     this.coords,
     this.website,
     this.categories,
-    this.languages,
+    this.multilingual,
     this.eligibility,
     this.accessibility,
     this.notes,
@@ -63,7 +63,7 @@ class Resource {
           : null,
       website: data?['website'],
       categories: data?['categories'],
-      languages: data?['languages'],
+      multilingual: data?['multilingual'],
       eligibility: data?['eligibility'],
       accessibility: data?['accessibility'],
       notes: data?['notes'],
@@ -90,7 +90,7 @@ class Resource {
         "coords": GeoPoint(coords!.latitude, coords!.longitude),
       if (website != null) "website": website?.toLowerCase(),
       if (categories != null) "categories": categories,
-      if (languages != null) "languages": languages,
+      if (multilingual != null) "multilingual": multilingual,
       if (eligibility != null) "eligibility": eligibility,
       if (accessibility != null) "accessibility": accessibility,
       if (notes != null) "notes": notes,
