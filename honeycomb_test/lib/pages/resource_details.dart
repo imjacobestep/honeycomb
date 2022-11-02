@@ -1,19 +1,22 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../model/resource.dart';
+import '../model/user.dart';
 import '../ui_components/resource_ui.dart';
 
 class ServiceDetails extends StatefulWidget {
   @override
   ServiceDetailsState createState() => ServiceDetailsState();
-  //String previousPage;
+  Proxy proxyModel = Proxy();
+  String userID = FirebaseAuth.instance.currentUser!.uid;
   Resource resource;
-  //var locData;
-
+  GoogleMapController? mapController;
   ServiceDetails({required this.resource});
 }
 
@@ -92,7 +95,51 @@ class ServiceDetailsState extends State<ServiceDetails> {
     }
   }
 
-  Widget detailListing(String label, String value) {
+  Widget numbersSection() {
+    List<Widget> children = [];
+    children.add(
+      Text(
+        "Phone Numbers",
+        style: Theme.of(context).textTheme.labelLarge,
+      ),
+    );
+    widget.resource.phoneNumbers!.forEach((key, value) {
+      String contactName = key;
+      String number = value;
+      children.add(Padding(
+        padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(
+                  "$contactName:",
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                getSpacer(8),
+                Text(
+                  number,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                )
+              ],
+            ),
+            getAction("Phone Number", number)
+          ],
+        ),
+      ));
+    });
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: children,
+      ),
+    );
+  }
+
+  Widget detailItem(String label, String value) {
     List<Widget> children = [
       Expanded(
         flex: 9,
@@ -133,7 +180,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
     );
   }
 
-  Widget getAction2(String label, String value) {
+  Widget getQuickAction(String label, String value) {
     double size = 70.0;
     switch (label) {
       case "Call":
@@ -270,180 +317,281 @@ class ServiceDetailsState extends State<ServiceDetails> {
     }
   }
 
-  Widget detailsCategory(
-      Map<dynamic, dynamic> categories, BuildContext context) {
+  Widget tagsBuilder(Map<dynamic, dynamic> categories, BuildContext context) {
     return Wrap(children: [
       for (String category in categories.keys)
         detailsCategoryLabel(context, category)
     ]);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    //_kGooglePlex = getCamera(widget.provider.serviceList[widget.serviceIndex].serviceAddress);
-    CameraPosition kGooglePlex = CameraPosition(
-      target: widget.resource.coords!,
-      //target: LatLng(locData.latitude, locData.longitude),
-      zoom: 17.4746,
-    );
-
-    final Set<Marker> markers = {
-      Marker(
-          markerId: MarkerId(kGooglePlex.toString()),
-          position: kGooglePlex.target,
-          infoWindow: InfoWindow(title: widget.resource.name, snippet: ""),
-          icon: BitmapDescriptor.defaultMarker)
-    };
-
-    List<Widget> quickActions() {
-      List<Widget> ret = [];
-      if (widget.resource.address != null) {
-        ret.add(getAction2("Directions", widget.resource.address!));
-      } //directions
-      if (widget.resource.phoneNumbers != null &&
-          widget.resource.phoneNumbers!["primary"] != null) {
-        ret.add(getAction2("Call", widget.resource.phoneNumbers!['primary']));
-      } //phone
-      if (widget.resource.email != null) {
-        ret.add(getAction2("Email", widget.resource.email!));
-      } //email
-      if (widget.resource.website != null) {
-        ret.add(getAction2("Web", widget.resource.website!));
-      }
-      ret.add(getAction2("Client", widget.resource.address!)); //web
-      //client
-      return ret;
+  Widget getMisc() {
+    Map<dynamic, dynamic> miscDetails = {};
+    if (widget.resource.languages != null &&
+        widget.resource.languages!.keys!.length > 1) {
+      miscDetails["Multilingual"] = true;
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        //toolbarHeight: 80,
-        //backgroundColor: const Color(0xFF2B2A2A),
-        //backgroundColor: Colors.transparent,
-        elevation: 0,
-        //foregroundColor: Colors.white,
-        actions: [
-          ConstrainedBox(
-            constraints: const BoxConstraints.tightFor(width: 120, height: 40),
+    return tagsBuilder(miscDetails, context);
+  }
+
+  Widget editButton() {
+    return ElevatedButton(
+        onPressed: () {},
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text("Edit"),
+            getSpacer(8),
+            const Icon(Icons.edit_outlined),
+          ],
+        ));
+  }
+
+  Widget favoriteButton(value, MPUser user) {
+    Icon favStar =
+        value ? const Icon(Icons.star) : const Icon(Icons.star_border_outlined);
+    return ElevatedButton(
+        onPressed: () {
+          if (user.favorites != null && widget.resource.id != null) {
+            user.favorites!.add(widget.resource.id!);
+          }
+          widget.proxyModel.upsert(user);
+          setState(() {});
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            favStar,
+          ],
+        ));
+  }
+
+  Widget userBuilder() {
+    return FutureBuilder(
+      future: widget.proxyModel.getUser(widget.userID),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          MPUser user = snapshot.data!;
+          return favoritesButtonBuilder(snapshot.data);
+        } else {
+          return const Center(
+            child: Text("No user found"),
+          );
+        }
+      },
+    );
+  }
+
+  Widget favoritesButtonBuilder(MPUser user) {
+    return FutureBuilder(
+      future: widget.proxyModel.listUserFavorites(user),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          Iterable favs = snapshot.data!;
+          bool isFavorite = false;
+          if (favs.contains(widget.resource)) {
+            isFavorite = true;
+          }
+          return favoriteButton(isFavorite, user);
+        } else {
+          return Padding(
+            padding: const EdgeInsets.all(8),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(80, 40),
-                ),
+                    elevation: 0, backgroundColor: Colors.black12),
                 onPressed: () {},
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Text("Edit"),
-                    Icon(Icons.edit_outlined),
+                  children: [
+                    const Icon(Icons.error),
                   ],
                 )),
-          ),
-          getSpacer(8),
-          ConstrainedBox(
-            constraints: const BoxConstraints.tightFor(width: 120, height: 40),
-            child: ElevatedButton(
-                onPressed: () {},
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Text("Favorites"),
-                    Icon(Icons.star_border_outlined),
-                  ],
-                )),
-          ),
-          /* ElevatedButton(
-              onPressed: () {},
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("Favorite"),
-                  getSpacer(4),
-                  const Icon(Icons.star_border),
-                ],
-              )
-              //icon: const Icon(Icons.edit_outlined),
-              //iconSize: 30,
-              ) */
-        ],
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+          );
+        }
+      },
+    );
+  }
+
+  PreferredSizeWidget topHeader() {
+    return AppBar(
+      elevation: 0,
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: editButton(),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> quickActionsBuilder() {
+    List<Widget> ret = [];
+    if (widget.resource.address != null) {
+      ret.add(getQuickAction("Directions", widget.resource.address!));
+    } //directions
+    if (widget.resource.phoneNumbers != null &&
+        widget.resource.phoneNumbers!["primary"] != null) {
+      ret.add(getQuickAction("Call", widget.resource.phoneNumbers!['primary']));
+    } //phone
+    if (widget.resource.email != null) {
+      ret.add(getQuickAction("Email", widget.resource.email!));
+    } //email
+    if (widget.resource.website != null) {
+      ret.add(getQuickAction("Web", widget.resource.website!));
+    }
+    ret.add(getQuickAction("Client", "stuff")); //web
+    //client
+    return ret;
+  }
+
+  Widget getMap() {
+    return Container(
+      foregroundDecoration: BoxDecoration(
+        border: Border.all(
+            color: Colors.black12, width: 2, strokeAlign: StrokeAlign.outside),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        children: [
-          Container(
-            foregroundDecoration: BoxDecoration(
-              border: Border.all(color: Colors.black12, width: 2),
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-            ),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-            ),
-            clipBehavior: Clip.antiAlias,
-            height: 250,
-            margin: const EdgeInsets.only(bottom: 16),
-            child: GoogleMap(
-              //liteModeEnabled: true,
-              mapToolbarEnabled: false,
-              mapType: MapType.normal,
-              markers: markers,
-              initialCameraPosition: kGooglePlex,
-              myLocationEnabled: true,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    widget.resource.name!,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: const Icon(Icons.star_border_outlined))
-                  /* IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.star_border_outlined),
-                    iconSize: 30,
-                  ) */
-                ],
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      height: 250,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: GoogleMap(
+        //liteModeEnabled: true,
+        myLocationButtonEnabled: false,
+        mapToolbarEnabled: false,
+        mapType: MapType.normal,
+        markers: {
+          Marker(
+              markerId: MarkerId(widget.resource.name!),
+              position: widget.resource.coords!,
+              infoWindow: InfoWindow(
+                title: widget.resource.name!,
               ),
-            ],
-          ),
-          detailsCategory(widget.resource.categories!, context),
-          getSpacer(8),
-          getDivider(context),
-          getSpacer(8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: quickActions(),
-          ),
-          getSpacer(8),
-          getDivider(context),
-          getSpacer(8),
-          detailListing("notes", widget.resource.notes!),
-          getSpacer(8),
-          getDivider(context),
-          getSpacer(8),
-          detailListing(
-              "Phone Number", widget.resource.phoneNumbers!["primary"]),
-          detailListing("Email Address", widget.resource.email!),
-          detailListing("Street Address", widget.resource.address!),
-          detailListing("Website", widget.resource.website!)
-        ],
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueAzure))
+        },
+        initialCameraPosition:
+            CameraPosition(target: widget.resource.coords!, zoom: 18),
+        myLocationEnabled: true,
+        onMapCreated: (GoogleMapController controller) {
+          setState(() {
+            widget.mapController = controller;
+          });
+        },
       ),
-      //bottomNavigationBar: BottomNavigationBar(items: [],),
+    );
+  }
+
+  Widget resourceHeader() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          widget.resource.name!,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        userBuilder()
+      ],
+    );
+  }
+
+  Widget listBuilder() {
+    List<Widget> children = [];
+    //MAP
+    if (widget.resource.coords != null) {
+      children.add(getMap());
+    }
+    //HEADER
+    children.add(resourceHeader());
+    if (widget.resource.categories != null) {
+      children.add(tagsBuilder(widget.resource.categories!, context));
+    }
+    children.add(getDivider(context));
+    //QUICK ACTIONS
+    children.add(Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize: MainAxisSize.max,
+      children: quickActionsBuilder(),
+    ));
+    //NOTES
+    children.add(getDivider(context));
+    if (widget.resource.notes != null) {
+      children.add(detailItem("Notes", widget.resource.notes!));
+      children.add(getDivider(context));
+    }
+    //OTHER INFO
+    if (widget.resource.eligibility != null) {
+      children.add(Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Eligibility Requirements",
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            tagsBuilder(widget.resource.eligibility!, context)
+          ],
+        ),
+      ));
+      children.add(getDivider(context));
+    }
+    if (widget.resource.eligibility != null) {
+      children.add(Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Misc Details",
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            getMisc()
+          ],
+        ),
+      ));
+      children.add(getDivider(context));
+    }
+    //EXPANDED CONTACTS
+    if (widget.resource.phoneNumbers != null) {
+      children.add(numbersSection());
+      children.add(getDivider(context));
+    }
+    if (widget.resource.email != null) {
+      children.add(detailItem("Email Address", widget.resource.email!));
+      children.add(getDivider(context));
+    }
+    if (widget.resource.address != null) {
+      children.add(detailItem("Street Address", widget.resource.address!));
+      children.add(getDivider(context));
+    }
+    if (widget.resource.website != null) {
+      children.add(detailItem("Website", widget.resource.website!));
+      children.add(getDivider(context));
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      children: children,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: topHeader(),
+      body: listBuilder(),
     );
   }
 }

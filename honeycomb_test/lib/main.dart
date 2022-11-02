@@ -13,7 +13,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -29,11 +29,21 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           primarySwatch: generateMaterialColor(color: const Color(0xFFFFE93E)),
           //primarySwatch: Colors.orange
+          cardTheme: CardTheme(
+            color: Color(0xFFF6F6F6),
+            surfaceTintColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(width: 2, color: Color(0xFFE7E7E7))),
+          ),
+          canvasColor: Colors.white,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.black,
-                backgroundColor: Color(0xFFFFE93E)),
+                backgroundColor: const Color(0xFFFFE93E)),
           )),
+
       initialRoute:
           FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {

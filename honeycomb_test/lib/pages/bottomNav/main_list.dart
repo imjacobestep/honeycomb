@@ -233,6 +233,7 @@ class ResourcesPageState extends State<ResourcesPage> {
           ];
         }
         return ListView(
+          padding: EdgeInsets.fromLTRB(4, 4, 4, 0),
           children: children,
         );
       },
@@ -248,7 +249,7 @@ class ResourcesPageState extends State<ResourcesPage> {
           if (text == "") {
             widget.resourceList = widget.proxyModel.list("resources");
           } else {
-            widget.resourceList = widget.proxyModel.searchResources("text");
+            widget.resourceList = widget.proxyModel.searchResources(text);
           }
         });
       },

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
-import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import '../../proxy.dart';
 import '../../utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
@@ -24,72 +23,7 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   @override
   void initState() {
-    //loadData();
-    Future.delayed(Duration.zero, () async {
-      String var1 = await testfunction();
-      //here is the async code, you can execute any async code here
-      print(var1);
-    });
     super.initState();
-  }
-
-  Future<String> testfunction() async {
-    widget.user = await widget.proxyModel.getUser(widget.userID) as MPUser;
-    widget.favs = await widget.proxyModel.listUserFavorites(widget.user!);
-    widget.clients = await widget.proxyModel.listUserClients(widget.user!);
-    print("This is test function");
-    return Future(() => "abc");
-  }
-
-  loadData() async {
-    widget.user = await widget.proxyModel.getUser(widget.userID);
-    widget.favs = await widget.proxyModel.listUserFavorites(widget.user!);
-    widget.clients = await widget.proxyModel.listUserClients(widget.user!);
-    setState(() {});
-  }
-
-  Widget clientsList() {
-    if (widget.clients == null) {
-      return Center(
-        child: Text("no clients yet"),
-      );
-    } else {
-      return ListView.builder(
-        padding: const EdgeInsets.all(8),
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: widget.clients!.isEmpty ? 0 : 3,
-        itemBuilder: (BuildContext context, int index) {
-          if (widget.clients!.isEmpty) {
-            return Container();
-          } else {
-            return clientCard(context, widget.clients!.elementAt(index));
-          }
-        },
-      );
-    }
-  }
-
-  Widget favsList() {
-    if (widget.favs == null) {
-      return Center(
-        child: Text("no favs yet"),
-      );
-    } else {
-      return ListView.builder(
-        padding: const EdgeInsets.all(8),
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: widget.favs!.isEmpty ? 0 : 3,
-        itemBuilder: (BuildContext context, int index) {
-          if (widget.favs!.isEmpty) {
-            return Container();
-          } else {
-            return resourceCard(context, widget.favs!.elementAt(index));
-          }
-        },
-      );
-    }
   }
 
   Widget filterCard(IconData icon, String label) {
@@ -121,36 +55,128 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    //String? userEmail = FirebaseAuth.instance.currentUser?.email;
-    //String? displayName = FirebaseAuth.instance.currentUser?.displayName;
-    // User? user = widget.user;
+  Widget clientsBuilder(MPUser user) {
+    return FutureBuilder(
+      future: widget.proxyModel.listUserClients(user),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          Iterable clients = snapshot.data!;
+          if (clients.isEmpty) {
+            return (const Center(
+              child: Text("No Clients Found"),
+            ));
+          }
+          return ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(8),
+            shrinkWrap: true,
+            itemCount: clients.length,
+            itemBuilder: (BuildContext context, int index) {
+              return clientCard(context, clients.elementAt(index));
+            },
+          );
+        } else {
+          return const Center(
+            child: Text("Error"),
+          );
+        }
+      },
+    );
+  }
 
-    String? userName = widget.user != null ? widget.user?.name : "u";
-    //String? userName = "u";
+  Widget greetingBuilder(MPUser user) {
+    String name = FirebaseAuth.instance.currentUser!.displayName != null
+        ? FirebaseAuth.instance.currentUser!.displayName!
+        : "user";
+    return Text(
+      "Hi, $name",
+      style: Theme.of(context)
+          .textTheme
+          .headlineMedium!
+          .copyWith(color: Colors.white),
+    );
+  }
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Image.asset("lib/assets/icon/icon.png"),
+  Widget userBuilder(String component) {
+    return FutureBuilder(
+      future: widget.proxyModel.getUser(widget.userID),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          MPUser user = snapshot.data!;
+          switch (component) {
+            case "clients":
+              return clientsBuilder(user);
+            case "greeting":
+              return greetingBuilder(user);
+            default:
+              return const Center(
+                child: Text("error"),
+              );
+          }
+        } else {
+          return const Center(
+            child: Text("No user found"),
+          );
+        }
+      },
+    );
+  }
+
+  Widget listsBuilder() {
+    return Container();
+  }
+
+  PreferredSizeWidget topHeader() {
+    return AppBar(
+      toolbarHeight: 100,
+      leadingWidth: 80,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
+      leading: Padding(
+        padding: EdgeInsets.all(8),
+        child: Image.asset(
+          "lib/assets/icon/icon.png",
+          width: 80,
+          height: 80,
         ),
-        //leading: Image(image: AssetImage('../lib/assets/icon/icon.png')),
-        centerTitle: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
-        title: Text("Hello, $userName"),
-        actions: [
-          IconButton(
+      ),
+      centerTitle: false,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "Honeycomb",
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium!
+                .copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+          ),
+          userBuilder("greeting")
+        ],
+      ),
+      actions: [
+        Padding(
+          padding: EdgeInsets.all(16),
+          child: IconButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/profile');
               },
-              icon: const Icon(Icons.account_circle_outlined))
-        ],
-        //backgroundColor: const Color(0xFF2B2A2A),
-        //foregroundColor: Colors.white,
-      ),
+              icon: const Icon(
+                Icons.account_circle_outlined,
+                color: Colors.white,
+              )),
+        )
+      ],
+      backgroundColor: const Color(0xFF2B2A2A),
+      foregroundColor: Colors.white,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: topHeader(),
       body: ListView(
         children: [
           sectionHeader("Find by Category", context),
@@ -171,10 +197,10 @@ class HomePageState extends State<HomePage> {
           ),
           getDivider(context),
           sectionHeader("Recent Clients", context),
-          clientsList(),
+          listsBuilder(),
           getDivider(context),
           sectionHeader("Favorites", context),
-          favsList(),
+          listsBuilder(),
         ],
       ),
       bottomNavigationBar: customNav(context, 0),

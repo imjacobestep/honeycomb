@@ -10,6 +10,7 @@ import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:location/location.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MapPage extends StatefulWidget {
   @override
@@ -25,7 +26,6 @@ class MapPage extends StatefulWidget {
   String typedAddress = "12280 NE District Wy";
   String typedZipCode = "98005";
   GoogleMapController? mapController;
-  bool showReturnLocation = false;
   Set<Marker> markers = {
     const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
@@ -36,18 +36,24 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   @override
   void initState() {
-    //widget._controller = GoogleMapController;
     widget.resourceList = widget.proxyModel.list("resources");
     widget.currentLocation = widget.location.getLocation();
     widget.typedLocation =
         widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode);
     widget.useCurrentLocation = true;
+    clearMarkers();
     super.initState();
   }
 
-  LatLng lastLocation = LatLng(0, 0);
+  LatLng lastLocation = const LatLng(0, 0);
 
 // FUNCTIONS
+  void clearMarkers() {
+    widget.markers = {
+      const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
+    };
+  }
+
   void currentMarker(LatLng position) {
     widget.markers.add(Marker(
         onTap: () {},
@@ -94,6 +100,147 @@ class MapPageState extends State<MapPage> {
   }
 
 // UI WIDGETS
+
+  List<Widget> getFilters(Map map) {
+    List<Widget> ret = [];
+    ret.add(
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ElevatedButton(
+              onPressed: () {
+                resetFilters();
+              },
+              child: const Text("clear filters")),
+          IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.close))
+        ],
+      ),
+    );
+    ret.add(getSpacer(8));
+
+    ret.add(ElevatedButton(
+        onPressed: () {
+          setState(() {});
+          Navigator.pop(context);
+        },
+        child: const Text("Apply Filters")));
+    return ret;
+  }
+
+  Widget sheetBuilder() {
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setSheetState) {
+      Widget filterChip(String label, bool value) {
+        return InkWell(
+            borderRadius: BorderRadius.circular(35),
+            enableFeedback: true,
+            onTap: () {
+              setFilter(label, !value);
+              setSheetState(() {});
+            },
+            child: !value
+                ? Chip(
+                    label: Text(label),
+                    backgroundColor: Colors.transparent,
+                    side: const BorderSide(color: Colors.black12, width: 1),
+                  )
+                : Chip(
+                    side: const BorderSide(color: Colors.transparent, width: 1),
+                    backgroundColor: Colors.black,
+                    label: Text(
+                      label,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ));
+      }
+
+      List<Widget> filterSection(Map map) {
+        List<Widget> ret = [];
+        for (var key in map.keys) {
+          if (map[key] != null) {
+            ret.add(filterChip(key, map[key]));
+          }
+        }
+        return ret;
+      }
+
+      Widget filterHeader() {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  filters.forEach(
+                    (key, value) {
+                      value.forEach((key, value) {
+                        setFilter(key, false);
+                      });
+                    },
+                  );
+                  setSheetState(() {});
+                },
+                child: const Text("clear filters")),
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.close))
+          ],
+        );
+      }
+
+      Widget applyButton() {
+        return ElevatedButton(
+            onPressed: () {
+              setState(() {
+                widget.markers.clear();
+              });
+
+              widget.markers.clear();
+              Navigator.pop(context);
+            },
+            child: const Text("Apply Filters"));
+      }
+
+      List<Widget> buildList() {
+        List<Widget> children = [];
+        children.add(filterHeader());
+        children.add(getSpacer(8));
+        filters.forEach((key, value) {
+          children.add(Text(key));
+          children.add(Wrap(
+            spacing: 4,
+            children: filterSection(value),
+          ));
+        });
+        children.add(applyButton());
+        return children;
+      }
+
+      return ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        children: buildList(),
+      );
+    });
+  }
+
+  Future filterSheet() {
+    return showMaterialModalBottomSheet(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+        expand: false,
+        isDismissible: false,
+        context: context,
+        builder: (context) {
+          return sheetBuilder();
+        });
+  }
+
   Widget noResources() {
     return const Padding(
       padding: EdgeInsets.all(16),
@@ -104,7 +251,7 @@ class MapPageState extends State<MapPage> {
   Widget getMap(CameraPosition cam) {
     return GoogleMap(
       myLocationEnabled: true,
-      myLocationButtonEnabled: widget.showReturnLocation,
+      myLocationButtonEnabled: false,
       mapType: MapType.normal,
       markers: widget.markers,
       initialCameraPosition: cam,
@@ -112,11 +259,7 @@ class MapPageState extends State<MapPage> {
         setState(() {
           widget.mapController = controller;
         });
-        //widget.mapController = controller;
       },
-      /* onMapCreated: (GoogleMapController controller) {
-        widget._controller!.complete(controller);
-      }, */
     );
   }
 
@@ -180,7 +323,9 @@ class MapPageState extends State<MapPage> {
 
   Widget buildMap() {
     return FutureBuilder(
-      future: widget.resourceList,
+      future: !ifAnyFilters()
+          ? widget.resourceList
+          : widget.proxyModel.filter("resources", filters),
       builder: (BuildContext context, AsyncSnapshot<Iterable> resourceResults) {
         if (resourceResults.hasData && resourceResults.data != null) {
           buildList(resourceResults.data!);
@@ -201,21 +346,21 @@ class MapPageState extends State<MapPage> {
       maxLines: 1,
       textAlignVertical: TextAlignVertical.center,
       onSubmitted: (text) {
-        setState(() {
-          final split = text.split(',');
+        if (text != "") {
+          setState(() {
+            final split = text.split(',');
 
-          widget.typedAddress = split[0];
-          widget.typedZipCode = split[split.length - 1];
-          widget.typedLocation =
-              widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode);
-          widget.useCurrentLocation = false;
-          //widget._controller = Completer();
-          widget.showReturnLocation = false;
-          widget.markers.clear();
-        });
+            widget.typedAddress = split[0];
+            widget.typedZipCode = split[split.length - 1];
+            widget.typedLocation = widget.geo
+                .parseAddress(widget.typedAddress, widget.typedZipCode);
+            widget.useCurrentLocation = false;
+            widget.markers.clear();
+          });
+        }
       },
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.all(0),
+        contentPadding: const EdgeInsets.all(0),
         isDense: true,
         constraints: const BoxConstraints(maxHeight: 50),
         filled: true,
@@ -238,8 +383,6 @@ class MapPageState extends State<MapPage> {
           } else {
             setState(() {
               widget.useCurrentLocation = true;
-              //widget._controller = Completer();
-              widget.showReturnLocation = true;
               widget.markers.clear();
             });
           }
@@ -282,10 +425,25 @@ class MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: topHeader(),
-      body: Stack(
-        children: [buildMap()],
-      ),
+      body: buildMap(),
+      floatingActionButton: ElevatedButton(
+          onPressed: () async {
+            await filterSheet();
+            setState(() {
+              widget.markers.clear();
+            });
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Filters"),
+              getSpacer(4),
+              const Icon(Icons.filter_list_outlined)
+            ],
+          )),
       bottomNavigationBar: customNav(context, 1),
     );
   }

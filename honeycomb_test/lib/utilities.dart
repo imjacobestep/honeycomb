@@ -48,11 +48,18 @@ Widget sectionHeader(String header, BuildContext context) {
 }
 
 Widget getDivider(BuildContext context) {
-  return const Divider(
-    height: 4,
-    thickness: 2,
-    indent: 8,
-    endIndent: 8,
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      getSpacer(8),
+      const Divider(
+        height: 4,
+        thickness: 2,
+        indent: 8,
+        endIndent: 8,
+      ),
+      getSpacer(8)
+    ],
   );
 }
 
