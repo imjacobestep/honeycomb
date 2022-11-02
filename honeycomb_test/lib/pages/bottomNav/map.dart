@@ -66,23 +66,25 @@ class MapPageState extends State<MapPage> {
   }
 
   void addMarker(Resource resource) {
-    widget.markers.add(Marker(
-        markerId: MarkerId(resource.name!),
-        position: resource.coords!,
-        infoWindow: InfoWindow(
-          title: resource.name!,
-          snippet: getCategories(resource),
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ServiceDetails(
-                          resource: resource,
-                        )));
-          },
-        ),
-        icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)));
+    if (resource.coords != null) {
+      widget.markers.add(Marker(
+          markerId: MarkerId(resource.name!),
+          position: resource.coords!,
+          infoWindow: InfoWindow(
+            title: resource.name!,
+            snippet: getCategories(resource),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ServiceDetails(
+                            resource: resource,
+                          )));
+            },
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueAzure)));
+    }
   }
 
   String getCategories(Resource resource) {

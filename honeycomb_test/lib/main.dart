@@ -40,6 +40,8 @@ class MyApp extends StatelessWidget {
           canvasColor: Colors.white,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
                 foregroundColor: Colors.black,
                 backgroundColor: const Color(0xFFFFE93E)),
           )),
