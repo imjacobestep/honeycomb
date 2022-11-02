@@ -326,8 +326,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   Widget getMisc() {
     Map<dynamic, dynamic> miscDetails = {};
-    if (widget.resource.languages != null &&
-        widget.resource.languages!.keys!.length > 1) {
+    if (widget.resource.multilingual != null && widget.resource.multilingual!) {
       miscDetails["Multilingual"] = true;
     }
 

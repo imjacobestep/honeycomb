@@ -124,6 +124,35 @@ class Proxy {
     return await listByIds('resources', client.resources ?? []);
   }
 
+  Iterable<dynamic> sort(
+      Iterable<dynamic> items, String field, bool ascending) {
+    if (ascending) {
+      if (field == 'name') {
+        return items.toList()..sort((a, b) => a.name!.compareTo(b.name!));
+      } else if (field == 'createdStamp') {
+        return items.toList()
+          ..sort((a, b) => a.createdStamp!.compareTo(b.createdStamp!));
+      } else if (field == 'updatedStamp') {
+        return items.toList()
+          ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
+      } else {
+        throw Exception('Unknown field');
+      }
+    } else {
+      if (field == 'name') {
+        return items.toList()..sort((a, b) => b.name!.compareTo(a.name!));
+      } else if (field == 'createdStamp') {
+        return items.toList()
+          ..sort((a, b) => b.createdStamp!.compareTo(a.createdStamp!));
+      } else if (field == 'updatedStamp') {
+        return items.toList()
+          ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
+      } else {
+        throw Exception('Unknown field');
+      }
+    }
+  }
+
   // Future<User> getUser(String id) async {
   //   final ref = firestore.collection('users');
   //   var rawUser = await ref.doc(id).get();
