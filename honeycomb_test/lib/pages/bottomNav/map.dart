@@ -36,6 +36,7 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   @override
   void initState() {
+    resetFilters();
     widget.resourceList = widget.proxyModel.list("resources");
     widget.currentLocation = widget.location.getLocation();
     widget.typedLocation =

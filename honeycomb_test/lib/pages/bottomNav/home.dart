@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   @override
   void initState() {
+    resetFilters();
     super.initState();
   }
 

@@ -4,6 +4,7 @@ import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
+import 'package:honeycomb_test/utilities.dart';
 
 class ClientsPage extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class ClientsPage extends StatefulWidget {
 class ClientsPageState extends State<ClientsPage> {
   @override
   void initState() {
+    resetFilters();
     super.initState();
   }
 

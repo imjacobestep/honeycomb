@@ -19,6 +19,7 @@ class FavsPage extends StatefulWidget {
 class FavsPageState extends State<FavsPage> {
   @override
   void initState() {
+    resetFilters();
     super.initState();
   }
 
