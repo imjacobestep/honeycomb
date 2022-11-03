@@ -85,11 +85,11 @@ Map<String, Map<String, bool>> filters = {
     "Family": false,
     "Individual": false
   },
-  "Accessibility": {
-    "Wheelchair": false,
-    "Sign Language": false,
+  "Other Filters": {
+    "Multilingual": false,
+    "Active": false,
+    "Accessible": false
   },
-  "Other Filters": {"Multilingual": false, "Active": false},
 };
 
 bool ifAnyFilters() {

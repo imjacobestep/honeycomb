@@ -46,8 +46,14 @@ class FavsPageState extends State<FavsPage> {
         if (snapshot.hasData && snapshot.data != null) {
           Iterable favs = snapshot.data!;
           if (favs.isEmpty) {
-            return (const Center(
-              child: Text("No Favorites Found"),
+            return (Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                  "No Favorites",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const Text('Tap the "Add +" button to make one')
+              ]),
             ));
           }
           return ListView.builder(

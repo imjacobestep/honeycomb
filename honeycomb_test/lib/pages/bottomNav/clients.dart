@@ -45,8 +45,14 @@ class ClientsPageState extends State<ClientsPage> {
         if (snapshot.hasData && snapshot.data != null) {
           Iterable clients = snapshot.data!;
           if (clients.isEmpty) {
-            return (const Center(
-              child: Text("No Clients Found"),
+            return (Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                  "No Clients",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const Text('Tap the "+ Client" button to make one')
+              ]),
             ));
           }
           return ListView.builder(

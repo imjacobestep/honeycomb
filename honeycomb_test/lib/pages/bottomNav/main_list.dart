@@ -216,8 +216,15 @@ class ResourcesPageState extends State<ResourcesPage> {
         if (snapshot.hasData && snapshot.data != null) {
           Iterable testList = snapshot.data!;
           if (testList.isEmpty) {
-            return const Center(
-              child: Text("No Results"),
+            String helper = ifAnyFilters() ? "filters" : "search terms";
+            return Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                  "No Results",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                Text("Try changing your $helper")
+              ]),
             );
           } else {
             for (Resource resource in testList) {
@@ -228,7 +235,7 @@ class ResourcesPageState extends State<ResourcesPage> {
           children = <Widget>[
             const Padding(
               padding: EdgeInsets.all(16),
-              child: Text("No Results"),
+              child: Text("Error"),
             )
           ];
         }

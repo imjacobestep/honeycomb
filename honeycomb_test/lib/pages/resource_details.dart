@@ -266,7 +266,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
         {
           return InkWell(
             onTap: () {
-              MapsLauncher.launchQuery(widget.resource.address!);
+              launchUrl(Uri.parse(widget.resource.website!));
             },
             child: SizedBox(
               height: size,
@@ -319,7 +319,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
   }
 
   Widget tagsBuilder(Map<dynamic, dynamic> categories, BuildContext context) {
-    return Wrap(spacing: 4, runSpacing: 4, children: [
+    return Wrap(spacing: 4, runSpacing: 0, children: [
       for (String category in categories.keys)
         detailsCategoryLabel(context, category)
     ]);
@@ -515,6 +515,8 @@ class ServiceDetailsState extends State<ServiceDetails> {
     String updatedUser = widget.resource.updatedBy != null
         ? widget.resource.updatedBy!.toString()
         : "unknown user";
+    int diff = DateTime.now().difference(widget.resource.updatedStamp!).inDays;
+    String plural = diff == 1 ? "" : "s";
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -526,7 +528,11 @@ class ServiceDetailsState extends State<ServiceDetails> {
               widget.resource.name!,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Text("updated $updatedTime by $updatedUser")
+            Text(
+              "updated $diff day$plural ago by $updatedUser",
+              style: Theme.of(context).textTheme.labelMedium,
+            )
+            //Text("updated $updatedTime by $updatedUser")
           ],
         ),
         userBuilder()
