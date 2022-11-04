@@ -188,6 +188,57 @@ class Proxy {
     }
   }
 
+  Future<dynamic> delFromList(dynamic subject, dynamic item) async {
+    if (subject is MPUser) {
+      if (item is Resource) {
+        subject.favorites!.remove(item.id);
+      } else if (item is Client) {
+        subject.clients!.remove(item.id);
+      }
+    } else if (subject is Client) {
+      if (item is Resource) {
+        subject.resources!.remove(item.id);
+      }
+    }
+
+    return await upsert(subject);
+  }
+
+  Future<dynamic> addToList(dynamic subject, dynamic item) async {
+    if (subject is MPUser) {
+      if (item is Resource) {
+        if (subject.favorites!.contains(item.id)) {
+          return subject;
+        } else {
+          subject.favorites!.add(item.id!);
+          return await upsert(subject);
+        }
+      } else if (item is Client) {
+        if (subject.clients!.contains(item.id)) {
+          return subject;
+        } else {
+          subject.clients!.add(item.id!);
+          return await upsert(subject);
+        }
+      } else {
+        throw Exception('Unknown type');
+      }
+    } else if (subject is Client) {
+      if (item is Resource) {
+        if (subject.resources!.contains(item.id)) {
+          return subject;
+        } else {
+          subject.resources!.add(item.id!);
+          return await upsert(subject);
+        }
+      } else {
+        throw Exception('Unknown type');
+      }
+    } else {
+      throw Exception('Unknown type');
+    }
+  }
+
   Future<Iterable<dynamic>> searchResources(String key) async {
     final resources = await list('resources');
     final keyLower = key.toLowerCase();
