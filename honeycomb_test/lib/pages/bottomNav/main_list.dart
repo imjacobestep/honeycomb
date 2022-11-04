@@ -127,20 +127,28 @@ class ResourcesPageState extends State<ResourcesPage> {
               setState(() {});
               Navigator.pop(context);
             },
-            child: const Text("Apply Filters"));
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Apply Filters",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ));
       }
 
       List<Widget> buildList() {
         List<Widget> children = [];
         children.add(filterHeader());
-        children.add(getSpacer(8));
+        children.add(getSpacer(24));
         filters.forEach((key, value) {
           children.add(Text(key));
           children.add(Wrap(
             spacing: 4,
             children: filterSection(value),
           ));
+          children.add(getSpacer(8));
         });
+        children.add(getSpacer(16));
         children.add(applyButton());
         return children;
       }
@@ -210,7 +218,7 @@ class ResourcesPageState extends State<ResourcesPage> {
     return FutureBuilder(
       future: !ifAnyFilters()
           ? widget.resourceList
-          : widget.proxyModel.filter("resources", filters),
+          : widget.proxyModel.filter("resources", getFilterQuery()),
       builder: (BuildContext context, AsyncSnapshot<Iterable> snapshot) {
         List<Widget> children = [];
         if (snapshot.hasData && snapshot.data != null) {
@@ -223,7 +231,8 @@ class ResourcesPageState extends State<ResourcesPage> {
                   "No Results",
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                Text("Try changing your $helper")
+                Text("Try changing your $helper"),
+                Text(getFilterQuery().toString())
               ]),
             );
           } else {

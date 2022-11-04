@@ -77,8 +77,8 @@ Map<String, Map<String, bool>> filters = {
     "Legal": false,
     "Employment": false,
   },
-  "Requirements": {
-    "None": false,
+  "Eligibility": {
+    "Open to All": false,
     "Women Only": false,
     "Minors Only": false,
     "Adult Only": false,
@@ -88,9 +88,29 @@ Map<String, Map<String, bool>> filters = {
   "Other Filters": {
     "Multilingual": false,
     "Active": false,
-    "Accessible": false
+    "Accessibility": false
   },
 };
+
+Map<String, dynamic> getFilterQuery() {
+  Map<String, dynamic> query = {};
+  List<String> categoriesSelected = [];
+  List<String> eligibilitySelected = [];
+  filters.forEach((filterType, filtersOfType) {
+    filtersOfType.forEach((filterLabel, filterValue) {
+      if (filterType == "Categories" && filterValue) {
+        categoriesSelected.add(filterLabel.toLowerCase());
+      } else if (filterType == "Eligibility" && filterValue) {
+        eligibilitySelected.add(filterLabel.toLowerCase());
+      } else if (filterType == "Other Filters" && filterValue) {
+        query[filterLabel.toLowerCase()] = filterValue;
+      }
+    });
+  });
+  query["categories"] = categoriesSelected;
+  query["eligibility"] = eligibilitySelected;
+  return query;
+}
 
 bool ifAnyFilters() {
   bool ret = false;
