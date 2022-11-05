@@ -129,10 +129,10 @@ class Proxy {
     if (ascending) {
       if (field == 'name') {
         return items.toList()..sort((a, b) => a.name!.compareTo(b.name!));
-      } else if (field == 'createdStamp') {
+      } else if (field == 'date created') {
         return items.toList()
           ..sort((a, b) => a.createdStamp!.compareTo(b.createdStamp!));
-      } else if (field == 'updatedStamp') {
+      } else if (field == 'date updated') {
         return items.toList()
           ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
       } else {
@@ -141,10 +141,10 @@ class Proxy {
     } else {
       if (field == 'name') {
         return items.toList()..sort((a, b) => b.name!.compareTo(a.name!));
-      } else if (field == 'createdStamp') {
+      } else if (field == 'date created') {
         return items.toList()
           ..sort((a, b) => b.createdStamp!.compareTo(a.createdStamp!));
-      } else if (field == 'updatedStamp') {
+      } else if (field == 'date updated') {
         return items.toList()
           ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
       } else {
@@ -185,6 +185,57 @@ class Proxy {
       return await upsert(user);
     } else {
       return users;
+    }
+  }
+
+  Future<dynamic> delFromList(dynamic subject, dynamic item) async {
+    if (subject is MPUser) {
+      if (item is Resource) {
+        subject.favorites!.remove(item.id);
+      } else if (item is Client) {
+        subject.clients!.remove(item.id);
+      }
+    } else if (subject is Client) {
+      if (item is Resource) {
+        subject.resources!.remove(item.id);
+      }
+    }
+
+    return await upsert(subject);
+  }
+
+  Future<dynamic> addToList(dynamic subject, dynamic item) async {
+    if (subject is MPUser) {
+      if (item is Resource) {
+        if (subject.favorites!.contains(item.id)) {
+          return subject;
+        } else {
+          subject.favorites!.add(item.id!);
+          return await upsert(subject);
+        }
+      } else if (item is Client) {
+        if (subject.clients!.contains(item.id)) {
+          return subject;
+        } else {
+          subject.clients!.add(item.id!);
+          return await upsert(subject);
+        }
+      } else {
+        throw Exception('Unknown type');
+      }
+    } else if (subject is Client) {
+      if (item is Resource) {
+        if (subject.resources!.contains(item.id)) {
+          return subject;
+        } else {
+          subject.resources!.add(item.id!);
+          return await upsert(subject);
+        }
+      } else {
+        throw Exception('Unknown type');
+      }
+    } else {
+      throw Exception('Unknown type');
     }
   }
 

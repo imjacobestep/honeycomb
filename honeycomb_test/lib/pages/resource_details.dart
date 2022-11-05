@@ -375,6 +375,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
             user.favorites!.add(widget.resource.id!);
           }
           widget.proxyModel.upsert(user);
+          widget.proxyModel.addToList(user, widget.resource);
           setState(() {});
         },
         child: Row(

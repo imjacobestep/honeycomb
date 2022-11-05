@@ -65,26 +65,24 @@ class MapPageState extends State<MapPage> {
             BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange)));
   }
 
-  void addMarker(Resource resource) {
-    if (resource.coords != null) {
-      widget.markers.add(Marker(
-          markerId: MarkerId(resource.name!),
-          position: resource.coords!,
-          infoWindow: InfoWindow(
-            title: resource.name!,
-            snippet: getCategories(resource),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ServiceDetails(
-                            resource: resource,
-                          )));
-            },
-          ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueAzure)));
-    }
+  Marker newMarker(Resource resource) {
+    return (Marker(
+        markerId: MarkerId(resource.name!),
+        position: resource.coords!,
+        infoWindow: InfoWindow(
+          title: resource.name!,
+          snippet: getCategories(resource),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ServiceDetails(
+                          resource: resource,
+                        )));
+          },
+        ),
+        icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)));
   }
 
   String getCategories(Resource resource) {
@@ -96,10 +94,14 @@ class MapPageState extends State<MapPage> {
     }
   }
 
-  void buildList(Iterable resourceList) {
+  Set<Marker> buildList(Iterable resourceList) {
+    Set<Marker> ret = {};
     for (Resource resource in resourceList) {
-      addMarker(resource);
+      if (resource.coords != null) {
+        ret.add(newMarker(resource));
+      }
     }
+    return ret;
   }
 
 // UI WIDGETS
@@ -251,12 +253,12 @@ class MapPageState extends State<MapPage> {
     );
   }
 
-  Widget getMap(CameraPosition cam) {
+  Widget getMap(CameraPosition cam, Iterable resources) {
     return GoogleMap(
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
       mapType: MapType.normal,
-      markers: widget.markers,
+      markers: buildList(resources),
       initialCameraPosition: cam,
       onMapCreated: (GoogleMapController controller) {
         setState(() {
@@ -266,7 +268,7 @@ class MapPageState extends State<MapPage> {
     );
   }
 
-  Widget buildCurrentLocation() {
+  Widget buildCurrentLocation(Iterable resources) {
     return FutureBuilder(
         future: widget.currentLocation,
         builder: (BuildContext context, AsyncSnapshot loc) {
@@ -280,8 +282,9 @@ class MapPageState extends State<MapPage> {
               target: location,
               zoom: 17.5,
             );
+            //buildList(resources);
             //currentMarker(location);
-            return getMap(cam);
+            return getMap(cam, resources);
           } else {
             return LoadingIndicator(
               size: 50,
@@ -292,7 +295,7 @@ class MapPageState extends State<MapPage> {
         });
   }
 
-  Widget buildClientLocation() {
+  Widget buildClientLocation(Iterable resources) {
     return FutureBuilder(
         future: widget.typedLocation,
         builder: (BuildContext context, AsyncSnapshot loc) {
@@ -307,7 +310,8 @@ class MapPageState extends State<MapPage> {
                 zoom: 17.5,
               );
               currentMarker(location);
-              return getMap(cam);
+              //buildList(resources);
+              return getMap(cam, resources);
             } else {
               return const Center(
                   child: Text(
@@ -328,17 +332,17 @@ class MapPageState extends State<MapPage> {
     return FutureBuilder(
       future: !ifAnyFilters()
           ? widget.resourceList
-          : widget.proxyModel.filter("resources", filters),
+          : widget.proxyModel.filter("resources", getFilterQuery()),
       builder: (BuildContext context, AsyncSnapshot<Iterable> resourceResults) {
         if (resourceResults.hasData && resourceResults.data != null) {
-          buildList(resourceResults.data!);
+          //buildList(resourceResults.data!);
+          if (widget.useCurrentLocation != null && widget.useCurrentLocation!) {
+            return buildCurrentLocation(resourceResults.data!);
+          } else {
+            return buildClientLocation(resourceResults.data!);
+          }
         } else {
           return noResources();
-        }
-        if (widget.useCurrentLocation != null && widget.useCurrentLocation!) {
-          return buildCurrentLocation();
-        } else {
-          return buildClientLocation();
         }
       },
     );
