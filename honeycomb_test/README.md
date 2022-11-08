@@ -1,3 +1,8 @@
+Install:
+Firebase CLI - https://firebase.google.com/docs/cli
+Flutter - https://docs.flutter.dev/get-started/install
+XCode
+
 Before building:
 Make sure to get the AndroidManifext.xml, secrets.dart, and AppDelegate.swift files from the "sensitive dev files" folder on our shared drive
 make sure you have the repo cloned to your computer
