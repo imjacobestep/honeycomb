@@ -46,6 +46,20 @@ class MapPageState extends State<MapPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    //resetFilters();
+    filters.forEach(
+      (key, value) {
+        value.forEach((key, value) {
+          setFilter(key, false);
+        });
+      },
+    );
+    widget.mapController ?? widget.mapController!.dispose();
+    super.dispose();
+  }
+
   LatLng lastLocation = const LatLng(0, 0);
 
 // FUNCTIONS

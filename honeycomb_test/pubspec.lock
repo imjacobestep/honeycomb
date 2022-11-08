@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.6"
+  another_flushbar:
+    dependency: transitive
+    description:
+      name: another_flushbar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.12.29"
   archive:
     dependency: transitive
     description:
@@ -106,6 +113,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.16.0"
+  cool_stepper:
+    dependency: "direct main"
+    description:
+      name: cool_stepper
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.1"
   cross_file:
     dependency: "direct main"
     description:
@@ -265,6 +279,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.5+1"
+  flutter_haptic:
+    dependency: "direct main"
+    description:
+      name: flutter_haptic
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.3"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -308,6 +329,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_wizard:
+    dependency: "direct main"
+    description:
+      name: flutter_wizard
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
   geocoder2:
     dependency: "direct main"
     description:
@@ -567,6 +595,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
+  rxdart:
+    dependency: transitive
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.27.5"
   share_plus:
     dependency: "direct main"
     description:

@@ -1,5 +1,6 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_haptic/haptic.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
 import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
@@ -51,6 +52,7 @@ Widget customNav(context, currentIndex) {
   ];
 
   void goToNav(index) {
+    Haptic.onSelection();
     switch (index) {
       case 0:
         Navigator.pushReplacement(

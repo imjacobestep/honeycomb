@@ -27,6 +27,12 @@ class ServiceDetailsState extends State<ServiceDetails> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    widget.mapController ?? widget.mapController!.dispose();
+    super.dispose();
+  }
+
   final Completer<GoogleMapController> _controller = Completer();
 
   Widget getAction(String label, String value) {

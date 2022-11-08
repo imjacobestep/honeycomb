@@ -1,7 +1,9 @@
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_haptic/haptic.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
+import 'package:honeycomb_test/pages/resource_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
@@ -21,6 +23,19 @@ class ResourcesPageState extends State<ResourcesPage> {
   void initState() {
     widget.resourceList = widget.proxyModel.list("resources");
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    //resetFilters();
+    filters.forEach(
+      (key, value) {
+        value.forEach((key, value) {
+          setFilter(key, false);
+        });
+      },
+    );
+    super.dispose();
   }
 
   // VARIABLES
@@ -71,6 +86,7 @@ class ResourcesPageState extends State<ResourcesPage> {
             borderRadius: BorderRadius.circular(35),
             enableFeedback: true,
             onTap: () {
+              Haptic.onSelection;
               setFilter(label, !value);
               setSheetState(() {});
             },
@@ -230,6 +246,7 @@ class ResourcesPageState extends State<ResourcesPage> {
           Iterable testList = widget.proxyModel
               .sort(snapshot.data!, defaultSortCriteria, sortOrder);
           if (testList.isEmpty) {
+            //Haptic.onFailure();
             String helper = ifAnyFilters() ? "filters" : "search terms";
             return Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -247,6 +264,7 @@ class ResourcesPageState extends State<ResourcesPage> {
             }
           }
         } else {
+          //Haptic.onFailure();
           children = <Widget>[
             const Padding(
               padding: EdgeInsets.all(16),
@@ -254,6 +272,7 @@ class ResourcesPageState extends State<ResourcesPage> {
             )
           ];
         }
+        //Haptic.onSuccess;
         return ListView(
           padding: EdgeInsets.fromLTRB(4, 4, 4, 0),
           children: children,
@@ -292,7 +311,13 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   Widget headerButton() {
     return ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Resource res = new Resource();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NewResource(resource: res)));
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,

@@ -54,6 +54,9 @@ dependencies:
   equatable: ^2.0.5
   bottom_sheet_bar: ^2.3.8
   location: ^4.4.0
+  flutter_haptic: ^0.0.3
+  cool_stepper: ^1.2.1
+  flutter_wizard: ^2.0.5
 
 
 dev_dependencies:

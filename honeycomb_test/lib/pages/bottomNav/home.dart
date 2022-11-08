@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/user.dart';
+import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
 import '../../proxy.dart';
 import '../../utilities.dart';
@@ -32,6 +33,8 @@ class HomePageState extends State<HomePage> {
       child: InkWell(
         onTap: () {
           filters["Categories"]![label] = !filters["Categories"]![label]!;
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => ResourcesPage()));
         },
         onLongPress: () {
           resetFilters();
