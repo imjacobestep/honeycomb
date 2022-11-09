@@ -1,7 +1,9 @@
 //import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
 import 'package:honeycomb_test/model/resource.dart';
+import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:honeycomb_test/pages/resource_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
@@ -14,6 +16,7 @@ class ResourcesPage extends StatefulWidget {
   ResourcesPageState createState() => ResourcesPageState();
   Proxy proxyModel = Proxy();
   Future<Iterable>? resourceList;
+  String userID = FirebaseAuth.instance.currentUser!.uid;
 
   ResourcesPage();
 }
@@ -309,10 +312,26 @@ class ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
-  Widget headerButton() {
+  Widget userBuilder() {
+    return FutureBuilder(
+      future: widget.proxyModel.getUser(widget.userID),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          MPUser user = snapshot.data!;
+          return headerButton(user);
+        } else {
+          return Center(
+            child: ElevatedButton(onPressed: () {}, child: Icon(Icons.error)),
+          );
+        }
+      },
+    );
+  }
+
+  Widget headerButton(MPUser user) {
     return ElevatedButton(
         onPressed: () {
-          Resource res = new Resource();
+          Resource res = makeNewResource(user);
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -332,6 +351,7 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
+      automaticallyImplyLeading: false,
       toolbarHeight: 80,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
@@ -344,7 +364,7 @@ class ResourcesPageState extends State<ResourcesPage> {
             flex: 1,
             child: getSpacer(4),
           ),
-          Expanded(flex: 8, child: headerButton())
+          Expanded(flex: 8, child: userBuilder())
         ],
       ),
       backgroundColor: const Color(0xFF2B2A2A),

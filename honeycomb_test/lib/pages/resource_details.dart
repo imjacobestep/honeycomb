@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:honeycomb_test/pages/resource_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -29,7 +30,9 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   @override
   void dispose() {
-    widget.mapController ?? widget.mapController!.dispose();
+    if (widget.mapController != null) {
+      widget.mapController!.dispose();
+    }
     super.dispose();
   }
 
@@ -359,7 +362,13 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   Widget editButton() {
     return ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      NewResource(resource: widget.resource)));
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
@@ -377,11 +386,13 @@ class ServiceDetailsState extends State<ServiceDetails> {
         value ? const Icon(Icons.star) : const Icon(Icons.star_border_outlined);
     return ElevatedButton(
         onPressed: () {
-          if (user.favorites != null && widget.resource.id != null) {
-            user.favorites!.add(widget.resource.id!);
+          if (widget.resource.id != null) {
+            if (value) {
+              widget.proxyModel.delFromList(user, widget.resource);
+            } else {
+              widget.proxyModel.addToList(user, widget.resource);
+            }
           }
-          widget.proxyModel.upsert(user);
-          widget.proxyModel.addToList(user, widget.resource);
           setState(() {});
         },
         child: Row(
@@ -417,8 +428,10 @@ class ServiceDetailsState extends State<ServiceDetails> {
         if (snapshot.hasData && snapshot.data != null) {
           Iterable favs = snapshot.data!;
           bool isFavorite = false;
-          if (favs.contains(widget.resource)) {
-            isFavorite = true;
+          for (var element in favs) {
+            if (element.id == widget.resource.id) {
+              isFavorite = true;
+            }
           }
           return favoriteButton(isFavorite, user);
         } else {

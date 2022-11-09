@@ -46,10 +46,8 @@ class MPUser {
     return {
       if (name != null) "name": name?.toLowerCase(),
       if (email != null) "email": email?.toLowerCase(),
-      if (favorites != null)
-        "favorites": favorites?.map((s) => s.toLowerCase()).toSet().toList(),
-      if (clients != null)
-        "clients": clients?.map((s) => s.toLowerCase()).toSet().toList(),
+      if (favorites != null) "favorites": favorites?.toSet().toList(),
+      if (clients != null) "clients": clients?.toSet().toList(),
       if (createdStamp != null) "createdStamp": createdStamp,
       "updatedStamp": DateTime.now(),
     };

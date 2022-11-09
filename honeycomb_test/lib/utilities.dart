@@ -6,6 +6,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/resource.dart';
+import 'package:honeycomb_test/model/user.dart';
 import 'package:share_plus/share_plus.dart';
 
 Widget getSpacer(double size) {
@@ -91,6 +92,18 @@ Map<String, Map<String, bool>> filters = {
     "Accessibility": false
   },
 };
+
+Resource makeNewResource(MPUser user) {
+  return Resource(
+      phoneNumbers: {},
+      categories: {},
+      multilingual: false,
+      eligibility: {},
+      accessibility: false,
+      isActive: true,
+      createdBy: user.name != null ? user.name : "unknown",
+      createdStamp: DateTime.now());
+}
 
 Map<String, dynamic> getFilterQuery() {
   Map<String, dynamic> query = {};

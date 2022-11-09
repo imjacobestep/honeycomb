@@ -33,7 +33,7 @@ class HomePageState extends State<HomePage> {
       child: InkWell(
         onTap: () {
           filters["Categories"]![label] = !filters["Categories"]![label]!;
-          Navigator.pushReplacement(context,
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => ResourcesPage()));
         },
         onLongPress: () {
@@ -195,7 +195,7 @@ class HomePageState extends State<HomePage> {
               filterCard(Icons.sports_kabaddi, "Domestic Violence"),
               filterCard(Icons.psychology, "Mental Health"),
               filterCard(Icons.food_bank, "Food"),
-              filterCard(Icons.medical_services, "Medical Help"),
+              filterCard(Icons.medical_services, "Medical"),
               filterCard(Icons.gavel, "Legal"),
             ],
           ),
