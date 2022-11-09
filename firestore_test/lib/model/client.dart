@@ -49,8 +49,7 @@ class Client {
       if (alias != null) "alias": alias?.toLowerCase(),
       if (agencyId != null) "agencyId": agencyId?.toLowerCase(),
       if (size != null) "size": size,
-      if (resources != null)
-        "resources": resources?.map((s) => s.toLowerCase()).toSet().toList(),
+      if (resources != null) "resources": resources?.toSet().toList(),
       if (notes != null) "notes": notes,
       if (createdStamp != null) "createdStamp": createdStamp,
       "updatedStamp": DateTime.now(),
