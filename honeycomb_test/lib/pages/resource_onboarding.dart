@@ -1,8 +1,10 @@
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:honeycomb_test/geo_helper.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
@@ -16,7 +18,19 @@ class NewResource extends StatefulWidget {
   NewResourceState createState() => NewResourceState();
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
-  Resource resource;
+  GeoHelper geo = GeoHelper();
+  Resource? resource;
+  //TextEditingController
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController webController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController notesController = TextEditingController();
+  Map<dynamic, dynamic> categoriesController = {};
+  Map<dynamic, dynamic> eligibilityController = {};
+  bool multilingualController = false;
+  bool accessibleController = false;
 
   NewResource({required this.resource});
 }
@@ -24,45 +38,156 @@ class NewResource extends StatefulWidget {
 class NewResourceState extends State<NewResource> {
   final formKey = GlobalKey<FormState>();
   int currentStep = 0;
+  double listSpacing = 12;
 
   @override
   void initState() {
+    writeControllers();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.nameController.dispose();
+    widget.phoneController.dispose();
+    widget.emailController.dispose();
+    widget.webController.dispose();
+    widget.addressController.dispose();
+    widget.notesController.dispose();
+    super.dispose();
+  }
+
+  void writeControllers() {
+    if (widget.resource!.name != null) {
+      widget.nameController.text = widget.resource!.name!;
+    }
+    if (widget.resource!.phoneNumbers!["primary"] != null) {
+      widget.phoneController.text = widget.resource!.phoneNumbers!["primary"];
+    }
+    if (widget.resource!.email != null) {
+      widget.emailController.text = widget.resource!.email!;
+    }
+    if (widget.resource!.website != null) {
+      widget.webController.text = widget.resource!.website!;
+    }
+    if (widget.resource!.address != null && widget.resource!.zipCode != null) {
+      widget.addressController.text =
+          widget.resource!.address! + " " + widget.resource!.zipCode!;
+    }
+    if (widget.resource!.notes != null) {
+      widget.notesController.text = widget.resource!.notes!;
+    }
+    if (widget.resource!.categories != null) {
+      widget.categoriesController = widget.resource!.categories!;
+    }
+    if (widget.resource!.eligibility != null) {
+      widget.eligibilityController = widget.resource!.eligibility!;
+    }
+    if (widget.resource!.multilingual != null) {
+      widget.multilingualController = widget.resource!.multilingual!;
+    }
+    if (widget.resource!.accessibility != null) {
+      widget.accessibleController = widget.resource!.accessibility!;
+    }
+  }
+
+  void writeResource() {
+    if (widget.nameController.text != null &&
+        widget.nameController.text != "") {
+      widget.resource!.name = widget.nameController.text;
+    } //
+
+    //TODO phone
+    if (widget.emailController.text != null &&
+        widget.emailController.text != "") {
+      widget.resource!.email = widget.emailController.text;
+    } //
+    if (widget.webController.text != null && widget.webController.text != "") {
+      widget.resource!.website = widget.webController.text;
+    } //
+    if (widget.resource!.address != null && widget.resource!.zipCode != null) {
+      widget.addressController.text =
+          widget.resource!.address! + " " + widget.resource!.zipCode!;
+    }
+    if (widget.resource!.notes != null) {
+      widget.notesController.text = widget.resource!.notes!;
+    }
+    if (widget.resource!.categories != null) {
+      widget.categoriesController = widget.resource!.categories!;
+    }
+    if (widget.resource!.eligibility != null) {
+      widget.eligibilityController = widget.resource!.eligibility!;
+    }
+    if (widget.resource!.multilingual != null) {
+      widget.multilingualController = widget.resource!.multilingual!;
+    }
+    if (widget.resource!.accessibility != null) {
+      widget.accessibleController = widget.resource!.accessibility!;
+    }
+  }
+
+  Widget getLabel(String label, bool required) {
+    List<Widget> children = [];
+    children.add(Text(
+      label,
+      style: Theme.of(context).textTheme.titleSmall,
+    ));
+    if (required) {
+      children.add(getSpacer(8));
+      children.add(const Text(
+        "required",
+        style: TextStyle(
+            color: Colors.red, fontWeight: FontWeight.w700, fontSize: 12),
+      ));
+    }
+    return Row(mainAxisSize: MainAxisSize.min, children: children);
+  }
+
+  Widget getStepLabel(String label) {
+    return Text(
+      label,
+      style: Theme.of(context).textTheme.headlineSmall,
+    );
+  }
+
+  bool isFirstPageComplete() {
+    return (widget.nameController.text != null &&
+        (widget.resource!.categories != null &&
+            widget.resource!.categories!.isNotEmpty));
   }
 
   Widget selectionChip(String label, String type, bool value) {
     return InkWell(
         borderRadius: BorderRadius.circular(35),
-        enableFeedback: true,
         onTap: () {
           Haptic.onSelection;
           switch (type) {
             case "category":
               if (value) {
-                widget.resource.categories!.remove(label.toLowerCase());
+                widget.categoriesController.remove(label.toLowerCase());
               } else {
-                widget.resource.categories![label.toLowerCase()] = true;
+                widget.categoriesController[label.toLowerCase()] = true;
               }
               break;
             case "language":
               if (label == "English Only") {
-                widget.resource.multilingual = false;
+                widget.multilingualController = false;
               } else {
-                widget.resource.multilingual = true;
+                widget.multilingualController = true;
               }
               break;
             case "eligibility":
               if (value) {
-                widget.resource.eligibility!.remove(label.toLowerCase());
+                widget.eligibilityController.remove(label.toLowerCase());
               } else {
-                widget.resource.eligibility![label.toLowerCase()] = true;
+                widget.eligibilityController[label.toLowerCase()] = true;
               }
               break;
             case "accessibility":
               if (label == "Yes") {
-                widget.resource.accessibility = true;
+                widget.accessibleController = true;
               } else {
-                widget.resource.accessibility = false;
+                widget.accessibleController = false;
               }
               break;
             default:
@@ -71,7 +196,7 @@ class NewResourceState extends State<NewResource> {
         },
         child: !value
             ? Chip(
-                label: Text(label, style: TextStyle(fontSize: 14)),
+                label: Text(label, style: const TextStyle(fontSize: 14)),
                 backgroundColor: Colors.transparent,
                 side: const BorderSide(color: Colors.black12, width: 1),
               )
@@ -86,34 +211,31 @@ class NewResourceState extends State<NewResource> {
   }
 
   Widget languageBuilder() {
-    widget.resource.multilingual ??= false;
     return Wrap(
       spacing: 4,
       children: [
         selectionChip(
-            "English Only", "language", !widget.resource.multilingual!),
-        selectionChip("MultiLingual", "language", widget.resource.multilingual!)
+            "English Only", "language", !widget.multilingualController),
+        selectionChip("MultiLingual", "language", widget.multilingualController)
       ],
     );
   }
 
   Widget accessBuilder() {
-    widget.resource.accessibility ??= false;
+    widget.resource!.accessibility ??= false;
     return Wrap(
       spacing: 4,
       children: [
-        selectionChip("Yes", "accessibility", widget.resource.accessibility!),
-        selectionChip("No", "accessibility", !widget.resource.accessibility!)
+        selectionChip("Yes", "accessibility", widget.accessibleController),
+        selectionChip("No", "accessibility", !widget.accessibleController)
       ],
     );
   }
 
   Widget eligibilityBuilder() {
-    widget.resource.eligibility ??= {};
     List<Widget> children = [];
     filters["Eligibility"]!.forEach((key, value) {
-      widget.resource.eligibility ??= {};
-      if (widget.resource.eligibility!.containsKey(key.toLowerCase())) {
+      if (widget.eligibilityController.containsKey(key.toLowerCase())) {
         children.add(selectionChip(key, 'eligibility', true));
       } else {
         children.add(selectionChip(key, 'eligibility', false));
@@ -126,11 +248,10 @@ class NewResourceState extends State<NewResource> {
   }
 
   Widget categoriesBuilder() {
-    widget.resource.categories ??= {};
     List<Widget> children = [];
     filters["Categories"]!.forEach((key, value) {
-      widget.resource.categories ??= {};
-      if (widget.resource.categories!.containsKey(key.toLowerCase())) {
+      widget.resource!.categories ??= {};
+      if (widget.categoriesController.containsKey(key.toLowerCase())) {
         children.add(selectionChip(key, 'category', true));
       } else {
         children.add(selectionChip(key, 'category', false));
@@ -161,35 +282,27 @@ class NewResourceState extends State<NewResource> {
 
   Step stepOne() {
     return Step(
-      title: const Text("Critical Info"),
+      title: getStepLabel("Critical Info"),
       content: ListView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          Text(
-            "Resource Name",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getLabel("Resource Name", true),
           TextField(
-            onChanged: (text) {
-              widget.resource.name = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
+            controller: widget.nameController,
+            keyboardType: TextInputType.name,
+            autofocus: true,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
-              hintText: widget.resource.name != null
-                  ? widget.resource.name!
-                  : "eg. [organization][service]",
-              border: const OutlineInputBorder(
+              hintText: "eg. [organization][service]",
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
           ),
-          getSpacer(24),
-          Text(
-            "Pick all applicable Categories",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getSpacer(listSpacing),
+          getLabel("Pick all applicable Categories", true),
           categoriesBuilder(),
         ],
       ),
@@ -200,27 +313,18 @@ class NewResourceState extends State<NewResource> {
 
   Step stepTwo() {
     return Step(
-      title: const Text("Additional Info"),
+      title: getStepLabel("Additional Info"),
       content: ListView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          Text(
-            "Language",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getLabel("Language", false),
           languageBuilder(),
-          getSpacer(24),
-          Text(
-            "Eligibility Requirements",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getSpacer(listSpacing),
+          getLabel("Eligibility Requirements", false),
           eligibilityBuilder(),
-          getSpacer(24),
-          Text(
-            "Wheelchair Accessible?",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getSpacer(listSpacing),
+          getLabel("Wheelchair Accessible", false),
           accessBuilder(),
         ],
       ),
@@ -231,127 +335,94 @@ class NewResourceState extends State<NewResource> {
 
   Step stepThree() {
     return Step(
-      title: const Text("Contact Info"),
+      title: getStepLabel("Contact Info"),
       content: ListView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          Text(
-            "Phone Number",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getLabel("Phone Number", false),
           TextField(
-            onChanged: (text) {
-              widget.resource.phoneNumbers ??= {};
-              widget.resource.phoneNumbers!["primary"] = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
+            controller: widget.phoneController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
-              hintText: widget.resource.phoneNumbers!["primary"] != null
-                  ? widget.resource.phoneNumbers!["primary"]!
-                  : "primary number",
-              border: const OutlineInputBorder(
+              hintText: "primary number",
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
           ),
-          getSpacer(24),
-          Text(
-            "Email",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getSpacer(listSpacing),
+          getLabel("Email", false),
           TextField(
-            onChanged: (text) {
-              widget.resource.email = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
+            controller: widget.emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
-              hintText: widget.resource.email != null
-                  ? widget.resource.email!
-                  : "eg. email@example.org",
-              border: const OutlineInputBorder(
+              hintText: "eg. email@example.org",
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
           ),
-          getSpacer(24),
-          Text(
-            "Website",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getSpacer(listSpacing),
+          getLabel("Website", false),
           TextField(
-            onChanged: (text) {
-              widget.resource.website = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
+            controller: widget.webController,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
-              hintText: widget.resource.website != null
-                  ? widget.resource.website!
-                  : "eg. example.org",
-              border: const OutlineInputBorder(
+              hintText: "eg. example.org",
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
           ),
-          getSpacer(24),
-          Text(
-            "Address",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          TextField(
-            onChanged: (text) {
-              widget.resource.address = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
+          getSpacer(listSpacing),
+          getLabel("Address with Zip Code", false),
+          /* TextField(
+            controller: widget.addressController,
+            keyboardType: TextInputType.streetAddress,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
-              hintText: widget.resource.address != null
-                  ? widget.resource.address!
-                  : "eg. 123 Example St",
-              border: const OutlineInputBorder(
+              hintText: "eg. 123 Example St",
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
-          ),
-          getSpacer(24),
-          Text(
-            "Zip Code",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          ), */
+          addressBuilder(),
+          getSpacer(listSpacing),
+          /* getLabel("Zip Code", false),
           TextField(
+            keyboardType: TextInputType.number,
             onChanged: (text) {
-              widget.resource.zipCode = text;
+              widget.changedResource!.zipCode = text;
             },
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: widget.resource.zipCode != null
-                  ? widget.resource.zipCode!
+              hintStyle: const TextStyle(color: Colors.black26),
+              hintText: widget.changedResource!.zipCode != null
+                  ? widget.changedResource!.zipCode!
                   : "eg. 12345",
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
           ),
-          getSpacer(24),
-          Text(
-            "Notes",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          getSpacer(listSpacing), */
+          getLabel("Notes", false),
           TextField(
-            onChanged: (text) {
-              widget.resource.notes = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
+            controller: widget.notesController,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
-              hintText: widget.resource.notes != null
-                  ? widget.resource.notes!
-                  : "eg. Type any extra details...",
-              border: const OutlineInputBorder(
+              hintText: "Type any extra details...",
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
@@ -363,35 +434,67 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  var steps = [
-    CoolStep(
-        title: "Add New Resource",
-        subtitle: "Primary Info",
-        content: Container(),
-        validation: () {}),
-    CoolStep(
-        title: "Add New Resource",
-        subtitle: "Page 2",
-        content: Container(),
-        validation: () {}),
-    CoolStep(
-        title: "Add New Resource",
-        subtitle: "Page 2",
-        content: Container(),
-        validation: () {}),
-  ];
-
-  Widget getStepper() {
-    return CoolStepper(
-        config: const CoolStepperConfig(
-            finalText: "Save Resource",
-            backText: "Back",
-            isHeaderEnabled: false,
-            nextTextList: ["Additional Info", "Contact Info", "Save Resource"]),
-        steps: steps,
-        onCompleted: () {
-          Navigator.pop(context);
+  Widget addressBox(bool hasError, bool isVerified) {
+    bool showIcon = (hasError || isVerified);
+    Icon verifiedIcon;
+    if (hasError) {
+      verifiedIcon = const Icon(
+        Icons.error_outline_outlined,
+        color: Colors.red,
+      );
+    } else {
+      verifiedIcon = const Icon(
+        Icons.verified_outlined,
+        color: Colors.green,
+      );
+    }
+    return TextField(
+      onSubmitted: (text) {
+        setState(() {
+          widget.addressController.text = text;
         });
+      },
+      controller: widget.addressController,
+      keyboardType: TextInputType.streetAddress,
+      decoration: InputDecoration(
+        prefixIcon: showIcon ? verifiedIcon : null,
+        errorText: hasError ? "Improper Address" : null,
+        contentPadding: const EdgeInsets.all(8),
+        hintStyle: const TextStyle(color: Colors.black26),
+        hintText: "eg. 123 Example St",
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4)),
+        ),
+      ),
+    );
+  }
+
+  Widget addressBuilder() {
+    if (widget.addressController.text == null ||
+        widget.addressController.text == "") {
+      return addressBox(false, false);
+    } else {
+      return FutureBuilder(
+        future: widget.geo.parseAddress(widget.addressController.text, ""),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            //print(loc.data);
+            if (snapshot.data!['lat'] != null &&
+                snapshot.data!['lng'] != null) {
+              return addressBox(false, true);
+            } else {
+              return addressBox(true, false);
+            }
+          } else {
+            return LoadingIndicator(
+              size: 50,
+              borderWidth: 5,
+              color: Theme.of(context).colorScheme.primary,
+            );
+          }
+        },
+      );
+    }
   }
 
   tapped(int step) {
@@ -408,6 +511,35 @@ class NewResourceState extends State<NewResource> {
     currentStep > 0 ? setState(() => currentStep -= 1) : Navigator.pop(context);
   }
 
+  Widget backBuilder(ControlsDetails details) {
+    String backText = currentStep == 0 ? "Cancel" : "Back";
+    Icon backIcon = currentStep == 0
+        ? const Icon(Icons.cancel)
+        : const Icon(Icons.arrow_upward_outlined);
+    return ElevatedButton(
+      onPressed: details.onStepCancel,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
+        child: Row(children: [backIcon, getSpacer(8), Text(backText)]),
+      ),
+    );
+  }
+
+  Widget nextBuilder(ControlsDetails details) {
+    bool firstIncomplete = (currentStep == 0 && !isFirstPageComplete());
+    Icon nextIcon = currentStep == 2
+        ? const Icon(Icons.check_circle)
+        : const Icon(Icons.arrow_downward_outlined);
+    String nextText = currentStep == 2 ? "Save Resource" : "Next";
+    return ElevatedButton(
+      onPressed: firstIncomplete ? null : details.onStepContinue,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
+        child: Row(children: [Text(nextText), getSpacer(8), nextIcon]),
+      ),
+    );
+  }
+
   Widget getStepper2() {
     return Stepper(
       steps: [stepOne(), stepTwo(), stepThree()],
@@ -422,6 +554,18 @@ class NewResourceState extends State<NewResource> {
         continued();
       },
       currentStep: currentStep,
+      controlsBuilder: (BuildContext context, ControlsDetails details) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+          child: Row(
+            children: <Widget>[
+              backBuilder(details),
+              getSpacer(8),
+              nextBuilder(details)
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -429,6 +573,7 @@ class NewResourceState extends State<NewResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          leading: const BackButton(color: Colors.white),
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
           title: const Text(
