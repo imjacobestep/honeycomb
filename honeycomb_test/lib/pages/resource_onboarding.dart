@@ -22,7 +22,9 @@ class NewResource extends StatefulWidget {
   Resource? resource;
   //TextEditingController
   TextEditingController nameController = TextEditingController();
-  Map<dynamic, dynamic> phoneController = {"primary": null};
+  Map<String, TextEditingController> phoneController = {
+    "primary": TextEditingController()
+  };
   TextEditingController emailController = TextEditingController();
   TextEditingController webController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -62,7 +64,11 @@ class NewResourceState extends State<NewResource> {
     }
     if (widget.resource!.phoneNumbers != null &&
         widget.resource!.phoneNumbers!.isNotEmpty) {
-      widget.phoneController = widget.resource!.phoneNumbers!;
+      widget.resource!.phoneNumbers!.forEach((key, value) {
+        widget.phoneController[key] =
+            TextEditingController.fromValue(TextEditingValue(text: value));
+      });
+      //widget.phoneController = widget.resource!.phoneNumbers!;
     }
     if (widget.resource!.email != null) {
       widget.emailController.text = widget.resource!.email!;
@@ -266,7 +272,7 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget phoneInput(String name, String number) {
+  Widget phoneInput(String name) {
     Widget delete = name == "primary"
         ? Container()
         : IconButton(
@@ -289,14 +295,15 @@ class NewResourceState extends State<NewResource> {
           children: [getLabel("Contact Name", false), delete],
         ),
         TextField(
-          readOnly: name == "primary" ? true : false,
+          enabled: name == "primary" ? false : true,
           onSubmitted: (text) {
             setState(() {
               if (name == "") {
+                widget.phoneController[text] = widget.phoneController['']!;
                 widget.phoneController.remove('');
               }
               if (!widget.phoneController.keys.contains(text)) {
-                widget.phoneController[text] = null;
+                widget.phoneController[text] = TextEditingController();
               }
             });
           },
@@ -322,11 +329,7 @@ class NewResourceState extends State<NewResource> {
               child: getLabel("Phone Number", false),
             ),
             TextField(
-              onChanged: (text) {
-                setState(() {
-                  widget.phoneController[name] = text;
-                });
-              },
+              controller: widget.phoneController[name],
               keyboardType: TextInputType.phone,
               autofocus: true,
               decoration: const InputDecoration(
@@ -349,14 +352,14 @@ class NewResourceState extends State<NewResource> {
   Widget phoneBuilder() {
     List<Widget> children = [];
     widget.phoneController.forEach((key, value) {
-      String val = value != null ? value : '';
-      children.add(phoneInput(key, val));
+      //String val = value != null ? value : '';
+      children.add(phoneInput(key));
     });
     children.add(ElevatedButton(
         onPressed: () {
           print(widget.phoneController.keys);
           setState(() {
-            widget.phoneController[''] = '';
+            widget.phoneController[''] = TextEditingController();
           });
         },
         child: Row(
