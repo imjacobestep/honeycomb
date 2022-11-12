@@ -51,6 +51,14 @@ Widget detailsCategoryLabel(BuildContext context, String category) {
 }
 
 Widget resourceCard(BuildContext context, Resource resource) {
+  List<Widget> categories = [];
+  if (resource.categories != null) {
+    for (String category in resource.categories!.keys) {
+      categories.add(cardCategoryLabel(context, category));
+    }
+  } else {
+    categories.add(Container());
+  }
   return Card(
     child: InkWell(
       onTap: () => Navigator.push(
@@ -73,12 +81,7 @@ Widget resourceCard(BuildContext context, Resource resource) {
                   style: const TextStyle(fontSize: 20),
                 ),
                 //getSpacer(2),
-                Wrap(
-                  children: [
-                    for (String category in resource.categories!.keys)
-                      cardCategoryLabel(context, category)
-                  ],
-                ),
+                Wrap(children: categories),
               ],
             ),
             IconButton(

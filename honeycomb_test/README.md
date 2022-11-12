@@ -10,3 +10,6 @@ copy the xml to honeycomb/honeycomb_test/android/app/src/main
 copy secrets.dart into honeycomb/honeycomb_test/lib
 copy the swift to honeycomb/honeycomb_test/ios/Runner
 these are kept off the github because they contain api keys
+
+THEN: delete ios/podfile and podfile.lock
+run 'flutter clean'

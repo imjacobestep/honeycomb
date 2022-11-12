@@ -423,6 +423,7 @@ class MapPageState extends State<MapPage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
+      automaticallyImplyLeading: false,
       toolbarHeight: 80,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),

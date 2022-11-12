@@ -22,7 +22,7 @@ class NewResource extends StatefulWidget {
   Resource? resource;
   //TextEditingController
   TextEditingController nameController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
+  Map<dynamic, dynamic> phoneController = {"primary": null};
   TextEditingController emailController = TextEditingController();
   TextEditingController webController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -49,7 +49,6 @@ class NewResourceState extends State<NewResource> {
   @override
   void dispose() {
     widget.nameController.dispose();
-    widget.phoneController.dispose();
     widget.emailController.dispose();
     widget.webController.dispose();
     widget.addressController.dispose();
@@ -61,8 +60,9 @@ class NewResourceState extends State<NewResource> {
     if (widget.resource!.name != null) {
       widget.nameController.text = widget.resource!.name!;
     }
-    if (widget.resource!.phoneNumbers!["primary"] != null) {
-      widget.phoneController.text = widget.resource!.phoneNumbers!["primary"];
+    if (widget.resource!.phoneNumbers != null &&
+        widget.resource!.phoneNumbers!.isNotEmpty) {
+      widget.phoneController = widget.resource!.phoneNumbers!;
     }
     if (widget.resource!.email != null) {
       widget.emailController.text = widget.resource!.email!;
@@ -96,8 +96,10 @@ class NewResourceState extends State<NewResource> {
         widget.nameController.text != "") {
       widget.resource!.name = widget.nameController.text;
     } //
-
-    //TODO phone
+    if (widget.phoneController.isNotEmpty &&
+        widget.phoneController["primary"] != null) {
+      widget.resource!.phoneNumbers = widget.phoneController;
+    } //
     if (widget.emailController.text != null &&
         widget.emailController.text != "") {
       widget.resource!.email = widget.emailController.text;
@@ -151,7 +153,8 @@ class NewResourceState extends State<NewResource> {
   }
 
   bool isFirstPageComplete() {
-    return (widget.nameController.text != null &&
+    return ((widget.nameController.text != null &&
+            widget.nameController.text != "") &&
         (widget.resource!.categories != null &&
             widget.resource!.categories!.isNotEmpty));
   }
@@ -263,6 +266,110 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
+  Widget phoneInput(String name, String number) {
+    Widget delete = name == "primary"
+        ? Container()
+        : IconButton(
+            onPressed: () {
+              setState(() {
+                widget.phoneController.remove(name);
+              });
+            },
+            icon: Icon(
+              Icons.delete,
+              color: Colors.red,
+            ));
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [getLabel("Contact Name", false), delete],
+        ),
+        TextField(
+          readOnly: name == "primary" ? true : false,
+          onSubmitted: (text) {
+            setState(() {
+              if (name == "") {
+                widget.phoneController.remove('');
+              }
+              if (!widget.phoneController.keys.contains(text)) {
+                widget.phoneController[text] = null;
+              }
+            });
+          },
+          keyboardType: TextInputType.name,
+          autofocus: true,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.all(8),
+            hintStyle: const TextStyle(color: Colors.black26),
+            hintText: name == "primary" ? name : "eg. secretary",
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+            ),
+          ),
+        ),
+        getSpacer(4),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
+              child: getLabel("Phone Number", false),
+            ),
+            TextField(
+              onChanged: (text) {
+                setState(() {
+                  widget.phoneController[name] = text;
+                });
+              },
+              keyboardType: TextInputType.phone,
+              autofocus: true,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.subdirectory_arrow_right_outlined),
+                contentPadding: EdgeInsets.all(8),
+                hintStyle: TextStyle(color: Colors.black26),
+                hintText: "eg. 111-111-1111",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                ),
+              ),
+            ),
+            getSpacer(4)
+          ],
+        )
+      ],
+    );
+  }
+
+  Widget phoneBuilder() {
+    List<Widget> children = [];
+    widget.phoneController.forEach((key, value) {
+      String val = value != null ? value : '';
+      children.add(phoneInput(key, val));
+    });
+    children.add(ElevatedButton(
+        onPressed: () {
+          print(widget.phoneController.keys);
+          setState(() {
+            widget.phoneController[''] = '';
+          });
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [Icon(Icons.add), Text("Add Number")],
+        )));
+    return ListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: children,
+    );
+  }
+
   Widget userBuilder() {
     return FutureBuilder(
       future: widget.proxyModel.getUser(widget.userID),
@@ -290,6 +397,11 @@ class NewResourceState extends State<NewResource> {
           getLabel("Resource Name", true),
           TextField(
             controller: widget.nameController,
+            onChanged: (text) {
+              setState(() {
+                widget.nameController.text = text;
+              });
+            },
             keyboardType: TextInputType.name,
             autofocus: true,
             decoration: const InputDecoration(
@@ -340,10 +452,12 @@ class NewResourceState extends State<NewResource> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          getLabel("Phone Number", false),
+          /* getLabel("Phone Number", false),
           TextField(
-            controller: widget.phoneController,
             keyboardType: TextInputType.phone,
+            onChanged: (text) {
+              widget.phoneController['primary'] = text;
+            },
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
@@ -352,7 +466,8 @@ class NewResourceState extends State<NewResource> {
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
             ),
-          ),
+          ), */
+          phoneBuilder(),
           getSpacer(listSpacing),
           getLabel("Email", false),
           TextField(
