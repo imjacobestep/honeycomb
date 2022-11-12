@@ -397,7 +397,7 @@ class NewResourceState extends State<NewResource> {
           getLabel("Resource Name", true),
           TextField(
             controller: widget.nameController,
-            onChanged: (text) {
+            onSubmitted: (text) {
               setState(() {
                 widget.nameController.text = text;
               });
