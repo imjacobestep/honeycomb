@@ -132,6 +132,7 @@ class HomePageState extends State<HomePage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
+      surfaceTintColor: Colors.transparent,
       toolbarHeight: 80,
       leadingWidth: 80,
       shape: const RoundedRectangleBorder(

@@ -458,6 +458,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
+      surfaceTintColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
       leading: const BackButton(color: Colors.white),

@@ -450,6 +450,7 @@ class MapPageState extends State<MapPage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
+      surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
       toolbarHeight: 80,
       shape: const RoundedRectangleBorder(

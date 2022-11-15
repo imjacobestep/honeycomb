@@ -378,6 +378,7 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
+      surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
       toolbarHeight: 80,
       shape: const RoundedRectangleBorder(
