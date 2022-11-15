@@ -254,7 +254,12 @@ class ResourcesPageState extends State<ResourcesPage> {
           if (testList.isEmpty) {
             //Haptic.onFailure();
             String helper = ifAnyFilters() ? "filters" : "search terms";
-            return Center(
+            children.add(fabButtons());
+            children.addAll([
+              getSpacer(16),
+              helperText("No Results", "Try changing your $helper", context)
+            ]);
+            /* return Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Text(
                   "No Results",
@@ -263,8 +268,9 @@ class ResourcesPageState extends State<ResourcesPage> {
                 Text("Try changing your $helper"),
                 //Text(getFilterQuery().toString())
               ]),
-            );
+            ); */
           } else {
+            children.add(fabButtons());
             for (Resource resource in testList) {
               if (resource.name != null && resource.name != "") {
                 children.add(resourceCard(context, resource, () {

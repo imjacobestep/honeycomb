@@ -246,9 +246,10 @@ class ClientDetailsState extends State<ClientDetails> {
 
   Widget addButton() {
     return ElevatedButton(
-        onPressed: () {
-          Navigator.pushReplacement(context,
+        onPressed: () async {
+          await Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => ResourcesPage()));
+          setState(() {});
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

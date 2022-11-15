@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Client {
-  String? id;
+  final String? id;
   String? alias;
   String? agencyId;
   int? familySize;
@@ -49,8 +49,8 @@ class Client {
       if (alias != null) "alias": alias?.toLowerCase(),
       if (agencyId != null) "agencyId": agencyId?.toLowerCase(),
       if (familySize != null) "size": familySize,
-      if (notes != null) "notes": notes,
       if (resources != null) "resources": resources?.toSet().toList(),
+      if (notes != null) "notes": notes,
       if (createdStamp != null) "createdStamp": createdStamp,
       "updatedStamp": DateTime.now(),
     };

@@ -220,9 +220,14 @@ class NewClientState extends State<NewClient> {
               if (widget.client!.id == null) {
                 dynamic newClient =
                     await widget.proxyModel.upsert(widget.client);
-                widget.client!.id = newClient.id;
+
+                widget.client =
+                    await widget.proxyModel.get('clients', newClient.id);
+                widget.proxyModel.addToList(widget.user, widget.client);
+              } else {
+                widget.proxyModel.upsert(widget.client);
               }
-              widget.proxyModel.addToList(widget.user, widget.client);
+
               Navigator.pop(context);
             },
       child: Padding(
