@@ -50,13 +50,9 @@ dependencies:
   firebase_auth: ^4.0.1
   firebase_ui_auth: ^1.0.0-dev.0
   modal_bottom_sheet: ^2.1.2
-  bloc: ^8.1.0
-  equatable: ^2.0.5
   bottom_sheet_bar: ^2.3.8
   location: ^4.4.0
   flutter_haptic: ^0.0.3
-  cool_stepper: ^1.2.1
-  flutter_wizard: ^2.0.5
 
 
 dev_dependencies:
@@ -84,6 +80,7 @@ flutter:
   assets:
   #   - assets/map_pins/
     - lib/assets/icon/icon.png
+    - lib/assets/agency_button.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -9,7 +9,7 @@ Widget clientCard(BuildContext context, Client client) {
       onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ListDetails(
+              builder: (context) => ClientDetails(
                     client: client,
                   ))),
       child: Padding(

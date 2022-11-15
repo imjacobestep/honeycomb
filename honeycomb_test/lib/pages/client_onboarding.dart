@@ -188,13 +188,20 @@ class NewClientState extends State<NewClient> {
     );
   }
 
-  Widget userBuilder() {
+  Widget userBuilder(String buttonType) {
     return FutureBuilder(
       future: widget.proxyModel.getUser(widget.userID),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           widget.user = snapshot.data;
-          return saveButton();
+          if (buttonType == "save") {
+            return saveButton();
+          } else {
+            return Padding(
+              padding: const EdgeInsets.all(8),
+              child: deleteButton(),
+            );
+          }
         } else {
           return const Center(
             child: LoadingIndicator(size: 40, borderWidth: 3),
@@ -208,8 +215,13 @@ class NewClientState extends State<NewClient> {
     return ElevatedButton(
       onPressed: widget.nameController.text == ''
           ? null
-          : () {
+          : () async {
               writeClient();
+              if (widget.client!.id == null) {
+                dynamic newClient =
+                    await widget.proxyModel.upsert(widget.client);
+                widget.client!.id = newClient.id;
+              }
               widget.proxyModel.addToList(widget.user, widget.client);
               Navigator.pop(context);
             },
@@ -224,11 +236,30 @@ class NewClientState extends State<NewClient> {
     );
   }
 
+  Widget deleteButton() {
+    return ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+        onPressed: () {
+          widget.proxyModel.delFromList(widget.user, widget.client);
+          Navigator.pop(context);
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text("Delete"),
+            getSpacer(8),
+            const Icon(Icons.delete),
+          ],
+        ));
+  }
+
   Widget BottomButtons() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        children: [cancelButton(), getSpacer(8), userBuilder()],
+        children: [cancelButton(), getSpacer(8), userBuilder("save")],
       ),
     );
   }
@@ -237,12 +268,14 @@ class NewClientState extends State<NewClient> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           leading: const BackButton(color: Colors.white),
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
           title: Text(
             widget.client!.id != null ? "Edit Client" : "New Client",
           ),
+          actions: widget.client!.id != null ? [userBuilder("delete")] : null,
           backgroundColor: const Color(0xFF2B2A2A),
           foregroundColor: Colors.white),
       body: buildForm(),

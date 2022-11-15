@@ -8,13 +8,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.8"
-  another_flushbar:
-    dependency: transitive
-    description:
-      name: another_flushbar
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.12.29"
   archive:
     dependency: transitive
     description:
@@ -36,13 +29,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.9.0"
-  bloc:
-    dependency: "direct main"
-    description:
-      name: bloc
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "8.1.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -120,13 +106,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.1"
-  cool_stepper:
-    dependency: "direct main"
-    description:
-      name: cool_stepper
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.2.1"
   cross_file:
     dependency: "direct main"
     description:
@@ -169,13 +148,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.17"
-  equatable:
-    dependency: "direct main"
-    description:
-      name: equatable
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.5"
   fake_async:
     dependency: transitive
     description:
@@ -336,13 +308,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_wizard:
-    dependency: "direct main"
-    description:
-      name: flutter_wizard
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.5"
   geocoder2:
     dependency: "direct main"
     description:
@@ -609,13 +574,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
-  rxdart:
-    dependency: transitive
-    description:
-      name: rxdart
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.27.6"
   share_plus:
     dependency: "direct main"
     description:

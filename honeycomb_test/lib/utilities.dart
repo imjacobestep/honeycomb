@@ -105,6 +105,18 @@ Resource makeNewResource(String userName) {
       createdStamp: DateTime.now());
 }
 
+Widget helperText(String error, String helper, BuildContext context) {
+  return Center(
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
+      Text(
+        error,
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
+      Text(helper),
+    ]),
+  );
+}
+
 Map<String, dynamic> getFilterQuery() {
   Map<String, dynamic> query = {};
   List<String> categoriesSelected = [];

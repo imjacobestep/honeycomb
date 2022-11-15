@@ -26,6 +26,7 @@ class MapPage extends StatefulWidget {
   String typedAddress = "12280 NE District Wy";
   String typedZipCode = "98005";
   GoogleMapController? mapController;
+  TextEditingController searchController = TextEditingController();
   Set<Marker> markers = {
     const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
@@ -58,6 +59,9 @@ class MapPageState extends State<MapPage> {
     );
     if (widget.mapController != null) {
       widget.mapController!.dispose();
+    }
+    if (widget.searchController != null) {
+      widget.searchController.dispose();
     }
     super.dispose();
   }
@@ -367,18 +371,24 @@ class MapPageState extends State<MapPage> {
   Widget searchBar() {
     return TextField(
       maxLines: 1,
+      controller: widget.searchController,
       textAlignVertical: TextAlignVertical.center,
       onSubmitted: (text) {
-        if (text != "") {
+        if (widget.searchController.text != "") {
           setState(() {
-            final split = text.split(',');
+            //final split = widget.searchController.text.split(',');
 
-            widget.typedAddress = split[0];
-            widget.typedZipCode = split[split.length - 1];
+            widget.typedAddress = widget.searchController.text;
+            /* widget.typedZipCode = split[split.length - 1];
             widget.typedLocation = widget.geo
-                .parseAddress(widget.typedAddress, widget.typedZipCode);
+                .parseAddress(widget.searchController.text, ''); */
             widget.useCurrentLocation = false;
             widget.markers.clear();
+          });
+        } else {
+          setState(() {
+            widget.markers.clear();
+            widget.useCurrentLocation = true;
           });
         }
       },
@@ -393,6 +403,21 @@ class MapPageState extends State<MapPage> {
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
+        suffixIcon: widget.searchController.text != ""
+            ? IconButton(
+                onPressed: () {
+                  widget.searchController.clear;
+                  setState(() {
+                    widget.searchController.clear();
+                    setState(() {
+                      widget.markers.clear();
+                      widget.useCurrentLocation = true;
+                    });
+                  });
+                },
+                icon: Icon(Icons.clear),
+              )
+            : null,
       ),
     );
   }

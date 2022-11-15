@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
+import 'package:flutter_launcher_icons/constants.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
@@ -18,6 +19,7 @@ class ResourcesPage extends StatefulWidget {
   Proxy proxyModel = Proxy();
   Future<Iterable>? resourceList;
   String userID = FirebaseAuth.instance.currentUser!.uid;
+  TextEditingController searchController = TextEditingController();
 
   ResourcesPage();
 }
@@ -31,7 +33,6 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   @override
   void dispose() {
-    //resetFilters();
     filters.forEach(
       (key, value) {
         value.forEach((key, value) {
@@ -39,6 +40,7 @@ class ResourcesPageState extends State<ResourcesPage> {
         });
       },
     );
+    widget.searchController.dispose();
     super.dispose();
   }
 
@@ -296,6 +298,7 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   Widget searchBar() {
     return TextField(
+      controller: widget.searchController,
       maxLines: 1,
       textAlignVertical: TextAlignVertical.center,
       onSubmitted: (text) {
@@ -318,6 +321,18 @@ class ResourcesPageState extends State<ResourcesPage> {
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
+        suffixIcon: widget.searchController.text != ""
+            ? IconButton(
+                onPressed: () {
+                  widget.searchController.clear;
+                  setState(() {
+                    widget.searchController.clear();
+                    widget.resourceList = widget.proxyModel.list("resources");
+                  });
+                },
+                icon: Icon(Icons.clear),
+              )
+            : null,
       ),
     );
   }

@@ -458,7 +458,11 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
-      elevation: 0,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
+      leading: const BackButton(color: Colors.white),
+      backgroundColor: const Color(0xFF2B2A2A),
+      foregroundColor: Colors.white,
       actions: [
         Padding(
           padding: const EdgeInsets.all(8),
@@ -553,7 +557,6 @@ class ServiceDetailsState extends State<ServiceDetails> {
               "updated $diff day$plural ago by $updatedUser",
               style: Theme.of(context).textTheme.labelMedium,
             )
-            //Text("updated $updatedTime by $updatedUser")
           ],
         ),
         userBuilder()

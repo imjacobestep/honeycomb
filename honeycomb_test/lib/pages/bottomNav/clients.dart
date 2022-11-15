@@ -79,7 +79,7 @@ class ClientsPageState extends State<ClientsPage> {
     return ElevatedButton(
         onPressed: () {
           Client newClient = Client(createdStamp: DateTime.now());
-          Navigator.pushReplacement(
+          Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => NewClient(client: newClient)));
@@ -100,6 +100,7 @@ class ClientsPageState extends State<ClientsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
         title: const Text(
