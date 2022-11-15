@@ -4,7 +4,7 @@ class Client {
   final String? id;
   String? alias;
   String? agencyId;
-  int? size;
+  int? familySize;
   List<String>? resources;
   String? notes;
   DateTime? createdStamp;
@@ -14,7 +14,7 @@ class Client {
     this.id,
     this.alias,
     this.agencyId,
-    this.size,
+    this.familySize,
     this.resources,
     this.notes,
     this.createdStamp,
@@ -31,7 +31,7 @@ class Client {
       id: snapshot.id,
       alias: data?['alias'],
       agencyId: data?['agencyId'],
-      size: data?['size'],
+      familySize: data?['size'],
       resources:
           data?['resources'] is Iterable ? List.from(data?['resources']) : null,
       notes: data?['notes'],
@@ -48,7 +48,7 @@ class Client {
     return {
       if (alias != null) "alias": alias?.toLowerCase(),
       if (agencyId != null) "agencyId": agencyId?.toLowerCase(),
-      if (size != null) "size": size,
+      if (familySize != null) "size": familySize,
       if (resources != null) "resources": resources?.toSet().toList(),
       if (createdStamp != null) "createdStamp": createdStamp,
       "updatedStamp": DateTime.now(),

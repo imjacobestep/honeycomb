@@ -431,21 +431,6 @@ class NewResourceState extends State<NewResource> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          /* getLabel("Phone Number", false),
-          TextField(
-            keyboardType: TextInputType.phone,
-            onChanged: (text) {
-              widget.phoneController['primary'] = text;
-            },
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "primary number",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ), */
           phoneBuilder(),
           getSpacer(listSpacing),
           getLabel("Email", false),
@@ -477,38 +462,8 @@ class NewResourceState extends State<NewResource> {
           ),
           getSpacer(listSpacing),
           getLabel("Address with Zip Code", false),
-          /* TextField(
-            controller: widget.addressController,
-            keyboardType: TextInputType.streetAddress,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. 123 Example St",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ), */
           addressBuilder(),
           getSpacer(listSpacing),
-          /* getLabel("Zip Code", false),
-          TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (text) {
-              widget.changedResource!.zipCode = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
-              hintStyle: const TextStyle(color: Colors.black26),
-              hintText: widget.changedResource!.zipCode != null
-                  ? widget.changedResource!.zipCode!
-                  : "eg. 12345",
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing), */
           getLabel("Notes", false),
           TextField(
             controller: widget.notesController,
@@ -678,8 +633,8 @@ class NewResourceState extends State<NewResource> {
           leading: const BackButton(color: Colors.white),
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
-          title: const Text(
-            "Onboarding",
+          title: Text(
+            widget.resource!.id != null ? "Edit Resource" : "New Resource",
           ),
           backgroundColor: const Color(0xFF2B2A2A),
           foregroundColor: Colors.white),

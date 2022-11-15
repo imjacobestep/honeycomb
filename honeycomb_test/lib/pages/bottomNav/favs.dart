@@ -69,8 +69,8 @@ class FavsPageState extends State<FavsPage> {
                         builder: (context) => ServiceDetails(
                               resource: favs.elementAt(index),
                             )));
+                setState(() {});
               });
-              setState(() {});
             },
           );
         } else {

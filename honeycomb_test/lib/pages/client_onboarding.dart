@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/geo_helper.dart';
+import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/proxy.dart';
@@ -14,28 +15,19 @@ class NewClient extends StatefulWidget {
   NewClientState createState() => NewClientState();
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
-  GeoHelper geo = GeoHelper();
-  Resource? resource;
-  //TextEditingController
-  TextEditingController nameController = TextEditingController();
-  Map<TextEditingController, TextEditingController> phoneController = {};
-  TextEditingController emailController = TextEditingController();
-  TextEditingController webController = TextEditingController();
-  TextEditingController addressController = TextEditingController();
-  TextEditingController notesController = TextEditingController();
-  Map<dynamic, dynamic> categoriesController = {};
-  Map<dynamic, dynamic> eligibilityController = {};
-  bool multilingualController = false;
-  bool accessibleController = false;
+  Client? client;
+  MPUser? user;
 
-  NewClient({required this.resource});
+  TextEditingController nameController = TextEditingController();
+  TextEditingController agencyController = TextEditingController();
+  TextEditingController sizeController = TextEditingController();
+  TextEditingController notesController = TextEditingController();
+
+  NewClient({required this.client});
 }
 
 class NewClientState extends State<NewClient> {
-  final formKey = GlobalKey<FormState>();
-  int currentStep = 0;
   double listSpacing = 12;
-  final getZip = RegExp(r'^\d{5}(?:[-\s]\d{4})?$');
 
   @override
   void initState() {
@@ -46,95 +38,41 @@ class NewClientState extends State<NewClient> {
   @override
   void dispose() {
     widget.nameController.dispose();
-    widget.emailController.dispose();
-    widget.webController.dispose();
-    widget.addressController.dispose();
+    widget.agencyController.dispose();
+    widget.sizeController.dispose();
     widget.notesController.dispose();
     super.dispose();
   }
 
   void writeControllers() {
-    if (widget.resource!.name != null) {
-      widget.nameController.text = widget.resource!.name!;
+    if (widget.client!.alias != null) {
+      widget.nameController.text = widget.client!.alias!;
     }
-    if (widget.resource!.phoneNumbers != null &&
-        widget.resource!.phoneNumbers!.isNotEmpty) {
-      widget.resource!.phoneNumbers!.forEach((key, value) {
-        widget.phoneController[
-                TextEditingController.fromValue(TextEditingValue(text: key))] =
-            TextEditingController.fromValue(TextEditingValue(text: value));
-      });
-      //widget.phoneController = widget.resource!.phoneNumbers!;
-    } else {
-      widget.phoneController[TextEditingController.fromValue(
-          const TextEditingValue(text: 'primary'))] = TextEditingController();
+    if (widget.client!.agencyId != null) {
+      widget.agencyController.text = widget.client!.agencyId!;
     }
-    if (widget.resource!.email != null) {
-      widget.emailController.text = widget.resource!.email!;
+    if (widget.client!.familySize != null) {
+      widget.sizeController.text = widget.client!.familySize!.toString();
     }
-    if (widget.resource!.website != null) {
-      widget.webController.text = widget.resource!.website!;
-    }
-    if (widget.resource!.address != null && widget.resource!.zipCode != null) {
-      widget.addressController.text =
-          "${widget.resource!.address!} ${widget.resource!.zipCode!}";
-    }
-    if (widget.resource!.notes != null) {
-      widget.notesController.text = widget.resource!.notes!;
-    }
-    if (widget.resource!.categories != null) {
-      widget.categoriesController = widget.resource!.categories!;
-    }
-    if (widget.resource!.eligibility != null) {
-      widget.eligibilityController = widget.resource!.eligibility!;
-    }
-    if (widget.resource!.multilingual != null) {
-      widget.multilingualController = widget.resource!.multilingual!;
-    }
-    if (widget.resource!.accessibility != null) {
-      widget.accessibleController = widget.resource!.accessibility!;
+    if (widget.client!.notes != null) {
+      widget.notesController.text = widget.client!.notes!;
     }
   }
 
-  Future<void> writeResource() async {
+  void writeClient() {
     if (widget.nameController.text != "") {
-      widget.resource!.name = widget.nameController.text;
+      widget.client!.alias = widget.nameController.text;
     }
-    if (widget.phoneController.isNotEmpty) {
-      widget.phoneController.forEach((key, value) {
-        widget.resource!.phoneNumbers![key.text] = value.text;
-      });
+    if (widget.agencyController.text != "") {
+      widget.client!.agencyId = widget.agencyController.text;
     }
-    if (widget.emailController.text != "") {
-      widget.resource!.email = widget.emailController.text;
-    }
-    if (widget.webController.text != "") {
-      widget.resource!.website = widget.webController.text;
-    }
-    if (widget.addressController.text != "") {
-      widget.resource!.address = widget.addressController.text;
-      Map<dynamic, dynamic> coords =
-          await GeoHelper().parseAddress(widget.resource!.address!, '');
-      widget.resource!.coords = LatLng(coords['lat'], coords['lng']);
+    if (widget.sizeController.text != "") {
+      widget.client!.familySize = int.tryParse(widget.sizeController.text);
     }
     if (widget.notesController.text != "") {
-      widget.resource!.notes = widget.notesController.text;
+      widget.client!.notes = widget.notesController.text;
     }
-    if (widget.categoriesController.isNotEmpty) {
-      widget.resource!.categories = widget.categoriesController;
-    }
-    if (widget.eligibilityController.isNotEmpty) {
-      widget.resource!.eligibility = widget.eligibilityController;
-    }
-    widget.resource!.multilingual = widget.multilingualController;
-    widget.resource!.accessibility = widget.accessibleController;
-    if (FirebaseAuth.instance.currentUser != null &&
-        FirebaseAuth.instance.currentUser!.displayName != null) {
-      widget.resource!.createdBy =
-          FirebaseAuth.instance.currentUser!.displayName!;
-      widget.resource!.updatedBy =
-          FirebaseAuth.instance.currentUser!.displayName!;
-    }
+    widget.client!.updatedStamp = DateTime.now();
   }
 
   Widget getLabel(String label, bool required) {
@@ -161,513 +99,137 @@ class NewClientState extends State<NewClient> {
     );
   }
 
-  bool isFirstPageComplete() {
-    return ((widget.nameController.text != "") &&
-        (widget.resource!.categories != null &&
-            widget.resource!.categories!.isNotEmpty));
-  }
-
-  Widget selectionChip(String label, String type, bool value) {
-    return InkWell(
-        borderRadius: BorderRadius.circular(35),
-        onTap: () {
-          Haptic.onSelection;
-          switch (type) {
-            case "category":
-              if (value) {
-                widget.categoriesController.remove(label.toLowerCase());
-              } else {
-                widget.categoriesController[label.toLowerCase()] = true;
-              }
-              break;
-            case "language":
-              if (label == "English Only") {
-                widget.multilingualController = false;
-              } else {
-                widget.multilingualController = true;
-              }
-              break;
-            case "eligibility":
-              if (value) {
-                widget.eligibilityController.remove(label.toLowerCase());
-              } else {
-                widget.eligibilityController[label.toLowerCase()] = true;
-              }
-              break;
-            case "accessibility":
-              if (label == "Yes") {
-                widget.accessibleController = true;
-              } else {
-                widget.accessibleController = false;
-              }
-              break;
-            default:
-          }
-          setState(() {});
-        },
-        child: !value
-            ? Chip(
-                label: Text(label, style: const TextStyle(fontSize: 14)),
-                backgroundColor: Colors.transparent,
-                side: const BorderSide(color: Colors.black12, width: 1),
-              )
-            : Chip(
-                side: const BorderSide(color: Colors.transparent, width: 1),
-                backgroundColor: Colors.black,
-                label: Text(
-                  label,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ));
-  }
-
-  Widget languageBuilder() {
-    return Wrap(
-      spacing: 4,
+  Widget buildForm() {
+    return ListView(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
       children: [
-        selectionChip(
-            "English Only", "language", !widget.multilingualController),
-        selectionChip("MultiLingual", "language", widget.multilingualController)
-      ],
-    );
-  }
-
-  Widget accessBuilder() {
-    widget.resource!.accessibility ??= false;
-    return Wrap(
-      spacing: 4,
-      children: [
-        selectionChip("Yes", "accessibility", widget.accessibleController),
-        selectionChip("No", "accessibility", !widget.accessibleController)
-      ],
-    );
-  }
-
-  Widget eligibilityBuilder() {
-    List<Widget> children = [];
-    filters["Eligibility"]!.forEach((key, value) {
-      if (widget.eligibilityController.containsKey(key.toLowerCase())) {
-        children.add(selectionChip(key, 'eligibility', true));
-      } else {
-        children.add(selectionChip(key, 'eligibility', false));
-      }
-    });
-    return Wrap(
-      spacing: 4,
-      children: children,
-    );
-  }
-
-  Widget categoriesBuilder() {
-    List<Widget> children = [];
-    filters["Categories"]!.forEach((key, value) {
-      widget.resource!.categories ??= {};
-      if (widget.categoriesController.containsKey(key.toLowerCase())) {
-        children.add(selectionChip(key, 'category', true));
-      } else {
-        children.add(selectionChip(key, 'category', false));
-      }
-    });
-    return Wrap(
-      spacing: 4,
-      children: children,
-    );
-  }
-
-  Widget phoneInput(TextEditingController name, TextEditingController number) {
-    Widget delete = name.text == "primary"
-        ? Container()
-        : IconButton(
-            onPressed: () {
-              setState(() {
-                widget.phoneController.remove(name);
-              });
-            },
-            icon: const Icon(
-              Icons.delete,
-              color: Colors.red,
-            ));
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [getLabel("Contact Name", false), delete],
-        ),
+        getLabel("Client Alias", true),
         TextField(
-          enabled: name.text == "primary" ? false : true,
-          controller: name,
+          controller: widget.nameController,
+          onSubmitted: (text) {
+            setState(() {
+              widget.nameController.text = text;
+            });
+          },
           keyboardType: TextInputType.name,
           autofocus: true,
           decoration: const InputDecoration(
             contentPadding: EdgeInsets.all(8),
             hintStyle: TextStyle(color: Colors.black26),
-            hintText: "eg. secretary",
+            hintText: "eg. client 1111",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(4)),
             ),
           ),
         ),
-        getSpacer(4),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
-              child: getLabel("Phone Number", false),
+        getSpacer(listSpacing),
+        getLabel("Agency ID", false),
+        TextField(
+          controller: widget.agencyController,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(8),
+            hintStyle: TextStyle(color: Colors.black26),
+            hintText: "eg. 1111",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
             ),
-            TextField(
-              controller: number,
-              keyboardType: TextInputType.phone,
-              autofocus: true,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.subdirectory_arrow_right_outlined),
-                contentPadding: EdgeInsets.all(8),
-                hintStyle: TextStyle(color: Colors.black26),
-                hintText: "eg. 111-111-1111",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(4)),
-                ),
-              ),
+          ),
+        ),
+        getSpacer(listSpacing),
+        getLabel("Family Size", false),
+        TextField(
+          controller: widget.sizeController,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(8),
+            hintStyle: TextStyle(color: Colors.black26),
+            hintText: "eg. 5",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
             ),
-            getSpacer(4)
-          ],
-        )
+          ),
+        ),
+        getSpacer(listSpacing),
+        getLabel("Notes", false),
+        TextField(
+          controller: widget.notesController,
+          keyboardType: TextInputType.name,
+          autofocus: true,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(8),
+            hintStyle: TextStyle(color: Colors.black26),
+            hintText: "Type any extra details...",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+            ),
+          ),
+        ),
+        getSpacer(listSpacing),
       ],
     );
   }
 
-  Widget phoneBuilder() {
-    List<Widget> children = [];
-    widget.phoneController.forEach((key, value) {
-      //String val = value != null ? value : '';
-      children.add(phoneInput(key, value));
-    });
-    children.add(ElevatedButton(
-        onPressed: () {
-          print(widget.phoneController.keys);
-          setState(() {
-            widget.phoneController[TextEditingController()] =
-                TextEditingController();
-          });
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [const Icon(Icons.add), const Text("Add Number")],
-        )));
-    return ListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: children,
-    );
-  }
-
-  Step stepOne() {
-    return Step(
-      title: getStepLabel("Critical Info"),
-      content: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          getLabel("Resource Name", true),
-          TextField(
-            controller: widget.nameController,
-            onSubmitted: (text) {
-              setState(() {
-                widget.nameController.text = text;
-              });
-            },
-            keyboardType: TextInputType.name,
-            autofocus: true,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. [organization][service]",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing),
-          getLabel("Pick all applicable Categories", true),
-          categoriesBuilder(),
-        ],
-      ),
-      isActive: currentStep >= 0,
-      state: currentStep >= 0 ? StepState.complete : StepState.disabled,
-    );
-  }
-
-  Step stepTwo() {
-    return Step(
-      title: getStepLabel("Additional Info"),
-      content: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          getLabel("Language", false),
-          languageBuilder(),
-          getSpacer(listSpacing),
-          getLabel("Eligibility Requirements", false),
-          eligibilityBuilder(),
-          getSpacer(listSpacing),
-          getLabel("Wheelchair Accessible", false),
-          accessBuilder(),
-        ],
-      ),
-      isActive: currentStep >= 1,
-      state: currentStep >= 1 ? StepState.complete : StepState.disabled,
-    );
-  }
-
-  Step stepThree() {
-    return Step(
-      title: getStepLabel("Contact Info"),
-      content: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          /* getLabel("Phone Number", false),
-          TextField(
-            keyboardType: TextInputType.phone,
-            onChanged: (text) {
-              widget.phoneController['primary'] = text;
-            },
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "primary number",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ), */
-          phoneBuilder(),
-          getSpacer(listSpacing),
-          getLabel("Email", false),
-          TextField(
-            controller: widget.emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. email@example.org",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing),
-          getLabel("Website", false),
-          TextField(
-            controller: widget.webController,
-            keyboardType: TextInputType.url,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. example.org",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing),
-          getLabel("Address with Zip Code", false),
-          /* TextField(
-            controller: widget.addressController,
-            keyboardType: TextInputType.streetAddress,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. 123 Example St",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ), */
-          addressBuilder(),
-          getSpacer(listSpacing),
-          /* getLabel("Zip Code", false),
-          TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (text) {
-              widget.changedResource!.zipCode = text;
-            },
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(8),
-              hintStyle: const TextStyle(color: Colors.black26),
-              hintText: widget.changedResource!.zipCode != null
-                  ? widget.changedResource!.zipCode!
-                  : "eg. 12345",
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing), */
-          getLabel("Notes", false),
-          TextField(
-            controller: widget.notesController,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "Type any extra details...",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-        ],
-      ),
-      isActive: currentStep >= 2,
-      state: currentStep >= 2 ? StepState.complete : StepState.disabled,
-    );
-  }
-
-  Widget addressBox(bool hasError, bool isVerified) {
-    bool showIcon = (hasError || isVerified);
-    Icon verifiedIcon;
-    if (hasError) {
-      verifiedIcon = const Icon(
-        Icons.error_outline_outlined,
-        color: Colors.red,
-      );
-    } else {
-      verifiedIcon = const Icon(
-        Icons.verified_outlined,
-        color: Colors.green,
-      );
-    }
-    return TextField(
-      onSubmitted: (text) {
-        setState(() {
-          widget.addressController.text = text;
-        });
-      },
-      controller: widget.addressController,
-      keyboardType: TextInputType.streetAddress,
-      decoration: InputDecoration(
-        prefixIcon: showIcon ? verifiedIcon : null,
-        errorText: hasError ? "Improper Address" : null,
-        contentPadding: const EdgeInsets.all(8),
-        hintStyle: const TextStyle(color: Colors.black26),
-        hintText: "eg. 123 Example St",
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4)),
-        ),
-      ),
-    );
-  }
-
-  Widget addressBuilder() {
-    if (widget.addressController.text == "") {
-      return addressBox(false, false);
-    } else {
-      return FutureBuilder(
-        future: widget.geo.parseAddress(widget.addressController.text, ""),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            //print(loc.data);
-            if (snapshot.data!['lat'] != null &&
-                snapshot.data!['lng'] != null) {
-              return addressBox(false, true);
-            } else {
-              return addressBox(true, false);
-            }
-          } else {
-            return LoadingIndicator(
-              size: 50,
-              borderWidth: 5,
-              color: Theme.of(context).colorScheme.primary,
-            );
-          }
-        },
-      );
-    }
-  }
-
-  tapped(int step) {
-    setState(() {
-      currentStep = step;
-    });
-  }
-
-  continued() {
-    currentStep < 2 ? setState(() => currentStep += 1) : null;
-  }
-
-  cancel() {
-    currentStep > 0 ? setState(() => currentStep -= 1) : Navigator.pop(context);
-  }
-
-  Widget backBuilder(ControlsDetails details) {
-    String backText = currentStep == 0 ? "Cancel" : "Back";
-    Icon backIcon = currentStep == 0
-        ? const Icon(Icons.cancel)
-        : const Icon(Icons.arrow_upward_outlined);
+  Widget cancelButton() {
     return ElevatedButton(
-      onPressed: details.onStepCancel,
+      onPressed: () {
+        Navigator.pop(context);
+      },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
-        child: Row(children: [backIcon, getSpacer(8), Text(backText)]),
+        child: Row(children: [
+          const Icon(Icons.cancel),
+          getSpacer(8),
+          const Text("Cancel")
+        ]),
       ),
     );
   }
 
-  Widget nextBuilder(ControlsDetails details) {
-    bool firstIncomplete = (currentStep == 0 && !isFirstPageComplete());
+  Widget userBuilder() {
+    return FutureBuilder(
+      future: widget.proxyModel.getUser(widget.userID),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          widget.user = snapshot.data;
+          return saveButton();
+        } else {
+          return const Center(
+            child: LoadingIndicator(size: 40, borderWidth: 3),
+          );
+        }
+      },
+    );
+  }
 
-    Icon nextIcon = currentStep == 2
-        ? const Icon(Icons.check_circle)
-        : const Icon(Icons.arrow_downward_outlined);
-    String nextText = currentStep == 2 ? "Save Resource" : "Next";
+  Widget saveButton() {
     return ElevatedButton(
-      onPressed: (firstIncomplete)
+      onPressed: widget.nameController.text == ''
           ? null
-          : (currentStep == 2)
-              ? () {
-                  writeResource();
-                  widget.proxyModel.upsert(widget.resource);
-                  Navigator.pop(context);
-                }
-              : details.onStepContinue,
+          : () {
+              writeClient();
+              widget.proxyModel.addToList(widget.user, widget.client);
+              Navigator.pop(context);
+            },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
-        child: Row(children: [Text(nextText), getSpacer(8), nextIcon]),
+        child: Row(children: [
+          Text("Save Client"),
+          getSpacer(8),
+          Icon(Icons.check_circle)
+        ]),
       ),
     );
   }
 
-  Widget getStepper2() {
-    return Stepper(
-      steps: [stepOne(), stepTwo(), stepThree()],
-      type: StepperType.vertical,
-      onStepCancel: () {
-        cancel();
-      },
-      onStepTapped: (step) {
-        tapped(step);
-      },
-      onStepContinue: () {
-        continued();
-      },
-      currentStep: currentStep,
-      controlsBuilder: (BuildContext context, ControlsDetails details) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-          child: Row(
-            children: <Widget>[
-              backBuilder(details),
-              getSpacer(8),
-              nextBuilder(details)
-            ],
-          ),
-        );
-      },
+  Widget BottomButtons() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [cancelButton(), getSpacer(8), userBuilder()],
+      ),
     );
   }
 
@@ -678,12 +240,14 @@ class NewClientState extends State<NewClient> {
           leading: const BackButton(color: Colors.white),
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
-          title: const Text(
-            "Onboarding",
+          title: Text(
+            widget.client!.id != null ? "Edit Client" : "New Client",
           ),
           backgroundColor: const Color(0xFF2B2A2A),
           foregroundColor: Colors.white),
-      body: getStepper2(),
+      body: buildForm(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: BottomButtons(),
       //bottomNavigationBar: customNav(context, 3),
     );
   }

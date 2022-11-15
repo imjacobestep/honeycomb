@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
+import 'package:honeycomb_test/pages/client_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
@@ -73,6 +75,27 @@ class ClientsPageState extends State<ClientsPage> {
     );
   }
 
+  Widget addButton() {
+    return ElevatedButton(
+        onPressed: () {
+          Client newClient = Client(createdStamp: DateTime.now());
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NewClient(client: newClient)));
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text("Add"),
+            getSpacer(8),
+            const Icon(Icons.add_circle),
+          ],
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +107,12 @@ class ClientsPageState extends State<ClientsPage> {
         ),
         backgroundColor: const Color(0xFF2B2A2A),
         foregroundColor: Colors.white,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: addButton(),
+          ),
+        ],
       ),
       body: userBuilder(),
       bottomNavigationBar: customNav(context, 4),
