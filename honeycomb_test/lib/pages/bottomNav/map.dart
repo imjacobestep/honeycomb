@@ -56,7 +56,9 @@ class MapPageState extends State<MapPage> {
         });
       },
     );
-    widget.mapController ?? widget.mapController!.dispose();
+    if (widget.mapController != null) {
+      widget.mapController!.dispose();
+    }
     super.dispose();
   }
 

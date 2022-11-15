@@ -362,12 +362,13 @@ class ServiceDetailsState extends State<ServiceDetails> {
 
   Widget editButton() {
     return ElevatedButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          await Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) =>
                       NewResource(resource: widget.resource)));
+          setState(() {});
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -473,7 +474,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
       ret.add(getQuickAction("Directions", widget.resource.address!));
     } //directions
     if (widget.resource.phoneNumbers != null &&
-        widget.resource.phoneNumbers!["primary"] != null) {
+        widget.resource.phoneNumbers!["primary"] != "") {
       ret.add(getQuickAction("Call", widget.resource.phoneNumbers!['primary']));
     } //phone
     if (widget.resource.email != null) {
@@ -620,7 +621,8 @@ class ServiceDetailsState extends State<ServiceDetails> {
       children.add(getDivider(context));
     }
     //EXPANDED CONTACTS
-    if (widget.resource.phoneNumbers != null) {
+    if (widget.resource.phoneNumbers != null &&
+        widget.resource.phoneNumbers!['primary'] != "") {
       children.add(numbersSection());
       children.add(getDivider(context));
     }

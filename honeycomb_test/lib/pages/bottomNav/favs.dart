@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
+import 'package:honeycomb_test/pages/resource_details.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
@@ -28,7 +29,6 @@ class FavsPageState extends State<FavsPage> {
       future: widget.proxyModel.getUser(widget.userID),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          MPUser user = snapshot.data!;
           return favoritesBuilder(snapshot.data);
         } else {
           return const Center(
@@ -62,7 +62,15 @@ class FavsPageState extends State<FavsPage> {
             shrinkWrap: true,
             itemCount: favs.length,
             itemBuilder: (BuildContext context, int index) {
-              return resourceCard(context, favs.elementAt(index));
+              return resourceCard(context, favs.elementAt(index), () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ServiceDetails(
+                              resource: favs.elementAt(index),
+                            )));
+              });
+              setState(() {});
             },
           );
         } else {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/pages/resource_details.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
@@ -80,7 +81,14 @@ class ListDetailsState extends State<ListDetails> {
         shrinkWrap: true,
         itemCount: widget.resources!.length,
         itemBuilder: (BuildContext context, int index) {
-          return resourceCard(context, widget.resources!.elementAt(index));
+          return resourceCard(context, widget.resources!.elementAt(index), () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ServiceDetails(
+                          resource: widget.resources!.elementAt(index),
+                        )));
+          });
         },
       ),
       //bottomNavigationBar: BottomNavigationBar(items: [],),

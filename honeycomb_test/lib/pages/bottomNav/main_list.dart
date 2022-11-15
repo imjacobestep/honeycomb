@@ -5,6 +5,7 @@ import 'package:flutter_haptic/haptic.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
+import 'package:honeycomb_test/pages/resource_details.dart';
 import 'package:honeycomb_test/pages/resource_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
@@ -263,7 +264,16 @@ class ResourcesPageState extends State<ResourcesPage> {
             );
           } else {
             for (Resource resource in testList) {
-              children.add(resourceCard(context, resource));
+              if (resource.name != null && resource.name != "") {
+                children.add(resourceCard(context, resource, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ServiceDetails(
+                                resource: resource,
+                              )));
+                }));
+              }
             }
           }
         } else {
@@ -330,12 +340,14 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   Widget headerButton(MPUser user) {
     return ElevatedButton(
-        onPressed: () {
-          Resource res = makeNewResource(user);
-          Navigator.push(
+        onPressed: () async {
+          Resource res =
+              makeNewResource(FirebaseAuth.instance.currentUser!.displayName!);
+          await Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => NewResource(resource: res)));
+          setState(() {});
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

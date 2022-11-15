@@ -9,9 +9,9 @@ import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
 
-class NewResource extends StatefulWidget {
+class NewClient extends StatefulWidget {
   @override
-  NewResourceState createState() => NewResourceState();
+  NewClientState createState() => NewClientState();
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
   GeoHelper geo = GeoHelper();
@@ -28,10 +28,10 @@ class NewResource extends StatefulWidget {
   bool multilingualController = false;
   bool accessibleController = false;
 
-  NewResource({required this.resource});
+  NewClient({required this.resource});
 }
 
-class NewResourceState extends State<NewResource> {
+class NewClientState extends State<NewClient> {
   final formKey = GlobalKey<FormState>();
   int currentStep = 0;
   double listSpacing = 12;

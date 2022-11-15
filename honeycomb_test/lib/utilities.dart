@@ -93,7 +93,7 @@ Map<String, Map<String, bool>> filters = {
   },
 };
 
-Resource makeNewResource(MPUser user) {
+Resource makeNewResource(String userName) {
   return Resource(
       phoneNumbers: {},
       categories: {},
@@ -101,7 +101,7 @@ Resource makeNewResource(MPUser user) {
       eligibility: {},
       accessibility: false,
       isActive: true,
-      createdBy: user.name != null ? user.name : "unknown",
+      createdBy: (userName != null && userName != "") ? userName : "unknown",
       createdStamp: DateTime.now());
 }
 

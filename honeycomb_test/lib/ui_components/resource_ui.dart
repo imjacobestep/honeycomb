@@ -50,7 +50,8 @@ Widget detailsCategoryLabel(BuildContext context, String category) {
   );
 }
 
-Widget resourceCard(BuildContext context, Resource resource) {
+Widget resourceCard(
+    BuildContext context, Resource resource, void Function() tapFunction) {
   List<Widget> categories = [];
   if (resource.categories != null) {
     for (String category in resource.categories!.keys) {
@@ -61,13 +62,7 @@ Widget resourceCard(BuildContext context, Resource resource) {
   }
   return Card(
     child: InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ServiceDetails(
-                  resource: resource,
-                )),
-      ),
+      onTap: tapFunction,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Row(
