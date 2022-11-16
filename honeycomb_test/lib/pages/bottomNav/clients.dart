@@ -57,14 +57,20 @@ class ClientsPageState extends State<ClientsPage> {
               ]),
             ));
           }
-          return ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(8),
-            shrinkWrap: true,
-            itemCount: clients.length,
-            itemBuilder: (BuildContext context, int index) {
-              return clientCard(context, clients.elementAt(index));
+          return RefreshIndicator(
+            onRefresh: () async {
+              await Future.delayed(Duration(seconds: 1));
+              setState(() {});
             },
+            child: ListView.builder(
+              //physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(8),
+              //shrinkWrap: true,
+              itemCount: clients.length,
+              itemBuilder: (BuildContext context, int index) {
+                return clientCard(context, clients.elementAt(index));
+              },
+            ),
           );
         } else {
           return const Center(

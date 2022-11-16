@@ -56,22 +56,26 @@ class FavsPageState extends State<FavsPage> {
               ]),
             ));
           }
-          return ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(8),
-            shrinkWrap: true,
-            itemCount: favs.length,
-            itemBuilder: (BuildContext context, int index) {
-              return resourceCard(context, favs.elementAt(index), () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ServiceDetails(
-                              resource: favs.elementAt(index),
-                            )));
-                setState(() {});
-              });
+          return RefreshIndicator(
+            onRefresh: () async {
+              await Future.delayed(Duration(seconds: 1));
+              setState(() {});
             },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: favs.length,
+              itemBuilder: (BuildContext context, int index) {
+                return resourceCard(context, favs.elementAt(index), () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ServiceDetails(
+                                resource: favs.elementAt(index),
+                              )));
+                  setState(() {});
+                });
+              },
+            ),
           );
         } else {
           return const Center(

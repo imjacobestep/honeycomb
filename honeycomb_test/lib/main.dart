@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       title: 'Honeycomb',
       theme: ThemeData(
           useMaterial3: true,
-          primarySwatch: generateMaterialColor(color: const Color(0xFFFFE93E)),
+          primarySwatch: generateMaterialColor(color: const Color(0xFFFFC700)),
           //primarySwatch: Colors.orange
           cardTheme: CardTheme(
             color: Color(0xFFF6F6F6),
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
                 surfaceTintColor: Colors.transparent,
                 elevation: 0,
                 foregroundColor: Colors.black,
-                backgroundColor: const Color(0xFFFFE93E)),
+                backgroundColor: const Color(0xFFFFC700)),
           )),
 
       initialRoute:

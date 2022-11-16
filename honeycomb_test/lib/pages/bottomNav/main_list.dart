@@ -259,16 +259,6 @@ class ResourcesPageState extends State<ResourcesPage> {
               getSpacer(16),
               helperText("No Results", "Try changing your $helper", context)
             ]);
-            /* return Center(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text(
-                  "No Results",
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                Text("Try changing your $helper"),
-                //Text(getFilterQuery().toString())
-              ]),
-            ); */
           } else {
             children.add(fabButtons());
             for (Resource resource in testList) {
@@ -437,7 +427,7 @@ class ResourcesPageState extends State<ResourcesPage> {
         DecoratedBox(
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              color: Color(0xFFFFE93E)),
+              color: Color(0xFFFFC700)),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: DropdownButton(
@@ -458,7 +448,7 @@ class ResourcesPageState extends State<ResourcesPage> {
         DecoratedBox(
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              color: Color(0xFFFFE93E)),
+              color: Color(0xFFFFC700)),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: DropdownButton(
