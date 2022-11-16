@@ -17,7 +17,7 @@ List<Icon> icons = [
   const Icon(Icons.people_alt_outlined)
 ];
 
-TextStyle labelStyle = TextStyle(color: Colors.grey[600]);
+TextStyle labelStyle = TextStyle(color: Colors.white54, fontSize: 14);
 Widget customNav(context, currentIndex) {
   List<CustomNavigationBarItem> items = [
     CustomNavigationBarItem(
@@ -115,14 +115,15 @@ Widget customNav(context, currentIndex) {
   }
 
   return CustomNavigationBar(
+    scaleFactor: 0.44,
     items: items,
-    //blurEffect: true,
+    blurEffect: false,
     //opacity: 1,
-    iconSize: 26,
+    iconSize: 28,
     isFloating: true,
     selectedColor: Theme.of(context).colorScheme.primary,
     strokeColor: Colors.white,
-    unSelectedColor: Colors.grey[600],
+    unSelectedColor: Colors.white54,
     backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
     borderRadius: const Radius.circular(30.0),
     currentIndex: currentIndex,

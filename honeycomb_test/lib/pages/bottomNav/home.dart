@@ -30,6 +30,9 @@ class HomePageState extends State<HomePage> {
 
   Widget filterCard(IconData icon, String label) {
     return Card(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+          side: const BorderSide(width: 2, color: Color(0xFFE7E7E7))),
       child: InkWell(
         onTap: () {
           filters["Categories"]![label] = !filters["Categories"]![label]!;

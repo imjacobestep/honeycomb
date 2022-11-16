@@ -47,7 +47,8 @@ class MyApp extends StatelessWidget {
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(30))),
             //backgroundColor: Color(0xFF2B2A2A),
-            backgroundColor: Colors.black,
+            backgroundColor: Color(0xFF151515),
+            //backgroundColor: Colors.black,
             foregroundColor: Colors.white,
             //backgroundColor: const Color(0x33FFC700),
             //foregroundColor: Colors.black,

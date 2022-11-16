@@ -304,14 +304,14 @@ class MapPageState extends State<MapPage> {
       compassEnabled: false,
       liteModeEnabled: false,
       trafficEnabled: false,
-      onTap: (position) {
+      /* onTap: (position) {
         widget.infoController.hideInfoWindow!();
-      },
+      }, */
       /* onCameraMove: ((position) {
         widget.infoController.hideInfoWindow!();
       }), */
       onMapCreated: (GoogleMapController controller) {
-        widget.infoController.googleMapController = controller;
+        //widget.infoController.googleMapController = controller;
         setState(() {
           widget.mapController = controller;
         });
@@ -461,6 +461,7 @@ class MapPageState extends State<MapPage> {
                 CameraPosition(target: lastLocation, zoom: 17.5)));
           } else {
             setState(() {
+              widget.searchController.clear();
               widget.useCurrentLocation = true;
               widget.markers.clear();
             });
