@@ -1,6 +1,5 @@
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/client_onboarding.dart';
 import 'package:honeycomb_test/pages/resource_details.dart';
@@ -189,7 +188,7 @@ class ClientDetailsState extends State<ClientDetails> {
             return resourcesList(snapshot.data);
           } else {
             return helperText("This Client has no resources",
-                "Try adding some from the List page", context);
+                "Try adding some from the List page", context, true);
           }
         } else {
           return const LoadingIndicator(size: 50, borderWidth: 4);

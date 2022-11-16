@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:geocoder2/geocoder2.dart';
@@ -105,16 +106,26 @@ Resource makeNewResource(String userName) {
       createdStamp: DateTime.now());
 }
 
-Widget helperText(String error, String helper, BuildContext context) {
-  return Center(
-    child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Text(
-        error,
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
-      Text(helper),
-    ]),
-  );
+Widget helperText(
+    String error, String helper, BuildContext context, bool fullScreen) {
+  Widget content = Column(mainAxisSize: MainAxisSize.min, children: [
+    Text(
+      error,
+      style: Theme.of(context).textTheme.headlineSmall,
+    ),
+    Text(helper),
+  ]);
+
+  return fullScreen
+      ? Center(child: content)
+      : Padding(
+          padding: EdgeInsets.all(48),
+          child: content,
+        );
+}
+
+Widget getLoader() {
+  return const LoadingIndicator(size: 40, borderWidth: 8);
 }
 
 Map<String, dynamic> getFilterQuery() {

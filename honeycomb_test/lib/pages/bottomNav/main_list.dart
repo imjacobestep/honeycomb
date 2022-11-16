@@ -2,7 +2,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
-import 'package:flutter_launcher_icons/constants.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
@@ -257,7 +256,8 @@ class ResourcesPageState extends State<ResourcesPage> {
             children.add(fabButtons());
             children.addAll([
               getSpacer(16),
-              helperText("No Results", "Try changing your $helper", context)
+              helperText(
+                  "No Results", "Try changing your $helper", context, true)
             ]);
           } else {
             children.add(fabButtons());

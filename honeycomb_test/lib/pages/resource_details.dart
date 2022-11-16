@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/pages/resource_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../model/resource.dart';
 import '../model/user.dart';
@@ -37,6 +39,106 @@ class ServiceDetailsState extends State<ServiceDetails> {
   }
 
   final Completer<GoogleMapController> _controller = Completer();
+
+  Widget sheetBuilder(MPUser user) {
+    List<Widget> children = [];
+    children.add(resourceCard(context, widget.resource, () {
+      Navigator.pop(context);
+    }));
+    children.add(getDivider(context));
+
+    Widget clientCheckBox(Client client) {
+      bool isHere = (client.resources != null &&
+          client.resources!.contains(widget.resource.id));
+
+      if (isHere) {
+        return IconButton(
+            onPressed: () {
+              widget.proxyModel.delFromList(client, widget.resource);
+              setSheetState() {}
+              ;
+            },
+            icon: Icon(Icons.check_box));
+      } else {
+        return IconButton(
+            onPressed: () {
+              if (client.resources == null) {
+                client.resources = [];
+                widget.proxyModel.upsert(client);
+              }
+
+              widget.proxyModel.addToList(client, widget.resource);
+              setSheetState() {}
+              ;
+            },
+            icon: Icon(Icons.check_box_outline_blank_outlined));
+      }
+    }
+
+    Widget addToClientCard(Client client) {
+      return Card(
+        child: InkWell(
+          onTap: () {},
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  client.alias!,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                clientCheckBox(client)
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setSheetState) {
+      return FutureBuilder(
+        future: widget.proxyModel.listUserClients(user),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data != null) {
+              for (Client client in snapshot.data) {
+                children.add(addToClientCard(client));
+              }
+              children.add(getSpacer(36));
+              return ListView(
+                padding: EdgeInsets.all(16),
+                shrinkWrap: true,
+                children: children,
+              );
+            } else {
+              return helperText("No Clients Found",
+                  "Go to the clients tab to add clients", context, false);
+            }
+          } else {
+            return SizedBox(
+              height: 48,
+              //child: getLoader(),
+              child: Text("loading"),
+            );
+          }
+        },
+      );
+    });
+  }
+
+  Future filterSheet() {
+    return showMaterialModalBottomSheet(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+        expand: false,
+        isDismissible: true,
+        context: context,
+        builder: (context) {
+          return userBuilder('client sheet');
+        });
+  }
 
   Widget getAction(String label, String value) {
     switch (label) {
@@ -298,9 +400,8 @@ class ServiceDetailsState extends State<ServiceDetails> {
       case "Client":
         {
           return InkWell(
-            onTap: () {
-              MapsLauncher.launchQuery(widget.resource.address!);
-              //launchUrl(Uri.parse("https://maps.google.com?q=${widget.service.serviceAddress.replaceAll(RegExp(" "), "+")}"));
+            onTap: () async {
+              await filterSheet();
             },
             child: SizedBox(
               height: size,
@@ -406,13 +507,16 @@ class ServiceDetailsState extends State<ServiceDetails> {
         ));
   }
 
-  Widget userBuilder() {
+  Widget userBuilder(String elementContext) {
     return FutureBuilder(
       future: widget.proxyModel.getUser(widget.userID),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          MPUser user = snapshot.data!;
-          return favoritesButtonBuilder(snapshot.data);
+          if (elementContext == "fav button") {
+            return favoritesButtonBuilder(snapshot.data);
+          } else {
+            return sheetBuilder(snapshot.data);
+          }
         } else {
           return const Center(
             child: Text("No user found"),
@@ -560,7 +664,7 @@ class ServiceDetailsState extends State<ServiceDetails> {
             )
           ],
         ),
-        userBuilder()
+        userBuilder("fav button")
       ],
     );
   }
