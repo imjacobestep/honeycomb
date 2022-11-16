@@ -260,7 +260,7 @@ class NewClientState extends State<NewClient> {
         ));
   }
 
-  Widget BottomButtons() {
+  Widget bottomButtons() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -273,19 +273,16 @@ class NewClientState extends State<NewClient> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          surfaceTintColor: Colors.transparent,
-          leading: const BackButton(color: Colors.white),
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
-          title: Text(
-            widget.client!.id != null ? "Edit Client" : "New Client",
-          ),
-          actions: widget.client!.id != null ? [userBuilder("delete")] : null,
-          backgroundColor: const Color(0xFF2B2A2A),
-          foregroundColor: Colors.white),
+        leading:
+            BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
+        title: Text(
+          widget.client!.id != null ? "Edit Client" : "New Client",
+        ),
+        actions: widget.client!.id != null ? [userBuilder("delete")] : null,
+      ),
       body: buildForm(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: BottomButtons(),
+      floatingActionButton: bottomButtons(),
       //bottomNavigationBar: customNav(context, 3),
     );
   }

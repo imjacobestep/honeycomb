@@ -73,8 +73,8 @@ class ClientsPageState extends State<ClientsPage> {
             ),
           );
         } else {
-          return const Center(
-            child: Text("Error"),
+          return Center(
+            child: getLoader(),
           );
         }
       },
@@ -109,14 +109,9 @@ class ClientsPageState extends State<ClientsPage> {
     return Scaffold(
       appBar: AppBar(
         leading: null,
-        surfaceTintColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
         title: const Text(
           "My Clients",
         ),
-        backgroundColor: const Color(0xFF2B2A2A),
-        foregroundColor: Colors.white,
         actions: [
           Padding(
             padding: const EdgeInsets.all(8),

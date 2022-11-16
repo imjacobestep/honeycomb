@@ -3,7 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/pages/bottomNav/clients.dart';
+import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
+import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
+import 'package:honeycomb_test/pages/bottomNav/map.dart';
 import 'package:material_color_generator/material_color_generator.dart';
 
 import 'firebase_options.dart';
@@ -30,12 +34,23 @@ class MyApp extends StatelessWidget {
           primarySwatch: generateMaterialColor(color: const Color(0xFFFFC700)),
           //primarySwatch: Colors.orange
           cardTheme: CardTheme(
-            color: Color(0xFFF6F6F6),
+            color: const Color(0xFFF6F6F6),
             surfaceTintColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
-                side: BorderSide(width: 2, color: Color(0xFFE7E7E7))),
+                side: const BorderSide(width: 2, color: Color(0xFFE7E7E7))),
+          ),
+          appBarTheme: const AppBarTheme(
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(30))),
+            //backgroundColor: Color(0xFF2B2A2A),
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            //backgroundColor: const Color(0x33FFC700),
+            //foregroundColor: Colors.black,
           ),
           canvasColor: Colors.white,
           elevatedButtonTheme: ElevatedButtonThemeData(
@@ -61,6 +76,18 @@ class MyApp extends StatelessWidget {
         },
         '/home': (context) {
           return HomePage();
+        },
+        '/map': (context) {
+          return MapPage();
+        },
+        '/list': (context) {
+          return ResourcesPage();
+        },
+        '/favs': (context) {
+          return FavsPage();
+        },
+        '/clients': (context) {
+          return ClientsPage();
         },
         '/profile': (context) {
           return ProfileScreen(

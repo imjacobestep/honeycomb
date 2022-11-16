@@ -299,7 +299,11 @@ class MapPageState extends State<MapPage> {
       mapType: MapType.normal,
       markers: buildList(resources),
       initialCameraPosition: cam,
-      trafficEnabled: true,
+      mapToolbarEnabled: false,
+      buildingsEnabled: true,
+      compassEnabled: false,
+      liteModeEnabled: false,
+      trafficEnabled: false,
       onTap: (position) {
         widget.infoController.hideInfoWindow!();
       },
@@ -477,7 +481,7 @@ class MapPageState extends State<MapPage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
-      surfaceTintColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
       automaticallyImplyLeading: false,
       toolbarHeight: 80,
       shape: const RoundedRectangleBorder(
@@ -494,8 +498,6 @@ class MapPageState extends State<MapPage> {
           Expanded(flex: 8, child: headerButton())
         ],
       ),
-      backgroundColor: const Color(0xFF2B2A2A),
-      foregroundColor: Colors.white,
     );
   }
 
@@ -515,21 +517,34 @@ class MapPageState extends State<MapPage> {
         ),
       ]), */
       body: buildMap(),
-      floatingActionButton: ElevatedButton(
-          onPressed: () async {
-            await filterSheet();
-            setState(() {
-              widget.markers.clear();
-            });
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Filters"),
-              getSpacer(4),
-              const Icon(Icons.filter_list_outlined)
-            ],
-          )),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            height: 40,
+          ),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  side: !ifAnyFilters()
+                      ? null
+                      : const BorderSide(color: Colors.black, width: 4)),
+              onPressed: () async {
+                await filterSheet();
+                setState(() {
+                  widget.markers.clear();
+                });
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Filters"),
+                  getSpacer(4),
+                  const Icon(Icons.filter_list_outlined)
+                ],
+              )),
+        ],
+      ),
       bottomNavigationBar: customNav(context, 1),
     );
   }

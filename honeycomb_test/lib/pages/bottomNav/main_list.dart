@@ -246,7 +246,8 @@ class ResourcesPageState extends State<ResourcesPage> {
           ? widget.resourceList
           : widget.proxyModel.filter("resources", getFilterQuery()),
       builder: (BuildContext context, AsyncSnapshot<Iterable> snapshot) {
-        List<Widget> children = [];
+        List<Widget> children = [getSpacer(52)];
+        //children.add(getSpacer(52));
         if (snapshot.hasData && snapshot.data != null) {
           bool sortOrder = defaultSortOrder == "ascending" ? true : false;
           Iterable testList = widget.proxyModel
@@ -261,6 +262,12 @@ class ResourcesPageState extends State<ResourcesPage> {
             ]);
           } else {
             //children.add(fabButtons());
+            children.add(Row(
+              children: [
+                Text("  ${testList.length} resources found"),
+                //Text("${} active filters")
+              ],
+            ));
             for (Resource resource in testList) {
               if (resource.name != null && resource.name != "") {
                 children.add(resourceCard(context, resource, () {
@@ -288,11 +295,11 @@ class ResourcesPageState extends State<ResourcesPage> {
         print(filters.entries);
         return RefreshIndicator(
           onRefresh: () async {
-            await Future.delayed(Duration(seconds: 1));
+            await Future.delayed(const Duration(seconds: 1));
             setState(() {});
           },
           child: ListView(
-            padding: EdgeInsets.fromLTRB(4, 4, 4, 0),
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
             children: children,
           ),
         );
@@ -334,7 +341,7 @@ class ResourcesPageState extends State<ResourcesPage> {
                     widget.resourceList = widget.proxyModel.list("resources");
                   });
                 },
-                icon: Icon(Icons.clear),
+                icon: const Icon(Icons.clear),
               )
             : null,
       ),
@@ -350,7 +357,8 @@ class ResourcesPageState extends State<ResourcesPage> {
           return headerButton(user);
         } else {
           return Center(
-            child: ElevatedButton(onPressed: () {}, child: Icon(Icons.error)),
+            child: ElevatedButton(
+                onPressed: () {}, child: const Icon(Icons.error)),
           );
         }
       },
@@ -382,11 +390,8 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
-      surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
       toolbarHeight: 80,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
       title: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -399,15 +404,14 @@ class ResourcesPageState extends State<ResourcesPage> {
           Expanded(flex: 8, child: userBuilder())
         ],
       ),
-      backgroundColor: const Color(0xFF2B2A2A),
-      foregroundColor: Colors.white,
     );
   }
 
   Widget sortOrderDropdown() {
     return DecoratedBox(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30), color: Color(0xFFFFE93E)),
+          borderRadius: BorderRadius.circular(30),
+          color: const Color(0xFFFFE93E)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: DropdownButton(
@@ -429,71 +433,79 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   Widget fabButtons() {
     //return sortOrderDropdown();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: Color(0xFFFFC700)),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton(
-                style: Theme.of(context).textTheme.labelLarge,
-                isDense: true,
-                underline: Container(),
-                value: defaultSortCriteria,
-                items: sortCriteria.map((String item) {
-                  return DropdownMenuItem(value: item, child: Text(item));
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    defaultSortCriteria = newValue!;
-                  });
-                }),
-          ),
+        const SizedBox(
+          height: 60,
         ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: Color(0xFFFFC700)),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton(
-                style: Theme.of(context).textTheme.labelLarge,
-                isDense: true,
-                underline: Container(),
-                value: defaultSortOrder,
-                items: sortOrder.map((String item) {
-                  return DropdownMenuItem(value: item, child: Text(item));
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    defaultSortOrder = newValue!;
-                  });
-                }),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: const Color(0xFFFFC700)),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton(
+                    style: Theme.of(context).textTheme.labelLarge,
+                    isDense: true,
+                    underline: Container(),
+                    value: defaultSortCriteria,
+                    items: sortCriteria.map((String item) {
+                      return DropdownMenuItem(value: item, child: Text(item));
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        defaultSortCriteria = newValue!;
+                      });
+                    }),
+              ),
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: const Color(0xFFFFC700)),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton(
+                    style: Theme.of(context).textTheme.labelLarge,
+                    isDense: true,
+                    underline: Container(),
+                    value: defaultSortOrder,
+                    items: sortOrder.map((String item) {
+                      return DropdownMenuItem(value: item, child: Text(item));
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        defaultSortOrder = newValue!;
+                      });
+                    }),
+              ),
+            ),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    side: !ifAnyFilters()
+                        ? null
+                        : const BorderSide(color: Colors.black, width: 4)),
+                onPressed: () async {
+                  await filterSheet();
+                  setState(() {});
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "filters",
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    getSpacer(4),
+                    const Icon(Icons.filter_list_outlined)
+                  ],
+                )),
+          ],
         ),
-        ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                side: !ifAnyFilters()
-                    ? null
-                    : BorderSide(color: Colors.black, width: 4)),
-            onPressed: () async {
-              await filterSheet();
-              setState(() {});
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "filters",
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-                getSpacer(4),
-                const Icon(Icons.filter_list_outlined)
-              ],
-            )),
       ],
     );
   }
@@ -501,7 +513,7 @@ class ResourcesPageState extends State<ResourcesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       appBar: topHeader(),
       body: getResourceList(),
       floatingActionButton: fabButtons(),

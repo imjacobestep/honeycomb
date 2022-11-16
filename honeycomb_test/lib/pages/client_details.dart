@@ -266,11 +266,8 @@ class ClientDetailsState extends State<ClientDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: const BackButton(color: Colors.white),
-          backgroundColor: const Color(0xFF2B2A2A),
-          foregroundColor: Colors.white,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
+          leading:
+              BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
           title: const Text("Client Details"),
         ),
         body: detailsBuilder()

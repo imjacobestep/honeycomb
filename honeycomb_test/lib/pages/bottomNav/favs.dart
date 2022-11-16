@@ -78,8 +78,8 @@ class FavsPageState extends State<FavsPage> {
             ),
           );
         } else {
-          return const Center(
-            child: Text("Error"),
+          return Center(
+            child: getLoader(),
           );
         }
       },
@@ -108,14 +108,9 @@ class FavsPageState extends State<FavsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
         title: const Text(
           "My Favorites",
         ),
-        backgroundColor: const Color(0xFF2B2A2A),
-        foregroundColor: Colors.white,
         actions: [
           Padding(
             padding: const EdgeInsets.all(8),

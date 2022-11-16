@@ -562,12 +562,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
 
   PreferredSizeWidget topHeader() {
     return AppBar(
-      surfaceTintColor: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
-      leading: const BackButton(color: Colors.white),
-      backgroundColor: const Color(0xFF2B2A2A),
-      foregroundColor: Colors.white,
+      leading: BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
       actions: [
         Padding(
           padding: const EdgeInsets.all(8),

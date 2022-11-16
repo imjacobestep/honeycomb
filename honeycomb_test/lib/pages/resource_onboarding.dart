@@ -630,15 +630,12 @@ class NewResourceState extends State<NewResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          surfaceTintColor: Colors.transparent,
-          leading: const BackButton(color: Colors.white),
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
-          title: Text(
-            widget.resource!.id != null ? "Edit Resource" : "New Resource",
-          ),
-          backgroundColor: const Color(0xFF2B2A2A),
-          foregroundColor: Colors.white),
+        leading:
+            BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
+        title: Text(
+          widget.resource!.id != null ? "Edit Resource" : "New Resource",
+        ),
+      ),
       body: getStepper2(),
       //bottomNavigationBar: customNav(context, 3),
     );
