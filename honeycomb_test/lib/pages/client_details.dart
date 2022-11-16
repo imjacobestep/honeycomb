@@ -207,7 +207,7 @@ class ClientDetailsState extends State<ClientDetails> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ServiceDetails(
+                  builder: (context) => ResourceDetails(
                         resource: resources.elementAt(index),
                       )));
         });

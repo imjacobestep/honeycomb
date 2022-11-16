@@ -42,10 +42,71 @@ Widget cardCategoryLabel(BuildContext context, String category) {
 }
 
 Widget detailsCategoryLabel(BuildContext context, String category) {
-  return Container(
-    margin: const EdgeInsets.all(0),
-    child: Chip(
-      label: Text(category),
+  return Chip(
+    label: Text(category),
+  );
+}
+
+Widget mapCategoryLabel(BuildContext context, String category) {
+  return cardCategoryLabel(context, category);
+}
+
+Widget resourceWindow(BuildContext context, Resource resource) {
+  List<Widget> categories = [];
+  if (resource.categories != null) {
+    resource.categories!.forEach(
+      (key, value) {
+        categories.add(mapCategoryLabel(context, key));
+      },
+    );
+  }
+  return InkWell(
+    onTap: () {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ResourceDetails(
+                    resource: resource,
+                  )));
+    },
+    child: Column(
+      children: [
+        Container(
+          padding: EdgeInsetsDirectional.all(8),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).cardColor,
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 1,
+                    spreadRadius: 2,
+                    offset: Offset.fromDirection(1, 1))
+              ]),
+          child: Row(children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  resource.name!,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                Wrap(children: categories)
+              ],
+            ),
+            getSpacer(4),
+            const Icon(Icons.arrow_forward_ios)
+          ]),
+        ),
+        /* Triangle.isosceles(
+          edge: Edge.BOTTOM,
+          child: Container(
+            color: Colors.blue,
+            width: 20.0,
+            height: 10.0,
+          ),
+        ), */
+      ],
     ),
   );
 }
@@ -79,8 +140,7 @@ Widget resourceCard(
                 Wrap(children: categories),
               ],
             ),
-            IconButton(
-                onPressed: () {}, icon: const Icon(Icons.chevron_right_sharp))
+            Icon(Icons.chevron_right_sharp)
           ],
         ),
       ),

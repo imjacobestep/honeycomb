@@ -14,17 +14,17 @@ import '../model/user.dart';
 import '../ui_components/resource_ui.dart';
 import 'package:intl/intl.dart';
 
-class ServiceDetails extends StatefulWidget {
+class ResourceDetails extends StatefulWidget {
   @override
-  ServiceDetailsState createState() => ServiceDetailsState();
+  ResourceDetailsState createState() => ResourceDetailsState();
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
   Resource resource;
   GoogleMapController? mapController;
-  ServiceDetails({required this.resource});
+  ResourceDetails({required this.resource});
 }
 
-class ServiceDetailsState extends State<ServiceDetails> {
+class ResourceDetailsState extends State<ResourceDetails> {
   @override
   void initState() {
     super.initState();

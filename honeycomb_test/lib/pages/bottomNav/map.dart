@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:custom_info_window/custom_info_window.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:honeycomb_test/geo_helper.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/resource_details.dart';
 import 'package:honeycomb_test/proxy.dart';
+import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:location/location.dart';
@@ -15,7 +17,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class MapPage extends StatefulWidget {
   @override
   MapPageState createState() => MapPageState();
-  //ResourceList mainList;
+  BitmapDescriptor resourceIcon =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
   Proxy proxyModel = Proxy();
   GeoHelper geo = GeoHelper();
   Future<Iterable>? resourceList;
@@ -27,6 +30,7 @@ class MapPage extends StatefulWidget {
   String typedZipCode = "98005";
   GoogleMapController? mapController;
   TextEditingController searchController = TextEditingController();
+  CustomInfoWindowController infoController = CustomInfoWindowController();
   Set<Marker> markers = {
     const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
@@ -45,6 +49,7 @@ class MapPageState extends State<MapPage> {
     widget.useCurrentLocation = true;
     clearMarkers();
     super.initState();
+    setResourceIcon();
   }
 
   @override
@@ -57,6 +62,9 @@ class MapPageState extends State<MapPage> {
         });
       },
     );
+    if (widget.infoController != null) {
+      widget.infoController!.dispose();
+    }
     if (widget.mapController != null) {
       widget.mapController!.dispose();
     }
@@ -69,6 +77,14 @@ class MapPageState extends State<MapPage> {
   LatLng lastLocation = const LatLng(0, 0);
 
 // FUNCTIONS
+
+  void setResourceIcon() async {
+    widget.resourceIcon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(devicePixelRatio: 2.5),
+        'assets/map_pins/resource_pin.bmp');
+    setState(() {});
+  }
+
   void clearMarkers() {
     widget.markers = {
       const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
@@ -89,6 +105,10 @@ class MapPageState extends State<MapPage> {
     return (Marker(
         markerId: MarkerId(resource.name!),
         position: resource.coords!,
+        /* onTap: () {
+          widget.infoController.addInfoWindow!(
+              resourceWindow(context, resource), resource.coords!);
+        }, */
         infoWindow: InfoWindow(
           title: resource.name!,
           snippet: getCategories(resource),
@@ -96,13 +116,12 @@ class MapPageState extends State<MapPage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ServiceDetails(
+                    builder: (context) => ResourceDetails(
                           resource: resource,
                         )));
           },
         ),
-        icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)));
+        icon: widget.resourceIcon));
   }
 
   String getCategories(Resource resource) {
@@ -280,7 +299,15 @@ class MapPageState extends State<MapPage> {
       mapType: MapType.normal,
       markers: buildList(resources),
       initialCameraPosition: cam,
+      trafficEnabled: true,
+      onTap: (position) {
+        widget.infoController.hideInfoWindow!();
+      },
+      /* onCameraMove: ((position) {
+        widget.infoController.hideInfoWindow!();
+      }), */
       onMapCreated: (GoogleMapController controller) {
+        widget.infoController.googleMapController = controller;
         setState(() {
           widget.mapController = controller;
         });
@@ -415,7 +442,7 @@ class MapPageState extends State<MapPage> {
                     });
                   });
                 },
-                icon: Icon(Icons.clear),
+                icon: const Icon(Icons.clear),
               )
             : null,
       ),
@@ -478,6 +505,15 @@ class MapPageState extends State<MapPage> {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: topHeader(),
+      /* body: Stack(children: [
+        buildMap(),
+        CustomInfoWindow(
+          controller: widget.infoController,
+          height: 100,
+          width: 260,
+          offset: 30,
+        ),
+      ]), */
       body: buildMap(),
       floatingActionButton: ElevatedButton(
           onPressed: () async {

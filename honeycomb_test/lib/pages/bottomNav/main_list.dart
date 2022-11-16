@@ -19,6 +19,7 @@ class ResourcesPage extends StatefulWidget {
   Future<Iterable>? resourceList;
   String userID = FirebaseAuth.instance.currentUser!.uid;
   TextEditingController searchController = TextEditingController();
+  List<Widget> resourcesToShow = [];
 
   ResourcesPage();
 }
@@ -251,23 +252,22 @@ class ResourcesPageState extends State<ResourcesPage> {
           Iterable testList = widget.proxyModel
               .sort(snapshot.data!, defaultSortCriteria, sortOrder);
           if (testList.isEmpty) {
-            //Haptic.onFailure();
             String helper = ifAnyFilters() ? "filters" : "search terms";
-            children.add(fabButtons());
+            //children.add(fabButtons());
             children.addAll([
               getSpacer(16),
               helperText(
                   "No Results", "Try changing your $helper", context, true)
             ]);
           } else {
-            children.add(fabButtons());
+            //children.add(fabButtons());
             for (Resource resource in testList) {
               if (resource.name != null && resource.name != "") {
                 children.add(resourceCard(context, resource, () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ServiceDetails(
+                          builder: (context) => ResourceDetails(
                                 resource: resource,
                               )));
                 }));
@@ -284,9 +284,17 @@ class ResourcesPageState extends State<ResourcesPage> {
           ];
         }
         //Haptic.onSuccess;
-        return ListView(
-          padding: EdgeInsets.fromLTRB(4, 4, 4, 0),
-          children: children,
+        print("//////// any filters? : ${ifAnyFilters()} ////////");
+        print(filters.entries);
+        return RefreshIndicator(
+          onRefresh: () async {
+            await Future.delayed(Duration(seconds: 1));
+            setState(() {});
+          },
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(4, 4, 4, 0),
+            children: children,
+          ),
         );
       },
     );
@@ -299,7 +307,7 @@ class ResourcesPageState extends State<ResourcesPage> {
       textAlignVertical: TextAlignVertical.center,
       onSubmitted: (text) {
         setState(() {
-          if (text == "") {
+          if (text == "" || text == null) {
             widget.resourceList = widget.proxyModel.list("resources");
           } else {
             widget.resourceList = widget.proxyModel.searchResources(text);
@@ -467,6 +475,10 @@ class ResourcesPageState extends State<ResourcesPage> {
           ),
         ),
         ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                side: !ifAnyFilters()
+                    ? null
+                    : BorderSide(color: Colors.black, width: 4)),
             onPressed: () async {
               await filterSheet();
               setState(() {});

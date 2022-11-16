@@ -53,7 +53,7 @@ dependencies:
   bottom_sheet_bar: ^2.3.8
   location: ^4.4.0
   flutter_haptic: ^0.0.3
-
+  custom_info_window: ^1.0.1
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +81,7 @@ flutter:
   #   - assets/map_pins/
     - lib/assets/icon/icon.png
     - lib/assets/agency_button.png
+    - lib/assets/map_pins/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

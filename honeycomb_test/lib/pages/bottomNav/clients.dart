@@ -84,7 +84,8 @@ class ClientsPageState extends State<ClientsPage> {
   Widget addButton() {
     return ElevatedButton(
         onPressed: () async {
-          Client newClient = Client(createdStamp: DateTime.now());
+          Client newClient =
+              Client(createdStamp: DateTime.now(), resources: []);
           await Navigator.push(
               context,
               MaterialPageRoute(

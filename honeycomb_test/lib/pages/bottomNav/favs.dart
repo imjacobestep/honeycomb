@@ -69,7 +69,7 @@ class FavsPageState extends State<FavsPage> {
                   await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ServiceDetails(
+                          builder: (context) => ResourceDetails(
                                 resource: favs.elementAt(index),
                               )));
                   setState(() {});
