@@ -3,8 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/client.dart';
+import 'package:honeycomb_test/pages/bottomNav/map.dart';
 import 'package:honeycomb_test/pages/resource_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
+import 'package:honeycomb_test/ui_components/animated_navigator.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -593,46 +595,66 @@ class ResourceDetailsState extends State<ResourceDetails> {
   }
 
   Widget getMap() {
-    return Container(
-      foregroundDecoration: BoxDecoration(
-        border: Border.all(
-            color: Colors.black12, width: 2, strokeAlign: StrokeAlign.outside),
-        borderRadius: const BorderRadius.all(Radius.circular(16)),
-      ),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      height: 250,
-      margin: const EdgeInsets.only(bottom: 16),
-      child: GoogleMap(
-        //liteModeEnabled: true,
-        myLocationButtonEnabled: false,
-        mapToolbarEnabled: false,
-        mapType: MapType.normal,
-        markers: {
-          Marker(
-              markerId: MarkerId(widget.resource.name!),
-              position: widget.resource.coords!,
-              infoWindow: InfoWindow(
-                title: widget.resource.name!,
-              ),
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueAzure))
-        },
-        initialCameraPosition:
-            CameraPosition(target: widget.resource.coords!, zoom: 18),
-        myLocationEnabled: true,
-        onMapCreated: (GoogleMapController controller) {
-          setState(() {
-            widget.mapController = controller;
-          });
-        },
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          FadeInRoute(
+            routeName: "/map",
+            page: MapPage(false, widget.resource.address!),
+          ),
+        );
+      },
+      child: IgnorePointer(
+        child: Container(
+          foregroundDecoration: BoxDecoration(
+            border: Border.all(
+                color: Colors.black12,
+                width: 2,
+                strokeAlign: StrokeAlign.outside),
+            borderRadius: const BorderRadius.all(Radius.circular(16)),
+          ),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          height: 250,
+          margin: const EdgeInsets.only(bottom: 16),
+          child: GoogleMap(
+            scrollGesturesEnabled: false,
+            rotateGesturesEnabled: false,
+            tiltGesturesEnabled: false,
+            zoomGesturesEnabled: false,
+            zoomControlsEnabled: false,
+            //liteModeEnabled: true,
+            myLocationButtonEnabled: false,
+            mapToolbarEnabled: false,
+            mapType: MapType.normal,
+            markers: {
+              Marker(
+                  markerId: MarkerId(widget.resource.name!),
+                  position: widget.resource.coords!,
+                  infoWindow: InfoWindow(
+                    title: widget.resource.name!,
+                  ),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueAzure))
+            },
+            initialCameraPosition:
+                CameraPosition(target: widget.resource.coords!, zoom: 18),
+            myLocationEnabled: true,
+            onMapCreated: (GoogleMapController controller) {
+              setState(() {
+                widget.mapController = controller;
+              });
+            },
+          ),
+        ),
       ),
     );
   }
 
-  Widget resourceHeader() {
+  Widget getRecency() {
     DateFormat formatter = DateFormat('MM-dd-yyyy');
     String updatedTime = widget.resource.updatedStamp != null
         ? formatter.format(widget.resource.updatedStamp!).toString()
@@ -640,8 +662,45 @@ class ResourceDetailsState extends State<ResourceDetails> {
     String updatedUser = widget.resource.updatedBy != null
         ? widget.resource.updatedBy!.toString()
         : "unknown user";
-    int diff = DateTime.now().difference(widget.resource.updatedStamp!).inDays;
-    String plural = diff == 1 ? "" : "s";
+    int updatedDays =
+        DateTime.now().difference(widget.resource.updatedStamp!).inDays;
+
+    String createdTime = widget.resource.createdStamp != null
+        ? formatter.format(widget.resource.createdStamp!).toString()
+        : "unknown time";
+    String createdUser = widget.resource.createdBy != null
+        ? widget.resource.createdBy!.toString()
+        : "unknown user";
+    int createdDays =
+        DateTime.now().difference(widget.resource.createdStamp!).inDays;
+
+    String plural(int num) {
+      String ret = (num == 1) ? "" : "s";
+      return ret;
+    }
+
+    return Row(
+      children: [
+        Column(
+          children: [
+            Text(
+              "updated $updatedDays day${plural(updatedDays)} ago by $updatedUser",
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+            getSpacer(2),
+            Text(
+              "created $createdDays day${plural(createdDays)} ago by $createdUser",
+              style: Theme.of(context).textTheme.labelMedium,
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget resourceHeader() {
+    List<Widget> children = [];
+
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -653,13 +712,9 @@ class ResourceDetailsState extends State<ResourceDetails> {
               widget.resource.name!,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Text(
-              "updated $diff day$plural ago by $updatedUser",
-              style: Theme.of(context).textTheme.labelMedium,
-            )
           ],
         ),
-        userBuilder("fav button")
+        userBuilder("fav button"),
       ],
     );
   }
@@ -675,6 +730,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
     if (widget.resource.categories != null) {
       children.add(tagsBuilder(widget.resource.categories!, context));
     }
+    children.add(getDivider(context));
+    children.add(getRecency());
     children.add(getDivider(context));
     //QUICK ACTIONS
     children.add(Row(

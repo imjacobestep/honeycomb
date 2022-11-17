@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
@@ -13,6 +14,7 @@ class FavsPage extends StatefulWidget {
   FavsPageState createState() => FavsPageState();
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
+  Iterable<dynamic> favoritesList = [];
 
   FavsPage();
 }
@@ -44,8 +46,9 @@ class FavsPageState extends State<FavsPage> {
       future: widget.proxyModel.listUserFavorites(user),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          Iterable favs = snapshot.data!;
-          if (favs.isEmpty) {
+          //Iterable favs = snapshot.data!;
+          widget.favoritesList = snapshot.data!;
+          if (widget.favoritesList.isEmpty) {
             return (Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Text(
@@ -63,15 +66,18 @@ class FavsPageState extends State<FavsPage> {
             },
             child: ListView.builder(
               padding: const EdgeInsets.all(8),
-              itemCount: favs.length,
+              itemCount: widget.favoritesList.length,
               itemBuilder: (BuildContext context, int index) {
-                return resourceCard(context, favs.elementAt(index), () async {
+                return resourceCard(
+                    context, widget.favoritesList.elementAt(index), () async {
                   await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => ResourceDetails(
-                                resource: favs.elementAt(index),
+                                resource: widget.favoritesList.elementAt(index),
                               )));
+                  widget.favoritesList =
+                      await widget.proxyModel.listUserFavorites(user);
                   setState(() {});
                 });
               },

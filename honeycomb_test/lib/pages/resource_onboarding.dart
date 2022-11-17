@@ -128,12 +128,16 @@ class NewResourceState extends State<NewResource> {
     }
     widget.resource!.multilingual = widget.multilingualController;
     widget.resource!.accessibility = widget.accessibleController;
-    if (FirebaseAuth.instance.currentUser != null &&
-        FirebaseAuth.instance.currentUser!.displayName != null) {
-      widget.resource!.createdBy =
-          FirebaseAuth.instance.currentUser!.displayName!;
-      widget.resource!.updatedBy =
-          FirebaseAuth.instance.currentUser!.displayName!;
+    if (FirebaseAuth.instance.currentUser != null) {
+      if (FirebaseAuth.instance.currentUser!.displayName != null) {
+        widget.resource!.createdBy =
+            FirebaseAuth.instance.currentUser!.displayName!;
+        widget.resource!.updatedBy =
+            FirebaseAuth.instance.currentUser!.displayName!;
+      } else if (FirebaseAuth.instance.currentUser!.email != null) {
+        widget.resource!.createdBy = FirebaseAuth.instance.currentUser!.email!;
+        widget.resource!.updatedBy = FirebaseAuth.instance.currentUser!.email!;
+      }
     }
   }
 
@@ -584,8 +588,8 @@ class NewResourceState extends State<NewResource> {
       onPressed: (firstIncomplete)
           ? null
           : (currentStep == 2)
-              ? () {
-                  writeResource();
+              ? () async {
+                  await writeResource();
                   widget.proxyModel.upsert(widget.resource);
                   Navigator.pop(context);
                 }

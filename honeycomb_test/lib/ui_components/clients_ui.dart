@@ -3,15 +3,11 @@ import 'package:honeycomb_test/model/client.dart';
 
 import '../pages/client_details.dart';
 
-Widget clientCard(BuildContext context, Client client) {
+Widget clientCard(
+    BuildContext context, Client client, void Function() tapFunction) {
   return Card(
     child: InkWell(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ClientDetails(
-                    client: client,
-                  ))),
+      onTap: tapFunction,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Row(
@@ -21,8 +17,7 @@ Widget clientCard(BuildContext context, Client client) {
               client.alias!,
               style: const TextStyle(fontSize: 20),
             ),
-            IconButton(
-                onPressed: () {}, icon: const Icon(Icons.chevron_right_sharp))
+            const Icon(Icons.chevron_right_sharp)
           ],
         ),
       ),

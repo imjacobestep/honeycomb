@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           primarySwatch: generateMaterialColor(color: const Color(0xFFFFC700)),
           //primarySwatch: Colors.orange
+          textTheme: TextTheme(bodyLarge: TextStyle(fontSize: 18)),
           cardTheme: CardTheme(
             color: const Color(0xFFF6F6F6),
             surfaceTintColor: Colors.white,
@@ -79,7 +80,8 @@ class MyApp extends StatelessWidget {
           return HomePage();
         },
         '/map': (context) {
-          return MapPage();
+          return MapPage(true, "12280 NE District Wy, 98005");
+          //return MapPage(useCurrentLocation: true, typedAddress: "");
         },
         '/list': (context) {
           return ResourcesPage();

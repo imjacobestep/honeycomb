@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
+import 'package:honeycomb_test/pages/client_details.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
 import '../../proxy.dart';
 import '../../utilities.dart';
@@ -79,7 +80,14 @@ class HomePageState extends State<HomePage> {
             shrinkWrap: true,
             itemCount: clients.length,
             itemBuilder: (BuildContext context, int index) {
-              return clientCard(context, clients.elementAt(index));
+              return clientCard(context, clients.elementAt(index), () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ClientDetails(
+                              client: clients.elementAt(index),
+                            )));
+              });
             },
           );
         } else {

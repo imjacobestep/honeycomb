@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
+import 'package:honeycomb_test/pages/client_details.dart';
 import 'package:honeycomb_test/pages/client_onboarding.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
@@ -13,6 +14,7 @@ class ClientsPage extends StatefulWidget {
   ClientsPageState createState() => ClientsPageState();
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
+  Iterable<dynamic> clientsList = [];
 
   ClientsPage();
 }
@@ -45,8 +47,8 @@ class ClientsPageState extends State<ClientsPage> {
       future: widget.proxyModel.listUserClients(user),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          Iterable clients = snapshot.data!;
-          if (clients.isEmpty) {
+          widget.clientsList = snapshot.data!;
+          if (widget.clientsList.isEmpty) {
             return (Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Text(
@@ -59,16 +61,25 @@ class ClientsPageState extends State<ClientsPage> {
           }
           return RefreshIndicator(
             onRefresh: () async {
-              await Future.delayed(Duration(seconds: 1));
+              await Future.delayed(const Duration(seconds: 1));
               setState(() {});
             },
             child: ListView.builder(
-              //physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.all(8),
-              //shrinkWrap: true,
-              itemCount: clients.length,
+              itemCount: widget.clientsList.length,
               itemBuilder: (BuildContext context, int index) {
-                return clientCard(context, clients.elementAt(index));
+                return clientCard(context, widget.clientsList.elementAt(index),
+                    () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ClientDetails(
+                                client: widget.clientsList.elementAt(index),
+                              )));
+                  widget.clientsList =
+                      await widget.proxyModel.listUserClients(user);
+                  setState(() {});
+                });
               },
             ),
           );

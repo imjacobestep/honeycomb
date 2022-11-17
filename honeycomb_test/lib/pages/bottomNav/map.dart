@@ -25,9 +25,9 @@ class MapPage extends StatefulWidget {
   Location location = Location();
   Future<LocationData>? currentLocation;
   Future<Map<dynamic, dynamic>>? typedLocation;
-  bool? useCurrentLocation;
-  String typedAddress = "12280 NE District Wy";
-  String typedZipCode = "98005";
+  bool? useCurrentLocation = true;
+  String? typedAddress;
+  String typedZipCode = "";
   GoogleMapController? mapController;
   TextEditingController searchController = TextEditingController();
   CustomInfoWindowController infoController = CustomInfoWindowController();
@@ -35,7 +35,7 @@ class MapPage extends StatefulWidget {
     const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
 
-  MapPage();
+  MapPage(this.useCurrentLocation, this.typedAddress);
 }
 
 class MapPageState extends State<MapPage> {
@@ -45,8 +45,8 @@ class MapPageState extends State<MapPage> {
     widget.resourceList = widget.proxyModel.list("resources");
     widget.currentLocation = widget.location.getLocation();
     widget.typedLocation =
-        widget.geo.parseAddress(widget.typedAddress, widget.typedZipCode);
-    widget.useCurrentLocation = true;
+        widget.geo.parseAddress(widget.typedAddress!, widget.typedZipCode);
+    //widget.useCurrentLocation = true;
     clearMarkers();
     super.initState();
     setResourceIcon();
@@ -62,9 +62,9 @@ class MapPageState extends State<MapPage> {
         });
       },
     );
-    if (widget.infoController != null) {
+    /* if (widget.infoController != null) {
       widget.infoController!.dispose();
-    }
+    } */
     if (widget.mapController != null) {
       widget.mapController!.dispose();
     }
@@ -188,7 +188,10 @@ class MapPageState extends State<MapPage> {
             },
             child: !value
                 ? Chip(
-                    label: Text(label),
+                    label: Text(
+                      label,
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
                     backgroundColor: Colors.transparent,
                     side: const BorderSide(color: Colors.black12, width: 1),
                   )
@@ -197,7 +200,10 @@ class MapPageState extends State<MapPage> {
                     backgroundColor: Colors.black,
                     label: Text(
                       label,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize:
+                              Theme.of(context).textTheme.labelLarge!.fontSize),
                     ),
                   ));
       }
@@ -260,6 +266,7 @@ class MapPageState extends State<MapPage> {
             spacing: 4,
             children: filterSection(value),
           ));
+          children.add(getDivider(context));
         });
         children.add(applyButton());
         return children;
@@ -483,7 +490,8 @@ class MapPageState extends State<MapPage> {
   PreferredSizeWidget topHeader() {
     return AppBar(
       backgroundColor: Colors.transparent,
-      automaticallyImplyLeading: false,
+      leading: Navigator.canPop(context) ? BackButton() : null,
+      //automaticallyImplyLeading: false,
       toolbarHeight: 80,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
