@@ -17,7 +17,7 @@ List<Icon> icons = [
   const Icon(Icons.people_alt_outlined)
 ];
 
-TextStyle labelStyle = TextStyle(color: Colors.white54, fontSize: 14);
+TextStyle labelStyle = const TextStyle(color: Colors.white54, fontSize: 14);
 Widget customNav(context, currentIndex) {
   List<CustomNavigationBarItem> items = [
     CustomNavigationBarItem(

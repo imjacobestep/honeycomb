@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, use_key_in_widget_constructors
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/user.dart';
@@ -148,7 +150,7 @@ class HomePageState extends State<HomePage> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(40))),
       leading: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Image.asset(
           "lib/assets/icon/icon.png",
           width: 80,
@@ -172,7 +174,7 @@ class HomePageState extends State<HomePage> {
       ),
       actions: [
         Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: IconButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/profile');

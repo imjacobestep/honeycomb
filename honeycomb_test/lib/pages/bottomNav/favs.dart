@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
@@ -9,6 +8,7 @@ import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
 
+// ignore: must_be_immutable
 class FavsPage extends StatefulWidget {
   @override
   FavsPageState createState() => FavsPageState();
@@ -16,6 +16,7 @@ class FavsPage extends StatefulWidget {
   String userID = FirebaseAuth.instance.currentUser!.uid;
   Iterable<dynamic> favoritesList = [];
 
+  // ignore: use_key_in_widget_constructors
   FavsPage();
 }
 
@@ -61,7 +62,7 @@ class FavsPageState extends State<FavsPage> {
           }
           return RefreshIndicator(
             onRefresh: () async {
-              await Future.delayed(Duration(seconds: 1));
+              await Future.delayed(const Duration(seconds: 1));
               setState(() {});
             },
             child: ListView.builder(

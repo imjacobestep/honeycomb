@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors
+
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
@@ -10,9 +12,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../model/client.dart';
 
+// ignore: must_be_immutable
 class ClientDetails extends StatefulWidget {
-  @override
   bool enableAgencyButton = true; // AGENCY BUTTON SWITCH
+  @override
   ClientDetailsState createState() => ClientDetailsState();
   Proxy proxyModel = Proxy();
   Client client;

@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, use_key_in_widget_constructors
+
 import 'dart:async';
 
 import 'package:custom_info_window/custom_info_window.dart';
@@ -8,7 +10,6 @@ import 'package:honeycomb_test/geo_helper.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/resource_details.dart';
 import 'package:honeycomb_test/proxy.dart';
-import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:honeycomb_test/pages/bottomNav/navbar.dart';
 import 'package:location/location.dart';
@@ -68,9 +69,7 @@ class MapPageState extends State<MapPage> {
     if (widget.mapController != null) {
       widget.mapController!.dispose();
     }
-    if (widget.searchController != null) {
-      widget.searchController.dispose();
-    }
+    widget.searchController.dispose();
     super.dispose();
   }
 
@@ -490,7 +489,7 @@ class MapPageState extends State<MapPage> {
   PreferredSizeWidget topHeader() {
     return AppBar(
       backgroundColor: Colors.transparent,
-      leading: Navigator.canPop(context) ? BackButton() : null,
+      leading: Navigator.canPop(context) ? const BackButton() : null,
       //automaticallyImplyLeading: false,
       toolbarHeight: 80,
       shape: const RoundedRectangleBorder(

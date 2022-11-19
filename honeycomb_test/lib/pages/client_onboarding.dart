@@ -1,11 +1,9 @@
+// ignore_for_file: must_be_immutable, use_key_in_widget_constructors
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_haptic/haptic.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:honeycomb_test/geo_helper.dart';
 import 'package:honeycomb_test/model/client.dart';
-import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
@@ -101,7 +99,7 @@ class NewClientState extends State<NewClient> {
 
   Widget buildForm() {
     return ListView(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       children: [
         getLabel("Client Alias", true),
         TextField(
@@ -233,9 +231,9 @@ class NewClientState extends State<NewClient> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
         child: Row(children: [
-          Text("Save Client"),
+          const Text("Save Client"),
           getSpacer(8),
-          Icon(Icons.check_circle)
+          const Icon(Icons.check_circle)
         ]),
       ),
     );

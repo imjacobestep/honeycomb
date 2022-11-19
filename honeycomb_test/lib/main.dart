@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           primarySwatch: generateMaterialColor(color: const Color(0xFFFFC700)),
           //primarySwatch: Colors.orange
-          textTheme: TextTheme(bodyLarge: TextStyle(fontSize: 18)),
+          textTheme: const TextTheme(bodyLarge: TextStyle(fontSize: 18)),
           cardTheme: CardTheme(
             color: const Color(0xFFF6F6F6),
             surfaceTintColor: Colors.white,

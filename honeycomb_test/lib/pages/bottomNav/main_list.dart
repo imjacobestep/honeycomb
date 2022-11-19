@@ -1,4 +1,6 @@
 //import 'package:flutter/cupertino.dart';
+// ignore_for_file: unnecessary_null_comparison, must_be_immutable, use_key_in_widget_constructors
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
@@ -291,8 +293,6 @@ class ResourcesPageState extends State<ResourcesPage> {
           ];
         }
         //Haptic.onSuccess;
-        print("//////// any filters? : ${ifAnyFilters()} ////////");
-        print(filters.entries);
         return RefreshIndicator(
           onRefresh: () async {
             await Future.delayed(const Duration(seconds: 1));

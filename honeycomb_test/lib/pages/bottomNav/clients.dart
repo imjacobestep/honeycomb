@@ -9,6 +9,7 @@ import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
 
+// ignore: must_be_immutable
 class ClientsPage extends StatefulWidget {
   @override
   ClientsPageState createState() => ClientsPageState();
@@ -16,6 +17,7 @@ class ClientsPage extends StatefulWidget {
   String userID = FirebaseAuth.instance.currentUser!.uid;
   Iterable<dynamic> clientsList = [];
 
+  // ignore: use_key_in_widget_constructors
   ClientsPage();
 }
 
@@ -31,7 +33,6 @@ class ClientsPageState extends State<ClientsPage> {
       future: widget.proxyModel.getUser(widget.userID),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          MPUser user = snapshot.data!;
           return clientsBuilder(snapshot.data);
         } else {
           return const Center(
