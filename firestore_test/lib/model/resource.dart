@@ -11,9 +11,9 @@ class Resource {
   LatLng? coords;
   String? website;
   //LIST ATTRIBUTES
-  Map? categories;
+  List<String>? categories;
   bool? multilingual;
-  Map? eligibility;
+  List<String>? eligibility;
   bool? accessibility;
   //EXTRA ATTRIBUTES
   String? notes;
@@ -62,9 +62,13 @@ class Resource {
           ? LatLng(data?['coords'].latitude, data?['coords'].longitude)
           : null,
       website: data?['website'],
-      categories: data?['categories'],
+      categories: data?['categories'] is Iterable
+          ? List.from(data?['categories'])
+          : null,
       multilingual: data?['multilingual'],
-      eligibility: data?['eligibility'],
+      eligibility: data?['eligibility'] is Iterable
+          ? List.from(data?['eligibility'])
+          : null,
       accessibility: data?['accessibility'],
       notes: data?['notes'],
       isActive: data?['isActive'],
@@ -89,9 +93,9 @@ class Resource {
       if (coords != null)
         "coords": GeoPoint(coords!.latitude, coords!.longitude),
       if (website != null) "website": website?.toLowerCase(),
-      if (categories != null) "categories": categories,
+      if (categories != null) "resources": categories?.toSet().toList(),
       if (multilingual != null) "multilingual": multilingual,
-      if (eligibility != null) "eligibility": eligibility,
+      if (eligibility != null) "resources": eligibility?.toSet().toList(),
       if (accessibility != null) "accessibility": accessibility,
       if (notes != null) "notes": notes,
       if (isActive != null) "isActive": isActive,
