@@ -9,7 +9,7 @@ Widget clientCard(
     child: InkWell(
       onTap: tapFunction,
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

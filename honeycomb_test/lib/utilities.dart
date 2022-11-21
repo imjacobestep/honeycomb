@@ -168,6 +168,8 @@ void setFilter(String inKey, bool inVal) {
   });
 }
 
+/* ß */
+
 void resetFilters() {
   filters.forEach((key, value) {
     setFilter(key, false);

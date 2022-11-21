@@ -61,7 +61,7 @@ class ClientDetailsState extends State<ClientDetails> {
   Widget getQuickAction(String label, String value) {
     double size = 70.0;
     switch (label) {
-      case "Open in Agency":
+      case "Open Agency":
         {
           return InkWell(
             onTap: () {
@@ -98,12 +98,39 @@ class ClientDetailsState extends State<ClientDetails> {
             },
             child: SizedBox(
               height: size,
-              width: size,
+              width: size * 1.6,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(
                     Icons.ios_share_outlined,
+                    size: 30,
+                  ),
+                  getSpacer(8),
+                  Text(
+                    label,
+                    style: Theme.of(context).textTheme.labelLarge,
+                  )
+                ],
+              ),
+            ),
+          );
+        }
+
+      case "Print":
+        {
+          return InkWell(
+            onTap: () {
+              //launchUrl(Uri.parse(widget.resource.website!));
+            },
+            child: SizedBox(
+              height: size,
+              width: size * 1.6,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.print_outlined,
                     size: 30,
                   ),
                   getSpacer(8),
@@ -127,9 +154,12 @@ class ClientDetailsState extends State<ClientDetails> {
   Widget quickActionsBuilder() {
     List<Widget> actions = [];
     if (widget.client.agencyId != null) {
-      actions.add(getQuickAction("Open in Agency", widget.client.agencyId!));
+      actions.add(getQuickAction("Open Agency", widget.client.agencyId!));
     } //agency
-    actions.add(getQuickAction("Share", "stuff")); //share
+    actions.addAll([
+      getQuickAction("Print", "stuff"),
+      getQuickAction("Share", "stuff")
+    ]); //share
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         mainAxisSize: MainAxisSize.max,

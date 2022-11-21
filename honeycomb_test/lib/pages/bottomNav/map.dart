@@ -1,8 +1,6 @@
 // ignore_for_file: must_be_immutable, use_key_in_widget_constructors
 
 import 'dart:async';
-
-import 'package:custom_info_window/custom_info_window.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -31,7 +29,6 @@ class MapPage extends StatefulWidget {
   String typedZipCode = "";
   GoogleMapController? mapController;
   TextEditingController searchController = TextEditingController();
-  CustomInfoWindowController infoController = CustomInfoWindowController();
   Set<Marker> markers = {
     const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
@@ -258,15 +255,16 @@ class MapPageState extends State<MapPage> {
       List<Widget> buildList() {
         List<Widget> children = [];
         children.add(filterHeader());
-        children.add(getSpacer(8));
+        children.add(getSpacer(0));
         filters.forEach((key, value) {
+          children.add(getDivider(context));
           children.add(Text(key));
           children.add(Wrap(
             spacing: 4,
             children: filterSection(value),
           ));
-          children.add(getDivider(context));
         });
+        children.add(getSpacer(16));
         children.add(applyButton());
         return children;
       }

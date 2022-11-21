@@ -114,23 +114,26 @@ Widget customNav(context, currentIndex) {
     }
   }
 
-  return CustomNavigationBar(
-    scaleFactor: 0.44,
-    items: items,
-    blurEffect: false,
-    //opacity: 1,
-    iconSize: 28,
-    isFloating: true,
-    selectedColor: Theme.of(context).colorScheme.primary,
-    strokeColor: Colors.white,
-    unSelectedColor: Colors.white54,
-    backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
-    borderRadius: const Radius.circular(30.0),
-    currentIndex: currentIndex,
-    onTap: (index) {
-      if (currentIndex != index) {
-        goToNav(index);
-      }
-    },
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+    child: CustomNavigationBar(
+      scaleFactor: 0.44,
+      items: items,
+      blurEffect: false,
+      //opacity: 1,
+      iconSize: 28,
+      isFloating: true,
+      selectedColor: Theme.of(context).colorScheme.primary,
+      strokeColor: Colors.white,
+      unSelectedColor: Colors.white54,
+      backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
+      borderRadius: const Radius.circular(50.0),
+      currentIndex: currentIndex,
+      onTap: (index) {
+        if (currentIndex != index) {
+          goToNav(index);
+        }
+      },
+    ),
   );
 }

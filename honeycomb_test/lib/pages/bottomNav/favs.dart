@@ -114,6 +114,7 @@ class FavsPageState extends State<FavsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         title: const Text(
           "My Favorites",

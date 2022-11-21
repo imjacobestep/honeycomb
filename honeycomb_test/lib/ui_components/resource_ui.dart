@@ -43,7 +43,10 @@ Widget cardCategoryLabel(BuildContext context, String category) {
 
 Widget detailsCategoryLabel(BuildContext context, String category) {
   return Chip(
-    label: Text(category),
+    label: Text(
+      category,
+      style: Theme.of(context).textTheme.labelMedium,
+    ),
   );
 }
 

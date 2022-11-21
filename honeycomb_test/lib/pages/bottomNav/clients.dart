@@ -119,6 +119,7 @@ class ClientsPageState extends State<ClientsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         leading: null,
         title: const Text(

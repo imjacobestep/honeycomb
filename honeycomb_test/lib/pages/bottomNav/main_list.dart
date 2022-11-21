@@ -100,7 +100,10 @@ class ResourcesPageState extends State<ResourcesPage> {
             },
             child: !value
                 ? Chip(
-                    label: Text(label),
+                    label: Text(
+                      label,
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
                     backgroundColor: Colors.transparent,
                     side: const BorderSide(color: Colors.black12, width: 1),
                   )
@@ -109,7 +112,14 @@ class ResourcesPageState extends State<ResourcesPage> {
                     backgroundColor: Colors.black,
                     label: Text(
                       label,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize:
+                              Theme.of(context).textTheme.labelLarge!.fontSize,
+                          fontStyle: Theme.of(context)
+                              .textTheme
+                              .labelLarge!
+                              .fontStyle),
                     ),
                   ));
       }
@@ -167,14 +177,14 @@ class ResourcesPageState extends State<ResourcesPage> {
       List<Widget> buildList() {
         List<Widget> children = [];
         children.add(filterHeader());
-        children.add(getSpacer(24));
+        children.add(getSpacer(0));
         filters.forEach((key, value) {
+          children.add(getDivider(context));
           children.add(Text(key));
           children.add(Wrap(
             spacing: 4,
             children: filterSection(value),
           ));
-          children.add(getSpacer(8));
         });
         children.add(getSpacer(16));
         children.add(applyButton());
@@ -256,18 +266,18 @@ class ResourcesPageState extends State<ResourcesPage> {
               .sort(snapshot.data!, defaultSortCriteria, sortOrder);
           if (testList.isEmpty) {
             String helper = ifAnyFilters() ? "filters" : "search terms";
-            //children.add(fabButtons());
             children.addAll([
               getSpacer(16),
               helperText(
                   "No Results", "Try changing your $helper", context, true)
             ]);
           } else {
-            //children.add(fabButtons());
             children.add(Row(
               children: [
-                Text("  ${testList.length} resources found"),
-                //Text("${} active filters")
+                Text(
+                    "  ${testList.where((element) => element.name != "").length} resources found"),
+                Text(
+                    "${filters.entries.where((element) => element.value == true)} filters")
               ],
             ));
             for (Resource resource in testList) {
@@ -283,8 +293,8 @@ class ResourcesPageState extends State<ResourcesPage> {
               }
             }
           }
+          children.add(getSpacer(36));
         } else {
-          //Haptic.onFailure();
           children = <Widget>[
             const Padding(
               padding: EdgeInsets.all(16),
@@ -292,7 +302,6 @@ class ResourcesPageState extends State<ResourcesPage> {
             )
           ];
         }
-        //Haptic.onSuccess;
         return RefreshIndicator(
           onRefresh: () async {
             await Future.delayed(const Duration(seconds: 1));
@@ -407,32 +416,7 @@ class ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
-  Widget sortOrderDropdown() {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: const Color(0xFFFFE93E)),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: DropdownButton(
-            style: Theme.of(context).textTheme.labelLarge,
-            isDense: true,
-            underline: Container(),
-            value: defaultSortCriteria,
-            items: sortCriteria.map((String item) {
-              return DropdownMenuItem(value: item, child: Text(item));
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                defaultSortCriteria = newValue!;
-              });
-            }),
-      ),
-    );
-  }
-
   Widget fabButtons() {
-    //return sortOrderDropdown();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -445,7 +429,9 @@ class ResourcesPageState extends State<ResourcesPage> {
             DecoratedBox(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
-                  color: const Color(0xFFFFC700)),
+                  //color: const Color(0xFFFFC700)
+                  border: Border.all(width: 2, color: Color(0xFFE7E7E7)),
+                  color: Theme.of(context).cardTheme.color),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButton(
@@ -465,8 +451,11 @@ class ResourcesPageState extends State<ResourcesPage> {
             ),
             DecoratedBox(
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: const Color(0xFFFFC700)),
+                borderRadius: BorderRadius.circular(30),
+                //color: const Color(0xFFFFC700)
+                border: Border.all(width: 2, color: Color(0xFFE7E7E7)),
+                color: Theme.of(context).cardTheme.color,
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButton(
@@ -486,9 +475,14 @@ class ResourcesPageState extends State<ResourcesPage> {
             ),
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    side: !ifAnyFilters()
+                    backgroundColor: !ifAnyFilters()
+                        ? Theme.of(context).cardTheme.color
+                        : Color(0xFFFFC700),
+                    side: BorderSide(width: 2, color: Color(0xFFE7E7E7))
+                    /* side: !ifAnyFilters()
                         ? null
-                        : const BorderSide(color: Colors.black, width: 4)),
+                        : const BorderSide(color: Colors.black, width: 4) */
+                    ),
                 onPressed: () async {
                   await filterSheet();
                   setState(() {});
@@ -513,6 +507,7 @@ class ResourcesPageState extends State<ResourcesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       appBar: topHeader(),
       body: getResourceList(),

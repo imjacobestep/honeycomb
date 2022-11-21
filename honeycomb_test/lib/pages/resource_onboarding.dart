@@ -220,7 +220,12 @@ class NewResourceState extends State<NewResource> {
                 backgroundColor: Colors.black,
                 label: Text(
                   label,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize:
+                          Theme.of(context).textTheme.labelLarge!.fontSize,
+                      fontStyle:
+                          Theme.of(context).textTheme.labelLarge!.fontStyle),
                 ),
               ));
   }

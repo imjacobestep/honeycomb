@@ -2,7 +2,9 @@
 
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/pages/bottomNav/map.dart';
@@ -24,7 +26,10 @@ class ResourceDetails extends StatefulWidget {
   Proxy proxyModel = Proxy();
   String userID = FirebaseAuth.instance.currentUser!.uid;
   Resource resource;
+  MPUser? user;
   GoogleMapController? mapController;
+  Map<Client, bool> clientsList = {};
+  List<Widget> sheetChildren = [];
   ResourceDetails({required this.resource});
 }
 
@@ -32,6 +37,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
   @override
   void initState() {
     super.initState();
+    widget.sheetChildren = [];
   }
 
   @override
@@ -43,44 +49,55 @@ class ResourceDetailsState extends State<ResourceDetails> {
   }
 
   Widget sheetBuilder(MPUser user) {
-    List<Widget> children = [];
-    children.add(resourceCard(context, widget.resource, () {
-      Navigator.pop(context);
-    }));
-    children.add(getDivider(context));
-
-    Widget clientCheckBox(Client client) {
-      bool isHere = (client.resources != null &&
-          client.resources!.contains(widget.resource.id));
-
-      if (isHere) {
-        return IconButton(
-            onPressed: () {
-              widget.proxyModel.delFromList(client, widget.resource);
-              setSheetState() {}
-              ;
-            },
-            icon: Icon(Icons.check_box));
-      } else {
-        return IconButton(
-            onPressed: () {
-              if (client.resources == null) {
-                client.resources = [];
-                widget.proxyModel.upsert(client);
-              }
-
-              widget.proxyModel.addToList(client, widget.resource);
-              setSheetState() {}
-              ;
-            },
-            icon: Icon(Icons.check_box_outline_blank_outlined));
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setSheetState) {
+      List<Widget> children = [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Add this resource to..."),
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.close))
+          ],
+        ),
+        getSpacer(8),
+        resourceCard(context, widget.resource, () {
+          Navigator.pop(context);
+        }),
+        getDivider(context)
+      ];
+      Widget clientCheckBox(Client client) {
+        if (widget.clientsList[client]!) {
+          return IconButton(
+              onPressed: () async {
+                await widget.proxyModel.delFromList(client, widget.resource);
+                setSheetState(() {
+                  widget.clientsList.clear();
+                });
+              },
+              icon: const Icon(Icons.check_box));
+        } else {
+          return IconButton(
+              onPressed: () async {
+                if (client.resources == null) {
+                  client.resources = [];
+                  widget.proxyModel.upsert(client);
+                }
+                await widget.proxyModel.addToList(client, widget.resource);
+                setSheetState(() {
+                  widget.clientsList.clear();
+                  widget.sheetChildren = [];
+                });
+              },
+              icon: const Icon(Icons.check_box_outline_blank_outlined));
+        }
       }
-    }
 
-    Widget addToClientCard(Client client) {
-      return Card(
-        child: InkWell(
-          onTap: () {},
+      Widget addToClientCard(Client client) {
+        return Card(
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: Row(
@@ -94,23 +111,35 @@ class ResourceDetailsState extends State<ResourceDetails> {
               ],
             ),
           ),
-        ),
-      );
-    }
+        );
+      }
 
-    return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setSheetState) {
       return FutureBuilder(
         future: widget.proxyModel.listUserClients(user),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data != null) {
               for (Client client in snapshot.data) {
+                bool isHere = (client.resources != null &&
+                    (client.resources!.contains(widget.resource.id)));
+                widget.clientsList[client] = isHere;
                 children.add(addToClientCard(client));
               }
-              children.add(getSpacer(36));
+              children.add(getSpacer(8));
+              children.add(ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      "Done",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  )));
+              children.add(getSpacer(24));
               return ListView(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 shrinkWrap: true,
                 children: children,
               );
@@ -119,7 +148,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                   "Go to the clients tab to add clients", context, false);
             }
           } else {
-            return SizedBox(
+            return const SizedBox(
               height: 48,
               //child: getLoader(),
               child: Text("loading"),
@@ -138,7 +167,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
         isDismissible: true,
         context: context,
         builder: (context) {
-          return userBuilder('client sheet');
+          return sheetBuilder(widget.user!);
         });
   }
 
@@ -269,13 +298,19 @@ class ResourceDetailsState extends State<ResourceDetails> {
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width - 50),
               padding: const EdgeInsets.only(left: 8),
-              child: Text(
-                value,
-                maxLines: 10,
-                softWrap: true,
-                textWidthBasis: TextWidthBasis.parent,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyLarge,
+              child: InkWell(
+                onLongPress: () async {
+                  await Clipboard.setData(ClipboardData(text: value));
+                  // copied successfully
+                },
+                child: Text(
+                  value,
+                  maxLines: 10,
+                  //softWrap: true,
+                  textWidthBasis: TextWidthBasis.parent,
+                  //overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
             ),
           ],
@@ -295,7 +330,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
   }
 
   Widget getQuickAction(String label, String value) {
-    double size = 70.0;
+    TextStyle labelStyle = Theme.of(context).textTheme.labelMedium!;
+    double size = 65.0;
     switch (label) {
       case "Call":
         {
@@ -316,7 +352,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                   getSpacer(4),
                   Text(
                     label,
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: labelStyle,
                   )
                 ],
               ),
@@ -343,7 +379,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                   getSpacer(4),
                   Text(
                     label,
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: labelStyle,
                   )
                 ],
               ),
@@ -367,7 +403,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                   getSpacer(4),
                   Text(
                     label,
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: labelStyle,
                   )
                 ],
               ),
@@ -391,7 +427,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                   getSpacer(4),
                   Text(
                     label,
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: labelStyle,
                   )
                 ],
               ),
@@ -401,25 +437,71 @@ class ResourceDetailsState extends State<ResourceDetails> {
 
       case "Client":
         {
-          return InkWell(
-            onTap: () async {
-              await filterSheet();
+          return FutureBuilder(
+            future: widget.proxyModel.listUserClients(widget.user!),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data != null) {
+                  for (Client client in snapshot.data) {
+                    bool isHere = (client.resources != null &&
+                        (client.resources!.contains(widget.resource.id)));
+                    widget.clientsList[client] = isHere;
+                  }
+                  return InkWell(
+                    onTap: () async {
+                      await filterSheet();
+                    },
+                    child: SizedBox(
+                      height: size,
+                      width: size,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.person_add_outlined),
+                          getSpacer(4),
+                          Text(
+                            label,
+                            style: labelStyle,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  return SizedBox(
+                    height: size,
+                    width: size,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error),
+                        getSpacer(4),
+                        Text(
+                          "No User",
+                          style: labelStyle,
+                        )
+                      ],
+                    ),
+                  );
+                }
+              } else {
+                return SizedBox(
+                  height: size,
+                  width: size,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LoadingIndicator(size: size / 3, borderWidth: 2),
+                      getSpacer(4),
+                      Text(
+                        "Loading",
+                        style: labelStyle,
+                      )
+                    ],
+                  ),
+                );
+              }
             },
-            child: SizedBox(
-              height: size,
-              width: size,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.person_add_outlined),
-                  getSpacer(4),
-                  Text(
-                    label,
-                    style: Theme.of(context).textTheme.labelLarge,
-                  )
-                ],
-              ),
-            ),
           );
         }
 
@@ -514,8 +596,11 @@ class ResourceDetailsState extends State<ResourceDetails> {
       future: widget.proxyModel.getUser(widget.userID),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
+          widget.user = snapshot.data;
           if (elementContext == "fav button") {
             return favoritesButtonBuilder(snapshot.data);
+          } else if (elementContext == "client button") {
+            return getQuickAction("Client", "");
           } else {
             return sheetBuilder(snapshot.data);
           }
@@ -589,7 +674,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
     if (widget.resource.website != null) {
       ret.add(getQuickAction("Web", widget.resource.website!));
     }
-    ret.add(getQuickAction("Client", "stuff")); //web
+    ret.add(userBuilder("client button"));
+    //ret.add(getQuickAction("Client", "stuff")); //web
     //client
     return ret;
   }

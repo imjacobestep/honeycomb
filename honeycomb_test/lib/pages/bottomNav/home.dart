@@ -56,6 +56,7 @@ class HomePageState extends State<HomePage> {
                   label,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 3,
+                  style: Theme.of(context).textTheme.labelMedium,
                 ),
               )
             ],
@@ -191,23 +192,24 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       appBar: topHeader(),
       body: ListView(
         children: [
           sectionHeader("Find by Category", context),
           GridView.count(
             shrinkWrap: true,
-            crossAxisCount: 3,
+            crossAxisCount: 2,
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.all(8),
-            childAspectRatio: 2,
+            childAspectRatio: 3.5,
             children: [
-              filterCard(Icons.home_work, "Shelter"),
-              filterCard(Icons.sports_kabaddi, "Domestic Violence"),
-              filterCard(Icons.psychology, "Mental Health"),
-              filterCard(Icons.food_bank, "Food"),
-              filterCard(Icons.medical_services, "Medical"),
-              filterCard(Icons.gavel, "Legal"),
+              filterCard(Icons.home_work_outlined, "Shelter"),
+              filterCard(Icons.sports_kabaddi_outlined, "Domestic Violence"),
+              filterCard(Icons.psychology_outlined, "Mental Health"),
+              filterCard(Icons.food_bank_outlined, "Food"),
+              filterCard(Icons.medical_services_outlined, "Medical"),
+              filterCard(Icons.gavel_outlined, "Legal"),
             ],
           ),
           getDivider(context),
