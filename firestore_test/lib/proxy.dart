@@ -82,9 +82,7 @@ class Proxy {
 
     conditions.forEach((key, value) {
       if (value is List) {
-        for (var mapKey in value) {
-          query = query.where('$key.$mapKey', isEqualTo: true);
-        }
+        query = query.where(key, arrayContainsAny: value);
       } else {
         query = query.where(key, isEqualTo: value);
       }
