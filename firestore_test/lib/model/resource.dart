@@ -85,10 +85,10 @@ class Resource {
 
   Map<String, dynamic> toFirestore() {
     return {
-      if (name != null) "name": name?.toLowerCase(),
+      if (name != null) "name": name,
       if (phoneNumbers != null) "phoneNumbers": phoneNumbers,
       if (email != null) "email": email?.toLowerCase(),
-      if (address != null) "address": address?.toLowerCase(),
+      if (address != null) "address": address,
       if (zipCode != null) "zipCode": zipCode,
       if (coords != null)
         "coords": GeoPoint(coords!.latitude, coords!.longitude),

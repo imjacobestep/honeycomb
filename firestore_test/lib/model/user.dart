@@ -44,7 +44,7 @@ class MPUser {
 
   Map<String, dynamic> toFirestore() {
     return {
-      if (name != null) "name": name?.toLowerCase(),
+      if (name != null) "name": name,
       if (email != null) "email": email?.toLowerCase(),
       if (favorites != null) "favorites": favorites?.toSet().toList(),
       if (clients != null) "clients": clients?.toSet().toList(),
