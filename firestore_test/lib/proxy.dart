@@ -83,19 +83,32 @@ class Proxy {
     // [START add_data_custom_objects]
     var ref = _getRef(collection);
     var query = ref.where('id', isNotEqualTo: null);
+    var arrayFilters = {};
 
     conditions.forEach((key, value) {
       if (value is List) {
-        value.add('n/a');
-        query = query.where(key, arrayContainsAny: value);
+        arrayFilters[key] = value;
       } else {
         query = query.where(key, isEqualTo: value);
       }
     });
 
-    final snapshot =
+    var snapshot =
         await query.get().then((value) => value.docs.map((e) => e.data()));
 
+    snapshot = snapshot.where((element) {
+      var result = true;
+      var resourceMap = (element as Resource).toFirestore();
+
+      arrayFilters.forEach((key, value) {
+        if (resourceMap[key] is List) {
+          result = result &&
+              ((resourceMap[key] as List).any((e) => value.contains(e)));
+        }
+      });
+
+      return result;
+    }).toList();
     return snapshot;
     // [END add_data_custom_objects]
   }
