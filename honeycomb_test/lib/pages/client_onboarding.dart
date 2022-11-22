@@ -5,7 +5,9 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/model/user.dart';
+import 'package:honeycomb_test/pages/bottomNav/clients.dart';
 import 'package:honeycomb_test/proxy.dart';
+import 'package:honeycomb_test/ui_components/animated_navigator.dart';
 import 'package:honeycomb_test/utilities.dart';
 
 class NewClient extends StatefulWidget {
@@ -15,6 +17,7 @@ class NewClient extends StatefulWidget {
   String userID = FirebaseAuth.instance.currentUser!.uid;
   Client? client;
   MPUser? user;
+  bool delete = false;
 
   TextEditingController nameController = TextEditingController();
   TextEditingController agencyController = TextEditingController();
@@ -95,6 +98,27 @@ class NewClientState extends State<NewClient> {
       label,
       style: Theme.of(context).textTheme.headlineSmall,
     );
+  }
+
+  confirmDelete() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Title"),
+            content: Text("content"),
+            actions: [
+              TextButton(
+                child: Text("Cancel"),
+                onPressed: () {},
+              ),
+              TextButton(
+                child: Text("Delete"),
+                onPressed: () {},
+              )
+            ],
+          );
+        });
   }
 
   Widget buildForm() {
@@ -239,12 +263,53 @@ class NewClientState extends State<NewClient> {
     );
   }
 
+  Widget confirmationPopup() {
+    return AlertDialog(
+      title: Text("Are you sure you want to delete this client?"),
+      content: Text("You may have to contact your IT admin to restore it"),
+      actions: [
+        ElevatedButton(
+          //style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          child: Text("Cancel"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          child: Text("Delete"),
+          onPressed: () {
+            widget.delete = true;
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    );
+  }
+
   Widget deleteButton() {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-        onPressed: () {
-          widget.proxyModel.delFromList(widget.user, widget.client);
-          Navigator.pop(context);
+        onPressed: () async {
+          //widget.proxyModel.delFromList(widget.user, widget.client);
+          //await confirmDelete();
+          await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return confirmationPopup();
+              });
+          if (widget.delete) {
+            widget.proxyModel.delFromList(widget.user, widget.client);
+            // ignore: use_build_context_synchronously
+            Navigator.pushReplacement(
+              context,
+              FadeInRoute(
+                routeName: "/clients",
+                page: ClientsPage(),
+              ),
+            );
+          }
+          //Navigator.pop(context);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
