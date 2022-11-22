@@ -109,9 +109,9 @@ class Resource {
       if (coords != null)
         "coords": GeoPoint(coords!.latitude, coords!.longitude),
       if (website != null) "website": website?.toLowerCase(),
-      if (categories != null) "resources": categories?.toSet().toList(),
+      if (categories != null) "categories": categories?.toSet().toList(),
       if (multilingual != null) "multilingual": multilingual,
-      if (eligibility != null) "resources": eligibility?.toSet().toList(),
+      if (eligibility != null) "eligibility": eligibility?.toSet().toList(),
       if (accessibility != null) "accessibility": accessibility,
       if (notes != null) "notes": notes,
       if (isActive != null) "isActive": isActive,
