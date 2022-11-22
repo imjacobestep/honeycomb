@@ -86,6 +86,7 @@ class Proxy {
 
     conditions.forEach((key, value) {
       if (value is List) {
+        value.add('n/a');
         query = query.where(key, arrayContainsAny: value);
       } else {
         query = query.where(key, isEqualTo: value);
