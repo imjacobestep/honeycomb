@@ -273,11 +273,11 @@ class ResourcesPageState extends State<ResourcesPage> {
             ]);
           } else {
             children.add(Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                     "  ${testList.where((element) => element.name != "").length} resources found"),
-                Text(
-                    "${filters.entries.where((element) => element.value == true)} filters")
+                Text("${howManyFilters()} filter${getPlural(howManyFilters())}")
               ],
             ));
             for (Resource resource in testList) {
@@ -293,7 +293,6 @@ class ResourcesPageState extends State<ResourcesPage> {
               }
             }
           }
-          children.add(getSpacer(36));
         } else {
           children = <Widget>[
             const Padding(
@@ -308,7 +307,7 @@ class ResourcesPageState extends State<ResourcesPage> {
             setState(() {});
           },
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 120),
             children: children,
           ),
         );
@@ -430,7 +429,7 @@ class ResourcesPageState extends State<ResourcesPage> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
                   //color: const Color(0xFFFFC700)
-                  border: Border.all(width: 2, color: Color(0xFFE7E7E7)),
+                  border: Border.all(width: 2, color: const Color(0xFFE7E7E7)),
                   color: Theme.of(context).cardTheme.color),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -453,7 +452,7 @@ class ResourcesPageState extends State<ResourcesPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
                 //color: const Color(0xFFFFC700)
-                border: Border.all(width: 2, color: Color(0xFFE7E7E7)),
+                border: Border.all(width: 2, color: const Color(0xFFE7E7E7)),
                 color: Theme.of(context).cardTheme.color,
               ),
               child: Padding(
@@ -477,8 +476,8 @@ class ResourcesPageState extends State<ResourcesPage> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: !ifAnyFilters()
                         ? Theme.of(context).cardTheme.color
-                        : Color(0xFFFFC700),
-                    side: BorderSide(width: 2, color: Color(0xFFE7E7E7))
+                        : const Color(0xFFFFC700),
+                    side: const BorderSide(width: 2, color: Color(0xFFE7E7E7))
                     /* side: !ifAnyFilters()
                         ? null
                         : const BorderSide(color: Colors.black, width: 4) */

@@ -1,14 +1,22 @@
 // ignore_for_file: use_key_in_widget_constructors
 
+import 'dart:io';
+
+import 'package:cross_file/cross_file.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/client_onboarding.dart';
 import 'package:honeycomb_test/pages/resource_details.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/ui_components/resource_ui.dart';
 import 'package:honeycomb_test/utilities.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 import '../model/client.dart';
 
@@ -94,6 +102,7 @@ class ClientDetailsState extends State<ClientDetails> {
         {
           return InkWell(
             onTap: () {
+              Share.share(value);
               //launchUrl(Uri.parse(widget.resource.website!));
             },
             child: SizedBox(
@@ -120,7 +129,23 @@ class ClientDetailsState extends State<ClientDetails> {
       case "Print":
         {
           return InkWell(
-            onTap: () {
+            onTap: () async {
+              final pdf = pw.Document();
+
+              pdf.addPage(pw.Page(
+                  pageFormat: PdfPageFormat.a4,
+                  build: (pw.Context context) {
+                    return pw.Center(
+                      child: pw.Text(value),
+                    ); // Center
+                  }));
+              // On Flutter, use the [path_provider](https://pub.dev/packages/path_provider) library:
+              final output = await getTemporaryDirectory();
+              //   final file = File("${output.path}/example.pdf");
+              final file =
+                  File("${output.path}/${widget.client.alias}_resources.pdf");
+              await file.writeAsBytes(await pdf.save());
+              Share.shareXFiles([XFile(file.path)]); // Page
               //launchUrl(Uri.parse(widget.resource.website!));
             },
             child: SizedBox(
@@ -157,8 +182,10 @@ class ClientDetailsState extends State<ClientDetails> {
       actions.add(getQuickAction("Open Agency", widget.client.agencyId!));
     } //agency
     actions.addAll([
-      getQuickAction("Print", "stuff"),
-      getQuickAction("Share", "stuff")
+      resourcesBuilder("printButton"),
+      resourcesBuilder("shareButton")
+      //getQuickAction("Print", "stuff"),
+      //getQuickAction("Share", "stuff")
     ]); //share
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -189,7 +216,7 @@ class ClientDetailsState extends State<ClientDetails> {
       getDivider(context),
       resourceHeader(),
       getSpacer(8),
-      resourcesBuilder()
+      resourcesBuilder("resourceList")
     ]);
 
     return ListView(
@@ -212,13 +239,31 @@ class ClientDetailsState extends State<ClientDetails> {
     );
   }
 
-  Widget resourcesBuilder() {
+  Widget resourcesBuilder(String elementContext) {
     return FutureBuilder(
       future: widget.proxyModel.listClientResources(widget.client),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           if (snapshot.data != null && snapshot.data.isNotEmpty) {
-            return resourcesList(snapshot.data);
+            if (elementContext == "resourceList") {
+              return resourcesList(snapshot.data);
+            } else if (elementContext == "shareButton") {
+              List<Resource> resources = [];
+              Iterable<dynamic> data = snapshot.data;
+              for (var element in data) {
+                resources.add(element);
+              }
+              String toShare = widget.proxyModel.serialize(resources);
+              return getQuickAction("Share", toShare);
+            } else {
+              List<Resource> resources = [];
+              Iterable<dynamic> data = snapshot.data;
+              for (var element in data) {
+                resources.add(element);
+              }
+              String toShare = widget.proxyModel.serialize(resources);
+              return getQuickAction("Print", toShare);
+            }
           } else {
             return helperText("This Client has no resources",
                 "Try adding some from the List page", context, true);

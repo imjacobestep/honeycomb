@@ -97,9 +97,9 @@ Map<String, Map<String, bool>> filters = {
 Resource makeNewResource(String userName) {
   return Resource(
       phoneNumbers: {},
-      categories: {},
+      categories: [],
       multilingual: false,
-      eligibility: {},
+      eligibility: [],
       accessibility: false,
       isActive: true,
       createdBy: (userName != null && userName != "") ? userName : "unknown",
@@ -143,8 +143,12 @@ Map<String, dynamic> getFilterQuery() {
       }
     });
   });
-  query["categories"] = categoriesSelected;
-  query["eligibility"] = eligibilitySelected;
+  if (categoriesSelected.isNotEmpty) {
+    query["categories"] = categoriesSelected;
+  }
+  if (eligibilitySelected.isNotEmpty) {
+    query["eligibility"] = eligibilitySelected;
+  }
   return query;
 }
 
@@ -154,6 +158,22 @@ bool ifAnyFilters() {
     value.forEach((key2, value2) {
       if (value2) {
         ret = true;
+      }
+    });
+  });
+  return ret;
+}
+
+String getPlural(int num) {
+  return num == 1 ? "" : "s";
+}
+
+int howManyFilters() {
+  int ret = 0;
+  filters.forEach((key, value) {
+    value.forEach((key2, value2) {
+      if (value2) {
+        ret++;
       }
     });
   });

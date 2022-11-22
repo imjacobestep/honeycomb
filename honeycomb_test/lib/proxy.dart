@@ -75,24 +75,40 @@ class Proxy {
     // [END add_data_custom_objects]
   }
 
+  String serialize(List<Resource> resources) {
+    return resources.map((e) => e.serialize()).join('\n');
+  }
+
   Future<Iterable<dynamic>> filter(String collection, Map conditions) async {
     // [START add_data_custom_objects]
     var ref = _getRef(collection);
     var query = ref.where('id', isNotEqualTo: null);
+    var arrayFilters = {};
 
     conditions.forEach((key, value) {
       if (value is List) {
-        for (var mapKey in value) {
-          query = query.where('$key.$mapKey', isEqualTo: true);
-        }
+        arrayFilters[key] = value;
       } else {
         query = query.where(key, isEqualTo: value);
       }
     });
 
-    final snapshot =
+    var snapshot =
         await query.get().then((value) => value.docs.map((e) => e.data()));
 
+    snapshot = snapshot.where((element) {
+      var result = true;
+      var resourceMap = (element as Resource).toFirestore();
+
+      arrayFilters.forEach((key, value) {
+        if (resourceMap[key] is List) {
+          result = result &&
+              ((resourceMap[key] as List).any((e) => value.contains(e)));
+        }
+      });
+
+      return result;
+    }).toList();
     return snapshot;
     // [END add_data_custom_objects]
   }
@@ -129,10 +145,10 @@ class Proxy {
     if (ascending) {
       if (field == 'name') {
         return items.toList()..sort((a, b) => a.name!.compareTo(b.name!));
-      } else if (field == 'date created') {
+      } else if (field == 'createdStamp') {
         return items.toList()
           ..sort((a, b) => a.createdStamp!.compareTo(b.createdStamp!));
-      } else if (field == 'date updated') {
+      } else if (field == 'updatedStamp') {
         return items.toList()
           ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
       } else {
@@ -141,10 +157,10 @@ class Proxy {
     } else {
       if (field == 'name') {
         return items.toList()..sort((a, b) => b.name!.compareTo(a.name!));
-      } else if (field == 'date created') {
+      } else if (field == 'createdStamp') {
         return items.toList()
           ..sort((a, b) => b.createdStamp!.compareTo(a.createdStamp!));
-      } else if (field == 'date updated') {
+      } else if (field == 'updatedStamp') {
         return items.toList()
           ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
       } else {
@@ -152,30 +168,6 @@ class Proxy {
       }
     }
   }
-
-  // Future<User> getUser(String id) async {
-  //   final ref = firestore.collection('users');
-  //   var rawUser = await ref.doc(id).get();
-  //   if (rawUser.exists) {
-  //     return User.fromFirestore(rawUser, null);
-  //   } else {
-  //     final user = User(id: id, favorites: [], clients: []);
-  //     final ref = firestore.collection('users');
-  //     await ref.doc(id).set(user.toFirestore());
-  //     return user;
-  //   }
-  // }
-
-  // Future<dynamic> getUser(String email) async {
-  //   final users = await filter('users', {'email': email});
-
-  //   if (users.isEmpty) {
-  //     final user = User(email: email, favorites: [], clients: []);
-  //     return await upsert(user);
-  //   } else {
-  //     return users.first;
-  //   }
-  // }
 
   Future<dynamic> getUser(String id) async {
     var users = await get('users', id);

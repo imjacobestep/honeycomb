@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors, must_be_immutable
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,6 @@ import 'package:flutter_haptic/haptic.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/geo_helper.dart';
 import 'package:honeycomb_test/model/resource.dart';
-import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/proxy.dart';
 import 'package:honeycomb_test/utilities.dart';
 
@@ -23,8 +24,10 @@ class NewResource extends StatefulWidget {
   TextEditingController webController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController notesController = TextEditingController();
-  Map<dynamic, dynamic> categoriesController = {};
-  Map<dynamic, dynamic> eligibilityController = {};
+  //Map<dynamic, dynamic> categoriesController = {};
+  //Map<dynamic, dynamic> eligibilityController = {};
+  List<String> categoriesController = [];
+  List<String> eligibilityController = [];
   bool multilingualController = false;
   bool accessibleController = false;
 
@@ -181,7 +184,7 @@ class NewResourceState extends State<NewResource> {
               if (value) {
                 widget.categoriesController.remove(label.toLowerCase());
               } else {
-                widget.categoriesController[label.toLowerCase()] = true;
+                widget.categoriesController.add(label.toLowerCase());
               }
               break;
             case "language":
@@ -195,7 +198,7 @@ class NewResourceState extends State<NewResource> {
               if (value) {
                 widget.eligibilityController.remove(label.toLowerCase());
               } else {
-                widget.eligibilityController[label.toLowerCase()] = true;
+                widget.eligibilityController.add(label.toLowerCase());
               }
               break;
             case "accessibility":
@@ -255,7 +258,7 @@ class NewResourceState extends State<NewResource> {
   Widget eligibilityBuilder() {
     List<Widget> children = [];
     filters["Eligibility"]!.forEach((key, value) {
-      if (widget.eligibilityController.containsKey(key.toLowerCase())) {
+      if (widget.eligibilityController.contains(key.toLowerCase())) {
         children.add(selectionChip(key, 'eligibility', true));
       } else {
         children.add(selectionChip(key, 'eligibility', false));
@@ -270,8 +273,8 @@ class NewResourceState extends State<NewResource> {
   Widget categoriesBuilder() {
     List<Widget> children = [];
     filters["Categories"]!.forEach((key, value) {
-      widget.resource!.categories ??= {};
-      if (widget.categoriesController.containsKey(key.toLowerCase())) {
+      widget.resource!.categories ??= [];
+      if (widget.categoriesController.contains(key.toLowerCase())) {
         children.add(selectionChip(key, 'category', true));
       } else {
         children.add(selectionChip(key, 'category', false));
@@ -358,7 +361,6 @@ class NewResourceState extends State<NewResource> {
     });
     children.add(ElevatedButton(
         onPressed: () {
-          print(widget.phoneController.keys);
           setState(() {
             widget.phoneController[TextEditingController()] =
                 TextEditingController();
@@ -366,7 +368,7 @@ class NewResourceState extends State<NewResource> {
         },
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [const Icon(Icons.add), const Text("Add Number")],
+          children: const [Icon(Icons.add), Text("Add Number")],
         )));
     return ListView(
       shrinkWrap: true,

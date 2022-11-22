@@ -55,7 +55,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Add this resource to..."),
+            const Text("Add this resource to..."),
             IconButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -512,9 +512,9 @@ class ResourceDetailsState extends State<ResourceDetails> {
     }
   }
 
-  Widget tagsBuilder(Map<dynamic, dynamic> categories, BuildContext context) {
+  Widget tagsBuilder(Iterable<dynamic> categories, BuildContext context) {
     return Wrap(spacing: 4, runSpacing: 0, children: [
-      for (String category in categories.keys)
+      for (String category in categories)
         detailsCategoryLabel(context, category)
     ]);
   }
@@ -535,7 +535,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
       miscDetails["Inactive"] = true;
     }
 
-    return tagsBuilder(miscDetails, context);
+    return tagsBuilder(miscDetails.keys, context);
   }
 
   bool miscTest() {
@@ -637,8 +637,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error),
+                  children: const [
+                    Icon(Icons.error),
                   ],
                 )),
           );

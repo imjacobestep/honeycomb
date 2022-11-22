@@ -58,8 +58,8 @@ Widget resourceWindow(BuildContext context, Resource resource) {
   List<Widget> categories = [];
   if (resource.categories != null) {
     resource.categories!.forEach(
-      (key, value) {
-        categories.add(mapCategoryLabel(context, key));
+      (element) {
+        categories.add(mapCategoryLabel(context, element));
       },
     );
   }
@@ -118,7 +118,7 @@ Widget resourceCard(
     BuildContext context, Resource resource, void Function() tapFunction) {
   List<Widget> categories = [];
   if (resource.categories != null) {
-    for (String category in resource.categories!.keys) {
+    for (String category in resource.categories!) {
       categories.add(cardCategoryLabel(context, category));
     }
   } else {

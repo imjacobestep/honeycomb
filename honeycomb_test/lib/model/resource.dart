@@ -11,9 +11,9 @@ class Resource {
   LatLng? coords;
   String? website;
   //LIST ATTRIBUTES
-  Map? categories;
+  List<String>? categories;
   bool? multilingual;
-  Map? eligibility;
+  List<String>? eligibility;
   bool? accessibility;
   //EXTRA ATTRIBUTES
   String? notes;
@@ -62,9 +62,13 @@ class Resource {
           ? LatLng(data?['coords'].latitude, data?['coords'].longitude)
           : null,
       website: data?['website'],
-      categories: data?['categories'],
+      categories: data?['categories'] is Iterable
+          ? List.from(data?['categories'])
+          : null,
       multilingual: data?['multilingual'],
-      eligibility: data?['eligibility'],
+      eligibility: data?['eligibility'] is Iterable
+          ? List.from(data?['eligibility'])
+          : null,
       accessibility: data?['accessibility'],
       notes: data?['notes'],
       isActive: data?['isActive'],
@@ -79,19 +83,35 @@ class Resource {
     );
   }
 
+  String serialize() {
+    return '''
+        "name": "$name",
+        "phoneNumbers": $phoneNumbers,
+        "email": "$email",
+        "address": "$address $zipCode",
+        "website": "$website",
+        "categories": $categories,
+        "multilingual": $multilingual,
+        "eligibility": $eligibility,
+        "accessibility": $accessibility,
+        "notes": "$notes",
+        "isActive": $isActive
+    ''';
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
-      if (name != null) "name": name?.toLowerCase(),
+      if (name != null) "name": name,
       if (phoneNumbers != null) "phoneNumbers": phoneNumbers,
       if (email != null) "email": email?.toLowerCase(),
-      if (address != null) "address": address?.toLowerCase(),
+      if (address != null) "address": address,
       if (zipCode != null) "zipCode": zipCode,
       if (coords != null)
         "coords": GeoPoint(coords!.latitude, coords!.longitude),
       if (website != null) "website": website?.toLowerCase(),
-      if (categories != null) "categories": categories,
+      if (categories != null) "categories": categories?.toSet().toList(),
       if (multilingual != null) "multilingual": multilingual,
-      if (eligibility != null) "eligibility": eligibility,
+      if (eligibility != null) "eligibility": eligibility?.toSet().toList(),
       if (accessibility != null) "accessibility": accessibility,
       if (notes != null) "notes": notes,
       if (isActive != null) "isActive": isActive,

@@ -123,7 +123,7 @@ class MapPageState extends State<MapPage> {
   String getCategories(Resource resource) {
     //String ret = "";
     if (resource.categories != null) {
-      return resource.categories!.keys.toString();
+      return resource.categories!.toString();
     } else {
       return "";
     }
