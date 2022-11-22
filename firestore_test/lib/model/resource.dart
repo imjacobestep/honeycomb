@@ -83,6 +83,22 @@ class Resource {
     );
   }
 
+  String serialize() {
+    return '''
+        "name": "$name",
+        "phoneNumbers": $phoneNumbers,
+        "email": "$email",
+        "address": "$address $zipCode",
+        "website": "$website",
+        "categories": $categories,
+        "multilingual": $multilingual,
+        "eligibility": $eligibility,
+        "accessibility": $accessibility,
+        "notes": "$notes",
+        "isActive": $isActive
+    ''';
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       if (name != null) "name": name,

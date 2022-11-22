@@ -75,6 +75,10 @@ class Proxy {
     // [END add_data_custom_objects]
   }
 
+  String serialize(List<Resource> resources) {
+    return resources.map((e) => e.serialize()).join('\n');
+  }
+
   Future<Iterable<dynamic>> filter(String collection, Map conditions) async {
     // [START add_data_custom_objects]
     var ref = _getRef(collection);
@@ -150,30 +154,6 @@ class Proxy {
       }
     }
   }
-
-  // Future<User> getUser(String id) async {
-  //   final ref = firestore.collection('users');
-  //   var rawUser = await ref.doc(id).get();
-  //   if (rawUser.exists) {
-  //     return User.fromFirestore(rawUser, null);
-  //   } else {
-  //     final user = User(id: id, favorites: [], clients: []);
-  //     final ref = firestore.collection('users');
-  //     await ref.doc(id).set(user.toFirestore());
-  //     return user;
-  //   }
-  // }
-
-  // Future<dynamic> getUser(String email) async {
-  //   final users = await filter('users', {'email': email});
-
-  //   if (users.isEmpty) {
-  //     final user = User(email: email, favorites: [], clients: []);
-  //     return await upsert(user);
-  //   } else {
-  //     return users.first;
-  //   }
-  // }
 
   Future<dynamic> getUser(String id) async {
     var users = await get('users', id);
