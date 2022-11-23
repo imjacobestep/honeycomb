@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, use_key_in_widget_constructors
+// ignore_for_file: must_be_immutable, use_key_in_widget_constructors, use_build_context_synchronously
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -107,15 +107,15 @@ class NewClientState extends State<NewClient> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Title"),
-            content: Text("content"),
+            title: const Text("Title"),
+            content: const Text("content"),
             actions: [
               TextButton(
-                child: Text("Cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {},
               ),
               TextButton(
-                child: Text("Delete"),
+                child: const Text("Delete"),
                 onPressed: () {},
               )
             ],
@@ -271,19 +271,20 @@ class NewClientState extends State<NewClient> {
 
   Widget confirmationPopup() {
     return AlertDialog(
-      title: Text("Are you sure you want to delete this client?"),
-      content: Text("You may have to contact your IT admin to restore it"),
+      title: const Text("Are you sure you want to delete this client?"),
+      content:
+          const Text("You may have to contact your IT admin to restore it"),
       actions: [
         ElevatedButton(
           //style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          child: Text("Cancel"),
+          child: const Text("Cancel"),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          child: Text("Delete"),
+          child: const Text("Delete"),
           onPressed: () {
             widget.delete = true;
             Navigator.of(context).pop();
@@ -306,7 +307,6 @@ class NewClientState extends State<NewClient> {
               });
           if (widget.delete) {
             widget.proxyModel.delFromList(widget.user, widget.client);
-            // ignore: use_build_context_synchronously
             Navigator.pushReplacement(
               context,
               FadeInRoute(

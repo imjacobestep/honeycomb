@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/model/client.dart';
 
-import '../pages/client_details.dart';
-
 Widget clientCard(
     BuildContext context, Client client, void Function() tapFunction) {
   return Card(

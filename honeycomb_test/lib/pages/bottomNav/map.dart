@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, use_key_in_widget_constructors
+// ignore_for_file: must_be_immutable, use_key_in_widget_constructors, use_build_context_synchronously
 
 import 'dart:async';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -24,7 +24,7 @@ class MapPage extends StatefulWidget {
   Location location = Location();
   Future<LocationData>? currentLocation;
   Future<Map<dynamic, dynamic>>? typedLocation;
-  bool? useCurrentLocation = true;
+  bool? useCurrentLocation;
   String? typedAddress;
   String typedZipCode = "";
   GoogleMapController? mapController;
@@ -33,7 +33,7 @@ class MapPage extends StatefulWidget {
     const Marker(markerId: MarkerId("test"), position: LatLng(0, 0))
   };
 
-  MapPage(this.useCurrentLocation, this.typedAddress);
+  MapPage(this.typedAddress);
 }
 
 class MapPageState extends State<MapPage> {
@@ -44,7 +44,7 @@ class MapPageState extends State<MapPage> {
     widget.currentLocation = widget.location.getLocation();
     widget.typedLocation =
         widget.geo.parseAddress(widget.typedAddress!, widget.typedZipCode);
-    //widget.useCurrentLocation = true;
+    widget.useCurrentLocation = true;
     clearMarkers();
     super.initState();
     setResourceIcon();
@@ -52,7 +52,6 @@ class MapPageState extends State<MapPage> {
 
   @override
   void dispose() {
-    //resetFilters();
     filters.forEach(
       (key, value) {
         value.forEach((key, value) {
@@ -60,9 +59,6 @@ class MapPageState extends State<MapPage> {
         });
       },
     );
-    /* if (widget.infoController != null) {
-      widget.infoController!.dispose();
-    } */
     if (widget.mapController != null) {
       widget.mapController!.dispose();
     }
@@ -316,9 +312,10 @@ class MapPageState extends State<MapPage> {
       }), */
       onMapCreated: (GoogleMapController controller) {
         //widget.infoController.googleMapController = controller;
-        setState(() {
+        widget.mapController = controller;
+        /* setState(() {
           widget.mapController = controller;
-        });
+        }); */
       },
     );
   }
@@ -337,8 +334,6 @@ class MapPageState extends State<MapPage> {
               target: location,
               zoom: 17.5,
             );
-            //buildList(resources);
-            //currentMarker(location);
             return getMap(cam, resources);
           } else {
             return LoadingIndicator(
@@ -352,12 +347,12 @@ class MapPageState extends State<MapPage> {
 
   Widget buildClientLocation(Iterable resources) {
     return FutureBuilder(
-        future: widget.typedLocation,
+        future:
+            widget.geo.parseAddress(widget.typedAddress!, widget.typedZipCode),
         builder: (BuildContext context, AsyncSnapshot loc) {
           CameraPosition cam;
           LatLng location;
           if (loc.hasData) {
-            //print(loc.data);
             if (loc.data!['lat'] != null && loc.data!['lng'] != null) {
               location = LatLng(loc.data!['lat']!, loc.data!['lng']!);
               cam = CameraPosition(
@@ -365,7 +360,6 @@ class MapPageState extends State<MapPage> {
                 zoom: 17.5,
               );
               currentMarker(location);
-              //buildList(resources);
               return getMap(cam, resources);
             } else {
               return const Center(
@@ -390,11 +384,10 @@ class MapPageState extends State<MapPage> {
           : widget.proxyModel.filter("resources", getFilterQuery()),
       builder: (BuildContext context, AsyncSnapshot<Iterable> resourceResults) {
         if (resourceResults.hasData && resourceResults.data != null) {
-          //buildList(resourceResults.data!);
-          if (widget.useCurrentLocation != null && widget.useCurrentLocation!) {
-            return buildCurrentLocation(resourceResults.data!);
-          } else {
+          if (widget.typedAddress != "") {
             return buildClientLocation(resourceResults.data!);
+          } else {
+            return buildCurrentLocation(resourceResults.data!);
           }
         } else {
           return noResources();
@@ -408,15 +401,21 @@ class MapPageState extends State<MapPage> {
       maxLines: 1,
       controller: widget.searchController,
       textAlignVertical: TextAlignVertical.center,
-      onSubmitted: (text) {
-        if (widget.searchController.text != "") {
-          setState(() {
-            //final split = widget.searchController.text.split(',');
+      onSubmitted: (text) async {
+        if (text != "") {
+          Map<dynamic, dynamic> coords =
+              await widget.geo.parseAddress(text, widget.typedZipCode);
+          if (coords["lat"] != null || coords["lng"] != null) {
+            widget.mapController!.animateCamera(CameraUpdate.newCameraPosition(
+                CameraPosition(
+                    target: LatLng(coords["lat"], coords["lng"]), zoom: 17.5)));
+            showToast("Moving to $text", context);
+          } else {
+            showToast("ERROR: invalid address", context);
 
-            widget.typedAddress = widget.searchController.text;
-            /* widget.typedZipCode = split[split.length - 1];
-            widget.typedLocation = widget.geo
-                .parseAddress(widget.searchController.text, ''); */
+            /* setState(() {
+            //widget.typedAddress = widget.searchController.text;
+            widget.typedAddress = text;
             widget.useCurrentLocation = false;
             widget.markers.clear();
           });
@@ -424,7 +423,8 @@ class MapPageState extends State<MapPage> {
           setState(() {
             widget.markers.clear();
             widget.useCurrentLocation = true;
-          });
+          }); */
+          }
         }
       },
       decoration: InputDecoration(
@@ -433,9 +433,17 @@ class MapPageState extends State<MapPage> {
         constraints: const BoxConstraints(maxHeight: 50),
         filled: true,
         hintText: "Search address...",
-        prefixIcon: const Icon(Icons.search_outlined),
+        prefixIcon: const Icon(
+          Icons.search_outlined,
+          color: Colors.black87,
+        ),
         fillColor: Theme.of(context).canvasColor,
-        border: const OutlineInputBorder(
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.black26),
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.black),
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
         suffixIcon: widget.searchController.text != ""
@@ -513,15 +521,6 @@ class MapPageState extends State<MapPage> {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: topHeader(),
-      /* body: Stack(children: [
-        buildMap(),
-        CustomInfoWindow(
-          controller: widget.infoController,
-          height: 100,
-          width: 260,
-          offset: 30,
-        ),
-      ]), */
       body: buildMap(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       floatingActionButton: Column(
@@ -532,9 +531,13 @@ class MapPageState extends State<MapPage> {
           ),
           ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  side: !ifAnyFilters()
-                      ? null
-                      : const BorderSide(color: Colors.black, width: 4)),
+                  backgroundColor:
+                      !ifAnyFilters() ? Colors.white : const Color(0xFFFFC700),
+                  side: const BorderSide(width: 2, color: Colors.black26)
+                  /* side: !ifAnyFilters()
+                        ? null
+                        : const BorderSide(color: Colors.black, width: 4) */
+                  ),
               onPressed: () async {
                 await filterSheet();
                 setState(() {

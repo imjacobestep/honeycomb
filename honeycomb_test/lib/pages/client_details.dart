@@ -154,9 +154,7 @@ class ClientDetailsState extends State<ClientDetails> {
 
                     return pw.ListView(children: data);
 
-                    return pw.Center(
-                      child: pw.Text(value),
-                    ); // Center
+// Center
                   }));
               final output = await getTemporaryDirectory();
               final file =

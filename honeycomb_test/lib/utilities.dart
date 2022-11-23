@@ -4,6 +4,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/resource.dart';
@@ -192,4 +193,11 @@ void resetFilters() {
   filters.forEach((key, value) {
     setFilter(key, false);
   });
+}
+
+void showToast(String message, BuildContext context) {
+  Fluttertoast.showToast(
+      msg: message,
+      backgroundColor: Theme.of(context).primaryColor,
+      textColor: Colors.black);
 }

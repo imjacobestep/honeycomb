@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           useMaterial3: true,
           primarySwatch: generateMaterialColor(color: const Color(0xFFFFC700)),
-          //primarySwatch: Colors.orange
           textTheme: const TextTheme(bodyLarge: TextStyle(fontSize: 17)),
           cardTheme: CardTheme(
             color: const Color(0xFFF6F6F6),
@@ -47,12 +46,8 @@ class MyApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(30))),
-            //backgroundColor: Color(0xFF2B2A2A),
             backgroundColor: Color(0xFF151515),
-            //backgroundColor: Colors.black,
             foregroundColor: Colors.white,
-            //backgroundColor: const Color(0x33FFC700),
-            //foregroundColor: Colors.black,
           ),
           canvasColor: Colors.white,
           elevatedButtonTheme: ElevatedButtonThemeData(
@@ -80,7 +75,7 @@ class MyApp extends StatelessWidget {
           return HomePage();
         },
         '/map': (context) {
-          return MapPage(true, "12280 NE District Wy, 98005");
+          return MapPage("");
           //return MapPage(useCurrentLocation: true, typedAddress: "");
         },
         '/list': (context) {

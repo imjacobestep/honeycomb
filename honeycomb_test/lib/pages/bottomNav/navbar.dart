@@ -73,7 +73,7 @@ Widget customNav(context, currentIndex) {
           context,
           FadeInRoute(
             routeName: "/map",
-            page: MapPage(true, "12280 NE District Wy, 98005"),
+            page: MapPage(""),
           ),
         );
         break;

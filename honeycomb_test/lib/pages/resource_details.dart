@@ -20,7 +20,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../model/resource.dart';
 import '../model/user.dart';
 import '../ui_components/resource_ui.dart';
-import 'package:intl/intl.dart';
 
 class ResourceDetails extends StatefulWidget {
   @override
@@ -710,7 +709,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
           context,
           FadeInRoute(
             routeName: "/map",
-            page: MapPage(false, widget.resource.address!),
+            page: MapPage(widget.resource.address!),
           ),
         );
       },
@@ -764,19 +763,12 @@ class ResourceDetailsState extends State<ResourceDetails> {
   }
 
   Widget getRecency() {
-    DateFormat formatter = DateFormat('MM-dd-yyyy');
-    String updatedTime = widget.resource.updatedStamp != null
-        ? formatter.format(widget.resource.updatedStamp!).toString()
-        : "unknown time";
     String updatedUser = widget.resource.updatedBy != null
         ? widget.resource.updatedBy!.toString()
         : "unknown user";
     int updatedDays =
         DateTime.now().difference(widget.resource.updatedStamp!).inDays;
 
-    String createdTime = widget.resource.createdStamp != null
-        ? formatter.format(widget.resource.createdStamp!).toString()
-        : "unknown time";
     String createdUser = widget.resource.createdBy != null
         ? widget.resource.createdBy!.toString()
         : "unknown user";
@@ -808,8 +800,6 @@ class ResourceDetailsState extends State<ResourceDetails> {
   }
 
   Widget resourceHeader() {
-    List<Widget> children = [];
-
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
