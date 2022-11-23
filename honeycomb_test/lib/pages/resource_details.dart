@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_haptic/haptic.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/pages/bottomNav/map.dart';
@@ -74,6 +76,10 @@ class ResourceDetailsState extends State<ResourceDetails> {
           return IconButton(
               onPressed: () async {
                 await widget.proxyModel.delFromList(client, widget.resource);
+                Haptic.onSelection();
+                Fluttertoast.showToast(
+                    msg:
+                        "${widget.resource.name} removed from ${client.alias}");
                 setSheetState(() {
                   widget.clientsList.clear();
                 });
@@ -87,6 +93,9 @@ class ResourceDetailsState extends State<ResourceDetails> {
                   widget.proxyModel.upsert(client);
                 }
                 await widget.proxyModel.addToList(client, widget.resource);
+                Haptic.onSelection();
+                Fluttertoast.showToast(
+                    msg: "${widget.resource.name} added to ${client.alias}");
                 setSheetState(() {
                   widget.clientsList.clear();
                   widget.sheetChildren = [];
@@ -249,26 +258,34 @@ class ResourceDetailsState extends State<ResourceDetails> {
     widget.resource.phoneNumbers!.forEach((key, value) {
       String contactName = key;
       String number = value;
-      children.add(Padding(
-        padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Text(
-                  "$contactName:",
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-                getSpacer(8),
-                Text(
-                  number,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                )
-              ],
-            ),
-            getAction("Phone Number", number)
-          ],
+      children.add(InkWell(
+        onLongPress: () async {
+          await Clipboard.setData(ClipboardData(text: value));
+          Haptic.onSuccess();
+          Fluttertoast.showToast(msg: "Phone number copied to clipboard");
+          // copied successfully
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "$contactName:",
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  getSpacer(8),
+                  Text(
+                    number,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  )
+                ],
+              ),
+              getAction("Phone Number", number)
+            ],
+          ),
         ),
       ));
     });
@@ -301,6 +318,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
               child: InkWell(
                 onLongPress: () async {
                   await Clipboard.setData(ClipboardData(text: value));
+                  Haptic.onSuccess();
+                  Fluttertoast.showToast(msg: "$label copied to clipboard");
                   // copied successfully
                 },
                 child: Text(
@@ -574,8 +593,12 @@ class ResourceDetailsState extends State<ResourceDetails> {
         onPressed: () {
           if (widget.resource.id != null) {
             if (value) {
+              Haptic.onSuccess();
+              Fluttertoast.showToast(msg: "Resource removed from favorites");
               widget.proxyModel.delFromList(user, widget.resource);
             } else {
+              Haptic.onSuccess();
+              Fluttertoast.showToast(msg: "Resource added to favorites");
               widget.proxyModel.addToList(user, widget.resource);
             }
           }

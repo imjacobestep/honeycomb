@@ -3,6 +3,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_haptic/haptic.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
@@ -246,8 +248,12 @@ class NewClientState extends State<NewClient> {
                 widget.client =
                     await widget.proxyModel.get('clients', newClient.id);
                 widget.proxyModel.addToList(widget.user, widget.client);
+                Haptic.onSuccess();
+                Fluttertoast.showToast(msg: "Client created");
               } else {
                 widget.proxyModel.upsert(widget.client);
+                Haptic.onSuccess();
+                Fluttertoast.showToast(msg: "Client updated");
               }
 
               Navigator.pop(context);

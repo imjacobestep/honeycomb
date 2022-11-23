@@ -51,15 +51,15 @@
 	<true/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-  		<string>sms</string>
-  		<string>tel</string>
+		<string>sms</string>
+		<string>tel</string>
 		<string>https</string>
 		<string>file</string>
 		<string>mailto</string>
 	</array>
 	<key>NSContactsUsageDescription</key>
-         <string>Exporting contact vCards</string>
+	<string>Exporting contact vCards</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-         <string>Using user location to find nearby resources in map view</string>
+	<string>Using user location to find nearby resources in map view</string>
 </dict>
 </plist>

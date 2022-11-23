@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/geo_helper.dart';
 import 'package:honeycomb_test/model/resource.dart';
@@ -597,6 +598,14 @@ class NewResourceState extends State<NewResource> {
           : (currentStep == 2)
               ? () async {
                   await writeResource();
+                  if (widget.resource!.id == null ||
+                      widget.resource!.id == "") {
+                    Haptic.onSuccess();
+                    Fluttertoast.showToast(msg: "Resource created");
+                  } else {
+                    Haptic.onSuccess();
+                    Fluttertoast.showToast(msg: "Resource Updated");
+                  }
                   widget.proxyModel.upsert(widget.resource);
                   Navigator.pop(context);
                 }

@@ -36,6 +36,8 @@ class ClientDetailsState extends State<ClientDetails> {
     super.initState();
   }
 
+  double quickActionSize = 70.0;
+
   Widget detailListing(String label, String value) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
@@ -66,64 +68,75 @@ class ClientDetailsState extends State<ClientDetails> {
     );
   }
 
+  Widget agencyButton(String value) {
+    return InkWell(
+      onTap: () {
+        launchUrl(Uri.parse(
+            "https://marysplace.agency-software.org/client_display.php?action=show&d=${widget.client.agencyId!}"));
+      },
+      child: SizedBox(
+        height: quickActionSize,
+        width: quickActionSize * 1.6,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              "lib/assets/agency_button.png",
+              width: 40,
+              height: 40,
+            ),
+            //getSpacer(4),
+            Text(
+              "Open Agency",
+              maxLines: 1,
+              style: Theme.of(context).textTheme.labelLarge,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget shareButton(String value) {
+    return InkWell(
+      onTap: () {
+        Share.share(value);
+        //launchUrl(Uri.parse(widget.resource.website!));
+      },
+      child: SizedBox(
+        height: quickActionSize,
+        width: quickActionSize * 1.6,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.ios_share_outlined,
+              size: 30,
+            ),
+            getSpacer(8),
+            Text(
+              "Share",
+              style: Theme.of(context).textTheme.labelLarge,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget printButton(List<Resource> resources) {
+    return Container();
+  }
+
   Widget getQuickAction(String label, String value) {
-    double size = 70.0;
     switch (label) {
       case "Open Agency":
         {
-          return InkWell(
-            onTap: () {
-              launchUrl(Uri.parse(
-                  "https://marysplace.agency-software.org/client_display.php?action=show&d=${widget.client.agencyId!}"));
-            },
-            child: SizedBox(
-              height: size,
-              width: size * 1.6,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    "lib/assets/agency_button.png",
-                    width: 40,
-                    height: 40,
-                  ),
-                  //getSpacer(4),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    style: Theme.of(context).textTheme.labelLarge,
-                  )
-                ],
-              ),
-            ),
-          );
+          return agencyButton(value);
         }
       case "Share":
         {
-          return InkWell(
-            onTap: () {
-              Share.share(value);
-              //launchUrl(Uri.parse(widget.resource.website!));
-            },
-            child: SizedBox(
-              height: size,
-              width: size * 1.6,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.ios_share_outlined,
-                    size: 30,
-                  ),
-                  getSpacer(8),
-                  Text(
-                    label,
-                    style: Theme.of(context).textTheme.labelLarge,
-                  )
-                ],
-              ),
-            ),
-          );
+          return shareButton(value);
         }
 
       case "Print":
@@ -135,22 +148,25 @@ class ClientDetailsState extends State<ClientDetails> {
               pdf.addPage(pw.Page(
                   pageFormat: PdfPageFormat.a4,
                   build: (pw.Context context) {
+                    pw.Text test = pw.Text(value);
+                    List<pw.Column> data = [];
+                    data.add(pw.Column(children: [pw.Text('stuff')]));
+
+                    return pw.ListView(children: data);
+
                     return pw.Center(
                       child: pw.Text(value),
                     ); // Center
                   }));
-              // On Flutter, use the [path_provider](https://pub.dev/packages/path_provider) library:
               final output = await getTemporaryDirectory();
-              //   final file = File("${output.path}/example.pdf");
               final file =
                   File("${output.path}/${widget.client.alias}_resources.pdf");
               await file.writeAsBytes(await pdf.save());
               Share.shareXFiles([XFile(file.path)]); // Page
-              //launchUrl(Uri.parse(widget.resource.website!));
             },
             child: SizedBox(
-              height: size,
-              width: size * 1.6,
+              height: quickActionSize,
+              width: quickActionSize * 1.6,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
