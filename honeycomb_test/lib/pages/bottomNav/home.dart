@@ -87,6 +87,7 @@ class HomePageState extends State<HomePage> {
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           Iterable clients = snapshot.data!;
+          clients = widget.proxyModel.sort(clients, "updatedStamp", false);
           if (clients.isEmpty) {
             return (const Center(
               child: Text("No Clients Found"),
@@ -355,6 +356,8 @@ class HomePageState extends State<HomePage> {
                 flex: 1,
                 child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                            color: Colors.black.withAlpha(30), width: 2),
                         foregroundColor: Colors.black,
                         alignment: Alignment.center),
                     onPressed: () async {
