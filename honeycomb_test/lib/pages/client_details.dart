@@ -27,6 +27,7 @@ class ClientDetails extends StatefulWidget {
   ClientDetailsState createState() => ClientDetailsState();
   Proxy proxyModel = Proxy();
   Client client;
+  List<dynamic> resources = [];
   ClientDetails({required this.client});
 }
 
@@ -128,6 +129,104 @@ class ClientDetailsState extends State<ClientDetails> {
     return Container();
   }
 
+  Future<void> printToPDF(List<dynamic> resources) async {
+    pw.TextStyle nameStyle =
+        pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold);
+    pw.TextStyle labelStyle =
+        pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.normal);
+    pw.TextStyle bodyStyle =
+        pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal);
+    pw.TextStyle headerStyle =
+        pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal);
+
+    final pdf = pw.Document();
+
+    pdf.addPage(pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          List<pw.Widget> data = [
+            pw.Text("Here are some resources we thought you might find useful!",
+                style: headerStyle)
+          ];
+
+          for (Resource resource in resources) {
+            data.addAll(
+                [pw.SizedBox(height: 2), pw.Text(" "), pw.SizedBox(height: 2)]);
+            List<pw.Widget> children = [];
+            //HEADER
+            children.add(pw.Text(resource.name!, style: nameStyle));
+            //CATEGORIES
+            if (resource.categories != null) {
+              children.add(pw.Text("services offered:", style: labelStyle));
+              children.add(pw.Wrap(spacing: 4, children: [
+                for (var text in resource.categories!)
+                  pw.Text("$text,", style: bodyStyle)
+              ]));
+            }
+            //PHONE////////////////////
+            if (resource.phoneNumbers != null) {
+              children.add(pw.Text("phone numbers:", style: labelStyle));
+              children.add(pw.Column(children: [
+                for (String key in resource.phoneNumbers!.keys)
+                  pw.Text("${key}: ${resource.phoneNumbers![key]}",
+                      style: bodyStyle)
+              ]));
+            }
+            //EMAIL
+            if (resource.email != null) {
+              children.add(pw.Text("email:", style: labelStyle));
+              children.add(pw.Text(resource.email!, style: bodyStyle));
+            }
+            //ADDRESS
+            if (resource.address != null) {
+              children.add(pw.Text("address:", style: labelStyle));
+              children.add(pw.Text(resource.address!, style: bodyStyle));
+            }
+            //WEBSITE
+            if (resource.website != null) {
+              children.add(pw.Text("website:", style: labelStyle));
+              children.add(pw.Text(resource.website!, style: bodyStyle));
+            }
+            //NOTES
+            if (resource.notes != null) {
+              children.add(pw.Text("notes:", style: labelStyle));
+              children.add(pw.Text(resource.notes!, style: bodyStyle));
+            }
+            //ELIGIBILITY
+            if (resource.eligibility != null) {
+              children.add(pw.Wrap(spacing: 8, children: [
+                for (var text in resource.eligibility!)
+                  pw.Text("$text,", style: bodyStyle)
+              ]));
+            }
+            if (resource.multilingual != null ||
+                resource.accessibility != null) {
+              children.add(pw.Text("misc:", style: labelStyle));
+            }
+            if (resource.multilingual != null) {
+              children.add(pw.Text(
+                  "This resource is${resource.multilingual! ? " " : " not "}multilingual",
+                  style: bodyStyle));
+            }
+            if (resource.accessibility != null) {
+              children.add(pw.Text(
+                  "This resource is${resource.accessibility! ? " " : " not "}wheelchair accessible",
+                  style: bodyStyle));
+            }
+
+            data.add(pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: children));
+          }
+          return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start, children: data);
+        }));
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/${widget.client.alias}_resources.pdf");
+    await file.writeAsBytes(await pdf.save());
+    Share.shareXFiles([XFile(file.path)]); // P
+  }
+
   Widget getQuickAction(String label, String value) {
     switch (label) {
       case "Open Agency":
@@ -143,24 +242,7 @@ class ClientDetailsState extends State<ClientDetails> {
         {
           return InkWell(
             onTap: () async {
-              final pdf = pw.Document();
-
-              pdf.addPage(pw.Page(
-                  pageFormat: PdfPageFormat.a4,
-                  build: (pw.Context context) {
-                    pw.Text test = pw.Text(value);
-                    List<pw.Column> data = [];
-                    data.add(pw.Column(children: [pw.Text('stuff')]));
-
-                    return pw.ListView(children: data);
-
-// Center
-                  }));
-              final output = await getTemporaryDirectory();
-              final file =
-                  File("${output.path}/${widget.client.alias}_resources.pdf");
-              await file.writeAsBytes(await pdf.save());
-              Share.shareXFiles([XFile(file.path)]); // Page
+              printToPDF(widget.resources);
             },
             child: SizedBox(
               height: quickActionSize,
@@ -259,6 +341,7 @@ class ClientDetailsState extends State<ClientDetails> {
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           if (snapshot.data != null && snapshot.data.isNotEmpty) {
+            widget.resources = snapshot.data;
             if (elementContext == "resourceList") {
               return resourcesList(snapshot.data);
             } else if (elementContext == "shareButton") {

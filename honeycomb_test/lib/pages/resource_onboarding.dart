@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/geo_helper.dart';
 import 'package:honeycomb_test/model/resource.dart';
@@ -478,6 +477,7 @@ class NewResourceState extends State<NewResource> {
           getSpacer(listSpacing),
           getLabel("Notes", false),
           TextField(
+            maxLines: null,
             controller: widget.notesController,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
@@ -601,10 +601,10 @@ class NewResourceState extends State<NewResource> {
                   if (widget.resource!.id == null ||
                       widget.resource!.id == "") {
                     Haptic.onSuccess();
-                    Fluttertoast.showToast(msg: "Resource created");
+                    showToast("Resource created", Colors.black);
                   } else {
                     Haptic.onSuccess();
-                    Fluttertoast.showToast(msg: "Resource Updated");
+                    showToast("Resource updated", Colors.black);
                   }
                   widget.proxyModel.upsert(widget.resource);
                   Navigator.pop(context);

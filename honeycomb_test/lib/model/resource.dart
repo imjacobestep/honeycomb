@@ -85,17 +85,17 @@ class Resource {
 
   String serialize() {
     return '''
-        "name": "$name",
-        "phoneNumbers": $phoneNumbers,
-        "email": "$email",
-        "address": "$address $zipCode",
-        "website": "$website",
-        "categories": $categories,
-        "multilingual": $multilingual,
-        "eligibility": $eligibility,
-        "accessibility": $accessibility,
-        "notes": "$notes",
-        "isActive": $isActive
+        Resource Name: $name,
+        Phone Numbers: $phoneNumbers,
+        Email: $email,
+        Address: $address $zipCode,
+        Website: $website,
+        Resource Categories: $categories,
+        Multilingual: $multilingual,
+        Eligibility: $eligibility,
+        Accessibility: $accessibility,
+        Notes: $notes,
+        Active: ${isActive ?? true}
     ''';
   }
 

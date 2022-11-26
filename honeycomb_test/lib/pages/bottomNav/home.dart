@@ -2,9 +2,11 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/client_details.dart';
+import 'package:honeycomb_test/pages/client_onboarding.dart';
 import 'package:honeycomb_test/ui_components/clients_ui.dart';
 import '../../proxy.dart';
 import '../../utilities.dart';
@@ -29,6 +31,16 @@ class HomePageState extends State<HomePage> {
   void initState() {
     resetFilters();
     super.initState();
+  }
+
+  Widget sectionHeader(String header, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 8, 0, 0),
+      child: Text(
+        header,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+    );
   }
 
   Widget filterCard(IconData icon, String label) {
@@ -94,9 +106,7 @@ class HomePageState extends State<HomePage> {
             },
           );
         } else {
-          return const Center(
-            child: Text("Error"),
-          );
+          return getLoader();
         }
       },
     );
@@ -138,10 +148,6 @@ class HomePageState extends State<HomePage> {
         }
       },
     );
-  }
-
-  Widget listsBuilder() {
-    return Container();
   }
 
   PreferredSizeWidget topHeader() {
@@ -205,19 +211,45 @@ class HomePageState extends State<HomePage> {
             childAspectRatio: 3.5,
             children: [
               filterCard(Icons.home_work_outlined, "Shelter"),
-              filterCard(Icons.sports_kabaddi_outlined, "Domestic Violence"),
-              filterCard(Icons.psychology_outlined, "Mental Health"),
+              filterCard(Icons.house_outlined, "Housing"),
               filterCard(Icons.food_bank_outlined, "Food"),
               filterCard(Icons.medical_services_outlined, "Medical"),
-              filterCard(Icons.gavel_outlined, "Legal"),
+              filterCard(Icons.psychology_outlined, "Mental Health"),
+              filterCard(Icons.sports_kabaddi_outlined, "DV"),
             ],
           ),
           getDivider(context),
-          sectionHeader("Recent Clients", context),
-          listsBuilder(),
-          getDivider(context),
-          sectionHeader("Favorites", context),
-          listsBuilder(),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                sectionHeader("Recent Clients", context),
+                ElevatedButton(
+                    onPressed: () async {
+                      Client newClient =
+                          Client(createdStamp: DateTime.now(), resources: []);
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  NewClient(client: newClient)));
+                      setState(() {});
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text("Add"),
+                        getSpacer(8),
+                        const Icon(Icons.add_circle),
+                      ],
+                    ))
+              ],
+            ),
+          ),
+          userBuilder("clients"),
         ],
       ),
       bottomNavigationBar: customNav(context, 0),

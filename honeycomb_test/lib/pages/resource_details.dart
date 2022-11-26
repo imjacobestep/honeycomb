@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, must_be_immutable, depend_on_referenced_packages
+// ignore_for_file: use_key_in_widget_constructors, must_be_immutable, depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,7 +6,6 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_haptic/haptic.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/pages/bottomNav/map.dart';
@@ -16,6 +15,7 @@ import 'package:honeycomb_test/ui_components/animated_navigator.dart';
 import 'package:honeycomb_test/utilities.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../model/resource.dart';
 import '../model/user.dart';
@@ -76,9 +76,9 @@ class ResourceDetailsState extends State<ResourceDetails> {
               onPressed: () async {
                 await widget.proxyModel.delFromList(client, widget.resource);
                 Haptic.onSelection();
-                Fluttertoast.showToast(
-                    msg:
-                        "${widget.resource.name} removed from ${client.alias}");
+                showToast(
+                    "${widget.resource.name} removed from ${client.alias}",
+                    Theme.of(context).primaryColor);
                 setSheetState(() {
                   widget.clientsList.clear();
                 });
@@ -93,8 +93,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
                 }
                 await widget.proxyModel.addToList(client, widget.resource);
                 Haptic.onSelection();
-                Fluttertoast.showToast(
-                    msg: "${widget.resource.name} added to ${client.alias}");
+                showToast("${widget.resource.name} added to ${client.alias}",
+                    Theme.of(context).primaryColor);
                 setSheetState(() {
                   widget.clientsList.clear();
                   widget.sheetChildren = [];
@@ -261,7 +261,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
         onLongPress: () async {
           await Clipboard.setData(ClipboardData(text: value));
           Haptic.onSuccess();
-          Fluttertoast.showToast(msg: "Phone number copied to clipboard");
+          showToast("Phone number copied to clipboard",
+              Theme.of(context).primaryColor);
           // copied successfully
         },
         child: Padding(
@@ -311,14 +312,13 @@ class ResourceDetailsState extends State<ResourceDetails> {
             ),
             getSpacer(4),
             Container(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width - 50),
               padding: const EdgeInsets.only(left: 8),
               child: InkWell(
                 onLongPress: () async {
                   await Clipboard.setData(ClipboardData(text: value));
                   Haptic.onSuccess();
-                  Fluttertoast.showToast(msg: "$label copied to clipboard");
+                  showToast("$label copied to clipboard",
+                      Theme.of(context).primaryColor);
                   // copied successfully
                 },
                 child: Text(
@@ -338,12 +338,9 @@ class ResourceDetailsState extends State<ResourceDetails> {
     if (isAction(label)) {
       children.add(Expanded(flex: 1, child: getAction(label, value)));
     }
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: children,
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: children,
     );
   }
 
@@ -563,6 +560,23 @@ class ResourceDetailsState extends State<ResourceDetails> {
     return false;
   }
 
+  Widget shareButton() {
+    return ElevatedButton(
+        onPressed: () async {
+          Share.share(widget.resource.serialize());
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text("Share"),
+            getSpacer(8),
+            const Icon(Icons.ios_share_outlined),
+          ],
+        ));
+  }
+
   Widget editButton() {
     return ElevatedButton(
         onPressed: () async {
@@ -593,11 +607,13 @@ class ResourceDetailsState extends State<ResourceDetails> {
           if (widget.resource.id != null) {
             if (value) {
               Haptic.onSuccess();
-              Fluttertoast.showToast(msg: "Resource removed from favorites");
+              showToast("Resource removed from favorites",
+                  Theme.of(context).primaryColor);
               widget.proxyModel.delFromList(user, widget.resource);
             } else {
               Haptic.onSuccess();
-              Fluttertoast.showToast(msg: "Resource added to favorites");
+              showToast("Resource added to favorites",
+                  Theme.of(context).primaryColor);
               widget.proxyModel.addToList(user, widget.resource);
             }
           }
@@ -673,6 +689,10 @@ class ResourceDetailsState extends State<ResourceDetails> {
     return AppBar(
       leading: BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
       actions: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: shareButton(),
+        ),
         Padding(
           padding: const EdgeInsets.all(8),
           child: editButton(),
@@ -780,21 +800,18 @@ class ResourceDetailsState extends State<ResourceDetails> {
       return ret;
     }
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          children: [
-            Text(
-              "updated $updatedDays day${plural(updatedDays)} ago by $updatedUser",
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
-            getSpacer(2),
-            Text(
-              "created $createdDays day${plural(createdDays)} ago by $createdUser",
-              style: Theme.of(context).textTheme.labelMedium,
-            )
-          ],
+        Text(
+          "updated $updatedDays day${plural(updatedDays)} ago by $updatedUser",
+          style: Theme.of(context).textTheme.labelMedium,
         ),
+        getSpacer(2),
+        Text(
+          "created $createdDays day${plural(createdDays)} ago by $createdUser",
+          style: Theme.of(context).textTheme.labelMedium,
+        )
       ],
     );
   }
@@ -830,8 +847,6 @@ class ResourceDetailsState extends State<ResourceDetails> {
       children.add(tagsBuilder(widget.resource.categories!, context));
     }
     children.add(getDivider(context));
-    children.add(getRecency());
-    children.add(getDivider(context));
     //QUICK ACTIONS
     children.add(Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -839,6 +854,8 @@ class ResourceDetailsState extends State<ResourceDetails> {
       children: quickActionsBuilder(),
     ));
     //NOTES
+    children.add(getDivider(context));
+    children.add(getRecency());
     children.add(getDivider(context));
     if (widget.resource.notes != null) {
       children.add(detailItem("Notes", widget.resource.notes!));

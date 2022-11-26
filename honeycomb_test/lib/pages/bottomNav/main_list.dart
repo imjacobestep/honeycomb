@@ -304,7 +304,9 @@ class ResourcesPageState extends State<ResourcesPage> {
         return RefreshIndicator(
           onRefresh: () async {
             await Future.delayed(const Duration(seconds: 1));
-            setState(() {});
+            setState(() {
+              widget.resourceList = widget.proxyModel.list("resources");
+            });
           },
           child: ListView(
             padding: const EdgeInsets.fromLTRB(4, 4, 4, 120),

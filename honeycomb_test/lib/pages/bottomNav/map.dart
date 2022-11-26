@@ -409,9 +409,9 @@ class MapPageState extends State<MapPage> {
             widget.mapController!.animateCamera(CameraUpdate.newCameraPosition(
                 CameraPosition(
                     target: LatLng(coords["lat"], coords["lng"]), zoom: 17.5)));
-            showToast("Moving to $text", context);
+            showToast("Moving to $text", Theme.of(context).primaryColor);
           } else {
-            showToast("ERROR: invalid address", context);
+            showToast("ERROR: invalid address", Theme.of(context).primaryColor);
 
             /* setState(() {
             //widget.typedAddress = widget.searchController.text;

@@ -40,23 +40,14 @@ void serviceToContact(Resource resource, int index) async {
   await Share.shareXFiles([XFile(file.path)]);
 }
 
-Widget sectionHeader(String header, BuildContext context) {
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(8.0, 8, 0, 0),
-    child: Text(
-      header,
-      style: Theme.of(context).textTheme.titleMedium,
-    ),
-  );
-}
-
 Widget getDivider(BuildContext context) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
       getSpacer(8),
-      const Divider(
-        height: 4,
+      Divider(
+        color: Colors.black.withAlpha(10),
+        height: 8,
         thickness: 2,
         indent: 8,
         endIndent: 8,
@@ -195,9 +186,9 @@ void resetFilters() {
   });
 }
 
-void showToast(String message, BuildContext context) {
+void showToast(String message, Color background) {
   Fluttertoast.showToast(
       msg: message,
-      backgroundColor: Theme.of(context).primaryColor,
-      textColor: Colors.black);
+      backgroundColor: background,
+      textColor: background == Colors.black ? Colors.white : Colors.black);
 }

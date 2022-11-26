@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_haptic/haptic.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:honeycomb_test/model/client.dart';
 import 'package:honeycomb_test/model/user.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
@@ -179,6 +178,7 @@ class NewClientState extends State<NewClient> {
         getSpacer(listSpacing),
         getLabel("Notes", false),
         TextField(
+          maxLines: null,
           controller: widget.notesController,
           keyboardType: TextInputType.name,
           autofocus: true,
@@ -249,11 +249,11 @@ class NewClientState extends State<NewClient> {
                     await widget.proxyModel.get('clients', newClient.id);
                 widget.proxyModel.addToList(widget.user, widget.client);
                 Haptic.onSuccess();
-                Fluttertoast.showToast(msg: "Client created");
+                showToast("Client created", Colors.black);
               } else {
                 widget.proxyModel.upsert(widget.client);
                 Haptic.onSuccess();
-                Fluttertoast.showToast(msg: "Client updated");
+                showToast("Client updated", Colors.black);
               }
 
               Navigator.pop(context);
@@ -306,6 +306,8 @@ class NewClientState extends State<NewClient> {
                 return confirmationPopup();
               });
           if (widget.delete) {
+            Haptic.onSuccess();
+            showToast("Client deleted", Colors.black);
             widget.proxyModel.delFromList(widget.user, widget.client);
             Navigator.pushReplacement(
               context,
