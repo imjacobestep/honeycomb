@@ -93,7 +93,7 @@ class HomePageState extends State<HomePage> {
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.all(8),
             shrinkWrap: true,
-            itemCount: clients.length,
+            itemCount: 3,
             itemBuilder: (BuildContext context, int index) {
               return clientCard(context, clients.elementAt(index), () {
                 Navigator.push(
