@@ -46,7 +46,7 @@ class Client {
 
   Map<String, dynamic> toFirestore() {
     return {
-      if (alias != null) "alias": alias?.toLowerCase(),
+      if (alias != null) "alias": alias,
       if (agencyId != null) "agencyId": agencyId?.toLowerCase(),
       if (familySize != null) "size": familySize,
       if (resources != null) "resources": resources?.toSet().toList(),

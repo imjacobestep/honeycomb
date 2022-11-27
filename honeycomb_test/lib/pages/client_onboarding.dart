@@ -180,7 +180,7 @@ class NewClientState extends State<NewClient> {
         TextField(
           maxLines: null,
           controller: widget.notesController,
-          keyboardType: TextInputType.name,
+          keyboardType: TextInputType.multiline,
           autofocus: true,
           decoration: const InputDecoration(
             contentPadding: EdgeInsets.all(8),
@@ -191,7 +191,7 @@ class NewClientState extends State<NewClient> {
             ),
           ),
         ),
-        getSpacer(listSpacing),
+        getSpacer(48),
       ],
     );
   }

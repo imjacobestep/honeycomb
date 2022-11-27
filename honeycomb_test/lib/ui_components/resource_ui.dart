@@ -29,7 +29,7 @@ Widget showRecency(BuildContext context, Resource resource) {
 
 Widget cardCategoryLabel(BuildContext context, String category) {
   return Container(
-    margin: const EdgeInsets.all(2),
+    //margin: const EdgeInsets.all(2),
     child: Chip(
       labelPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
       labelStyle: Theme.of(context).textTheme.labelSmall,
@@ -75,7 +75,7 @@ Widget resourceWindow(BuildContext context, Resource resource) {
     child: Column(
       children: [
         Container(
-          padding: EdgeInsetsDirectional.all(8),
+          padding: const EdgeInsetsDirectional.all(8),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Theme.of(context).cardColor,
@@ -132,18 +132,24 @@ Widget resourceCard(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  resource.name!,
-                  style: const TextStyle(fontSize: 20),
-                ),
-                //getSpacer(2),
-                Wrap(children: categories),
-              ],
+            Expanded(
+              flex: 11,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    resource.name!,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  //getSpacer(2),
+                  Wrap(
+                    children: categories,
+                    spacing: 2,
+                  ),
+                ],
+              ),
             ),
-            Icon(Icons.chevron_right_sharp)
+            const Expanded(flex: 1, child: Icon(Icons.chevron_right_sharp))
           ],
         ),
       ),

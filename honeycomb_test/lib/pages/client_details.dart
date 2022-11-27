@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_haptic/haptic.dart';
 import 'package:honeycomb_test/model/resource.dart';
 import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/client_onboarding.dart';
@@ -40,32 +42,44 @@ class ClientDetailsState extends State<ClientDetails> {
   double quickActionSize = 70.0;
 
   Widget detailListing(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.bodyText2,
+    List<Widget> children = [
+      Expanded(
+        flex: 9,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            getSpacer(4),
+            Container(
+              padding: const EdgeInsets.only(left: 8),
+              child: InkWell(
+                onLongPress: () async {
+                  await Clipboard.setData(ClipboardData(text: value));
+                  Haptic.onSuccess();
+                  showToast("$label copied to clipboard",
+                      Theme.of(context).primaryColor);
+                  // copied successfully
+                },
+                child: Text(
+                  value,
+                  maxLines: 10,
+                  //softWrap: true,
+                  textWidthBasis: TextWidthBasis.parent,
+                  //overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
-              getSpacer(4),
-              Row(
-                children: [
-                  getSpacer(8),
-                  Text(
-                    value,
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                ],
-              )
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      )
+    ];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: children,
     );
   }
 
@@ -362,8 +376,60 @@ class ClientDetailsState extends State<ClientDetails> {
               return getQuickAction("Print", toShare);
             }
           } else {
-            return helperText("This Client has no resources",
-                "Try adding some from the List page", context, true);
+            if (elementContext == "resourceList") {
+              return helperText("This Client has no resources",
+                  "Try adding some from the List page", context, true);
+            } else if (elementContext == "shareButton") {
+              return SizedBox(
+                height: quickActionSize,
+                width: quickActionSize * 1.6,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.ios_share_outlined,
+                      color: Colors.black26,
+                      size: 30,
+                    ),
+                    getSpacer(8),
+                    Text(
+                      "Share",
+                      style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelLarge!.fontSize,
+                          fontStyle:
+                              Theme.of(context).textTheme.labelLarge!.fontStyle,
+                          color: Colors.black26),
+                    )
+                  ],
+                ),
+              );
+            } else {
+              return SizedBox(
+                height: quickActionSize,
+                width: quickActionSize * 1.6,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.print_disabled_outlined,
+                      color: Colors.black26,
+                      size: 30,
+                    ),
+                    getSpacer(8),
+                    Text(
+                      "Print",
+                      style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelLarge!.fontSize,
+                          fontStyle:
+                              Theme.of(context).textTheme.labelLarge!.fontStyle,
+                          color: Colors.black26),
+                    )
+                  ],
+                ),
+              );
+            }
           }
         } else {
           return const LoadingIndicator(size: 50, borderWidth: 4);

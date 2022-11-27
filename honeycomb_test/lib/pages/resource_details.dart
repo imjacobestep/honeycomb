@@ -78,7 +78,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                 Haptic.onSelection();
                 showToast(
                     "${widget.resource.name} removed from ${client.alias}",
-                    Theme.of(context).primaryColor);
+                    Colors.black);
                 setSheetState(() {
                   widget.clientsList.clear();
                 });
@@ -94,7 +94,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                 await widget.proxyModel.addToList(client, widget.resource);
                 Haptic.onSelection();
                 showToast("${widget.resource.name} added to ${client.alias}",
-                    Theme.of(context).primaryColor);
+                    Colors.black);
                 setSheetState(() {
                   widget.clientsList.clear();
                   widget.sheetChildren = [];
@@ -619,14 +619,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
           }
           setState(() {});
         },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            favStar,
-          ],
-        ));
+        child: favStar);
   }
 
   Widget userBuilder(String elementContext) {
@@ -821,16 +814,19 @@ class ResourceDetailsState extends State<ResourceDetails> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.resource.name!,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ],
+        Expanded(
+          flex: 5,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.resource.name!,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ],
+          ),
         ),
-        userBuilder("fav button"),
+        Expanded(flex: 1, child: userBuilder("fav button")),
       ],
     );
   }

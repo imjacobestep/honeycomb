@@ -78,9 +78,8 @@ class NewResourceState extends State<NewResource> {
     if (widget.resource!.website != null) {
       widget.webController.text = widget.resource!.website!;
     }
-    if (widget.resource!.address != null && widget.resource!.zipCode != null) {
-      widget.addressController.text =
-          "${widget.resource!.address!} ${widget.resource!.zipCode!}";
+    if (widget.resource!.address != null) {
+      widget.addressController.text = widget.resource!.address!;
     }
     if (widget.resource!.notes != null) {
       widget.notesController.text = widget.resource!.notes!;
