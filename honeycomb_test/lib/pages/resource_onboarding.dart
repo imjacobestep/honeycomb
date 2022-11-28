@@ -142,11 +142,10 @@ class NewResourceState extends State<NewResource> {
     }
   }
 
-  Widget validationPopup() {
+  Widget validationPopup(String error, String suggestion) {
     return AlertDialog(
-      title: const Text("Invalid Address"),
-      content: const Text(
-          "This address didn't work. You might need to add information or change the formatting."),
+      title: Text(error),
+      content: Text(suggestion),
       actions: [
         ElevatedButton(
           //style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -630,9 +629,14 @@ class NewResourceState extends State<NewResource> {
                   bool validated =
                       await checkAddress(widget.addressController.text);
 
-                  if (validated ||
-                      (widget.addressController.text == null ||
-                          widget.addressController.text == "")) {
+                  bool addressValidated =
+                      (validated || (widget.addressController.text == ""));
+
+                  bool emailValid =
+                      (widget.emailController.text.contains("@") ||
+                          (widget.emailController.text == ""));
+
+                  if (addressValidated && emailValid) {
                     await writeResource();
                     if (widget.resource!.id == null ||
                         widget.resource!.id == "") {
@@ -645,11 +649,21 @@ class NewResourceState extends State<NewResource> {
                     widget.proxyModel.upsert(widget.resource);
                     Navigator.pop(context);
                   } else {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return validationPopup();
-                        });
+                    if (!addressValidated) {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return validationPopup("Invalid Address",
+                                "This address isn't valid. You might need to add information or change the formatting.");
+                          });
+                    } else {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return validationPopup("Invalid Email Address",
+                                "This email isn't valid. You might be missing an '@' symbol.");
+                          });
+                    }
                   }
                 }
               : details.onStepContinue,
