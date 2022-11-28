@@ -16,8 +16,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class MapPage extends StatefulWidget {
   @override
   MapPageState createState() => MapPageState();
-  BitmapDescriptor resourceIcon =
-      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+  BitmapDescriptor? resourceIcon;
   Proxy proxyModel = Proxy();
   GeoHelper geo = GeoHelper();
   Future<Iterable>? resourceList;
@@ -40,6 +39,7 @@ class MapPageState extends State<MapPage> {
   @override
   void initState() {
     resetFilters();
+    setResourceIcon();
     widget.resourceList = widget.proxyModel.list("resources");
     widget.currentLocation = widget.location.getLocation();
     widget.typedLocation =
@@ -47,7 +47,6 @@ class MapPageState extends State<MapPage> {
     widget.useCurrentLocation = true;
     clearMarkers();
     super.initState();
-    setResourceIcon();
   }
 
   @override
@@ -113,7 +112,7 @@ class MapPageState extends State<MapPage> {
                         )));
           },
         ),
-        icon: widget.resourceIcon));
+        icon: widget.resourceIcon!));
   }
 
   String getCategories(Resource resource) {
@@ -465,6 +464,26 @@ class MapPageState extends State<MapPage> {
     );
   }
 
+  Widget getBody() {
+    return FutureBuilder(
+      future: BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(devicePixelRatio: 2.5),
+          'assets/map_pins/resource_pin.bmp'),
+      builder:
+          (BuildContext context, AsyncSnapshot<BitmapDescriptor> mapPinIcon) {
+        if (mapPinIcon.hasData) {
+          if (mapPinIcon.data != null) {
+            print("got pin");
+            widget.resourceIcon = mapPinIcon.data!;
+          }
+          return buildMap();
+        } else {
+          return getLoader();
+        }
+      },
+    );
+  }
+
   Widget headerButton() {
     return ElevatedButton(
         onPressed: () {
@@ -521,7 +540,7 @@ class MapPageState extends State<MapPage> {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: topHeader(),
-      body: buildMap(),
+      body: getBody(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,

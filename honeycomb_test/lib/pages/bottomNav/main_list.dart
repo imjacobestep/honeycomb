@@ -384,7 +384,9 @@ class ResourcesPageState extends State<ResourcesPage> {
               context,
               MaterialPageRoute(
                   builder: (context) => NewResource(resource: res)));
-          setState(() {});
+          setState(() {
+            widget.resourceList = widget.proxyModel.list("resources");
+          });
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

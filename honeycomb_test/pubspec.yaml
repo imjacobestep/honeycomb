@@ -83,7 +83,7 @@ flutter:
   #   - assets/map_pins/
     - lib/assets/icon/icon.png
     - lib/assets/agency_button.png
-    - lib/assets/map_pins/
+    - lib/assets/map_pins/resource_pin.bmp
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
