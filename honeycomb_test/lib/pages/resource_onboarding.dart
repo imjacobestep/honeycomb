@@ -17,19 +17,17 @@ class NewResource extends StatefulWidget {
   String userID = FirebaseAuth.instance.currentUser!.uid;
   GeoHelper geo = GeoHelper();
   Resource? resource;
-  //TextEditingController
   TextEditingController nameController = TextEditingController();
   Map<TextEditingController, TextEditingController> phoneController = {};
   TextEditingController emailController = TextEditingController();
   TextEditingController webController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController notesController = TextEditingController();
-  //Map<dynamic, dynamic> categoriesController = {};
-  //Map<dynamic, dynamic> eligibilityController = {};
   List<String> categoriesController = [];
   List<String> eligibilityController = [];
   bool multilingualController = false;
   bool accessibleController = false;
+  bool addressValid = false;
 
   NewResource({required this.resource});
 }
@@ -114,7 +112,8 @@ class NewResourceState extends State<NewResource> {
       widget.resource!.website = widget.webController.text;
     }
     if (widget.addressController.text != "") {
-      widget.resource!.address = widget.addressController.text;
+      widget.resource!.address =
+          widget.addressController.text.replaceAll("#", "Apt ");
       Map<dynamic, dynamic> coords =
           await GeoHelper().parseAddress(widget.resource!.address!, '');
       widget.resource!.coords = LatLng(coords['lat'], coords['lng']);
@@ -141,6 +140,23 @@ class NewResourceState extends State<NewResource> {
         widget.resource!.updatedBy = FirebaseAuth.instance.currentUser!.email!;
       }
     }
+  }
+
+  Widget validationPopup() {
+    return AlertDialog(
+      title: const Text("Invalid Address"),
+      content: const Text(
+          "This address didn't work. You might need to add information or change the formatting."),
+      actions: [
+        ElevatedButton(
+          //style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          child: const Text("Ok"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
   }
 
   Widget getLabel(String label, bool required) {
@@ -471,7 +487,7 @@ class NewResourceState extends State<NewResource> {
             ),
           ),
           getSpacer(listSpacing),
-          getLabel("Address with Zip Code", false),
+          getLabel("Street Address", false),
           addressBuilder(),
           getSpacer(listSpacing),
           getLabel("Notes", false),
@@ -481,7 +497,7 @@ class NewResourceState extends State<NewResource> {
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               hintStyle: TextStyle(color: Colors.black26),
-              hintText: "Type any extra details...",
+              hintText: "eg. open hours...",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
@@ -511,7 +527,7 @@ class NewResourceState extends State<NewResource> {
     return TextField(
       onSubmitted: (text) {
         setState(() {
-          widget.addressController.text = text;
+          widget.addressController.text = text.replaceAll("#", "Apt ");
         });
       },
       controller: widget.addressController,
@@ -529,19 +545,34 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
+  Future<bool> checkAddress(String address) async {
+    address = address.replaceAll("#", "Apt ");
+    print(address);
+    Map<dynamic, dynamic> data = await widget.geo.parseAddress(address, "");
+    bool ret = (data['lat'] != null && data['lng'] != null);
+    if (ret) {
+      widget.addressController.text.replaceAll(RegExp(r'#'), "Apt ");
+    }
+    return ret;
+  }
+
   Widget addressBuilder() {
     if (widget.addressController.text == "") {
       return addressBox(false, false);
     } else {
       return FutureBuilder(
-        future: widget.geo.parseAddress(widget.addressController.text, ""),
+        future: widget.geo.parseAddress(
+            widget.addressController.text.replaceAll(RegExp(r'#'), "Apt "), ""),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
             //print(loc.data);
             if (snapshot.data!['lat'] != null &&
                 snapshot.data!['lng'] != null) {
+              widget.addressValid = true;
               return addressBox(false, true);
             } else {
+              widget.addressValid = false;
+
               return addressBox(true, false);
             }
           } else {
@@ -596,17 +627,28 @@ class NewResourceState extends State<NewResource> {
           ? null
           : (currentStep == 2)
               ? () async {
-                  await writeResource();
-                  if (widget.resource!.id == null ||
-                      widget.resource!.id == "") {
-                    Haptic.onSuccess();
-                    showToast("Resource created", Colors.black);
+                  bool validated =
+                      await checkAddress(widget.addressController.text);
+
+                  if (validated) {
+                    await writeResource();
+                    if (widget.resource!.id == null ||
+                        widget.resource!.id == "") {
+                      Haptic.onSuccess();
+                      showToast("Resource created", Colors.black);
+                    } else {
+                      Haptic.onSuccess();
+                      showToast("Resource updated", Colors.black);
+                    }
+                    widget.proxyModel.upsert(widget.resource);
+                    Navigator.pop(context);
                   } else {
-                    Haptic.onSuccess();
-                    showToast("Resource updated", Colors.black);
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return validationPopup();
+                        });
                   }
-                  widget.proxyModel.upsert(widget.resource);
-                  Navigator.pop(context);
                 }
               : details.onStepContinue,
       child: Padding(

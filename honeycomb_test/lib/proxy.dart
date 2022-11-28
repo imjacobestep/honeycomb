@@ -145,10 +145,10 @@ class Proxy {
     if (ascending) {
       if (field == 'name') {
         return items.toList()..sort((a, b) => a.name!.compareTo(b.name!));
-      } else if (field == 'createdStamp') {
+      } else if (field == 'date created') {
         return items.toList()
           ..sort((a, b) => a.createdStamp!.compareTo(b.createdStamp!));
-      } else if (field == 'updatedStamp') {
+      } else if (field == 'date updated') {
         return items.toList()
           ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
       } else {
@@ -157,10 +157,10 @@ class Proxy {
     } else {
       if (field == 'name') {
         return items.toList()..sort((a, b) => b.name!.compareTo(a.name!));
-      } else if (field == 'createdStamp') {
+      } else if (field == 'date created') {
         return items.toList()
           ..sort((a, b) => b.createdStamp!.compareTo(a.createdStamp!));
-      } else if (field == 'updatedStamp') {
+      } else if (field == 'date updated') {
         return items.toList()
           ..sort((a, b) => a.updatedStamp!.compareTo(b.updatedStamp!));
       } else {

@@ -70,6 +70,9 @@ Map<String, Map<String, bool>> filters = {
     "Translation": false,
     "Legal": false,
     "Employment": false,
+    "Childcare": false,
+    "Community": false,
+    "Other": false,
   },
   "Eligibility": {
     "Open to All": false,
@@ -91,7 +94,7 @@ Resource makeNewResource(String userName) {
       phoneNumbers: {},
       categories: [],
       multilingual: false,
-      eligibility: [],
+      eligibility: ["open to all"],
       accessibility: false,
       isActive: true,
       createdBy: (userName != null && userName != "") ? userName : "unknown",

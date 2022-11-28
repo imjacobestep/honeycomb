@@ -87,7 +87,7 @@ class HomePageState extends State<HomePage> {
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           Iterable clients = snapshot.data!;
-          clients = widget.proxyModel.sort(clients, "updatedStamp", false);
+          clients = widget.proxyModel.sort(clients, "date updated", false);
           if (clients.isEmpty) {
             return (const Center(
               child: Text("No Clients Found"),
