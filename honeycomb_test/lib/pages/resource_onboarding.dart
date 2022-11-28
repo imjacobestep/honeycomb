@@ -630,7 +630,9 @@ class NewResourceState extends State<NewResource> {
                   bool validated =
                       await checkAddress(widget.addressController.text);
 
-                  if (validated) {
+                  if (validated ||
+                      (widget.addressController.text == null ||
+                          widget.addressController == "")) {
                     await writeResource();
                     if (widget.resource!.id == null ||
                         widget.resource!.id == "") {
