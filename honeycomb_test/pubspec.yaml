@@ -81,9 +81,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
   #   - assets/map_pins/
-    - lib/assets/icon/icon.png
-    - lib/assets/agency_button.png
-    - lib/assets/map_pins/resource_pin.bmp
+    - lib/assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

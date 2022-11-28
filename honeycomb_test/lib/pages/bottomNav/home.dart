@@ -375,9 +375,9 @@ class HomePageState extends State<HomePage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.arrow_downward_outlined),
+                        const Icon(Icons.arrow_downward_outlined),
                         getSpacer(4),
-                        Text("See All")
+                        const Text("See All")
                       ],
                     )),
               ),

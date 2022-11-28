@@ -546,7 +546,6 @@ class NewResourceState extends State<NewResource> {
 
   Future<bool> checkAddress(String address) async {
     address = address.replaceAll("#", "Apt ");
-    print(address);
     Map<dynamic, dynamic> data = await widget.geo.parseAddress(address, "");
     bool ret = (data['lat'] != null && data['lng'] != null);
     if (ret) {

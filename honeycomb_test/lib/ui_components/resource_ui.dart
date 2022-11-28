@@ -28,15 +28,12 @@ Widget showRecency(BuildContext context, Resource resource) {
 }
 
 Widget cardCategoryLabel(BuildContext context, String category) {
-  return Container(
-    //margin: const EdgeInsets.all(2),
-    child: Chip(
-      labelPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-      labelStyle: Theme.of(context).textTheme.labelSmall,
-      visualDensity: VisualDensity.compact,
-      label: Text(
-        category,
-      ),
+  return Chip(
+    labelPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+    labelStyle: Theme.of(context).textTheme.labelSmall,
+    visualDensity: VisualDensity.compact,
+    label: Text(
+      category,
     ),
   );
 }
@@ -57,11 +54,9 @@ Widget mapCategoryLabel(BuildContext context, String category) {
 Widget resourceWindow(BuildContext context, Resource resource) {
   List<Widget> categories = [];
   if (resource.categories != null) {
-    resource.categories!.forEach(
-      (element) {
-        categories.add(mapCategoryLabel(context, element));
-      },
-    );
+    for (var element in resource.categories!) {
+      categories.add(mapCategoryLabel(context, element));
+    }
   }
   return InkWell(
     onTap: () {
@@ -143,8 +138,8 @@ Widget resourceCard(
                   ),
                   //getSpacer(2),
                   Wrap(
-                    children: categories,
                     spacing: 2,
+                    children: categories,
                   ),
                 ],
               ),

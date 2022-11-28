@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors
+// ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously
 
 import 'dart:io';
 
@@ -182,7 +182,7 @@ class ClientDetailsState extends State<ClientDetails> {
               children.add(pw.Text("phone numbers:", style: labelStyle));
               children.add(pw.Column(children: [
                 for (String key in resource.phoneNumbers!.keys)
-                  pw.Text("${key}: ${resource.phoneNumbers![key]}",
+                  pw.Text("$key: ${resource.phoneNumbers![key]}",
                       style: bodyStyle)
               ]));
             }

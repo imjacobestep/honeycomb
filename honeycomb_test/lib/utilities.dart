@@ -5,10 +5,7 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocoder2/geocoder2.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:honeycomb_test/model/resource.dart';
-import 'package:honeycomb_test/model/user.dart';
 import 'package:share_plus/share_plus.dart';
 
 Widget getSpacer(double size) {
@@ -97,7 +94,7 @@ Resource makeNewResource(String userName) {
       eligibility: ["open to all"],
       accessibility: false,
       isActive: true,
-      createdBy: (userName != null && userName != "") ? userName : "unknown",
+      createdBy: (userName != "") ? userName : "unknown",
       createdStamp: DateTime.now());
 }
 
@@ -114,7 +111,7 @@ Widget helperText(
   return fullScreen
       ? Center(child: content)
       : Padding(
-          padding: EdgeInsets.all(48),
+          padding: const EdgeInsets.all(48),
           child: content,
         );
 }

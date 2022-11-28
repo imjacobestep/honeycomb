@@ -16,7 +16,9 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class MapPage extends StatefulWidget {
   @override
   MapPageState createState() => MapPageState();
-  BitmapDescriptor? resourceIcon;
+  //BitmapDescriptor? resourceIcon;
+  BitmapDescriptor resourceIcon =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
   Proxy proxyModel = Proxy();
   GeoHelper geo = GeoHelper();
   Future<Iterable>? resourceList;
@@ -38,6 +40,12 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   @override
   void initState() {
+    BitmapDescriptor.fromAssetImage(
+            const ImageConfiguration(devicePixelRatio: 2.5),
+            'lib/assets/map_pins/resource_pin.bmp')
+        .then((onValue) {
+      widget.resourceIcon = onValue;
+    });
     resetFilters();
     setResourceIcon();
     widget.resourceList = widget.proxyModel.list("resources");
@@ -112,7 +120,7 @@ class MapPageState extends State<MapPage> {
                         )));
           },
         ),
-        icon: widget.resourceIcon!));
+        icon: widget.resourceIcon));
   }
 
   String getCategories(Resource resource) {
@@ -467,13 +475,12 @@ class MapPageState extends State<MapPage> {
   Widget getBody() {
     return FutureBuilder(
       future: BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(devicePixelRatio: 2.5),
+          const ImageConfiguration(devicePixelRatio: 2.5),
           'assets/map_pins/resource_pin.bmp'),
       builder:
           (BuildContext context, AsyncSnapshot<BitmapDescriptor> mapPinIcon) {
         if (mapPinIcon.hasData) {
           if (mapPinIcon.data != null) {
-            print("got pin");
             widget.resourceIcon = mapPinIcon.data!;
           }
           return buildMap();
