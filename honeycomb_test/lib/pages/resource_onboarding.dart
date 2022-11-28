@@ -407,7 +407,7 @@ class NewResourceState extends State<NewResource> {
                 widget.nameController.text = text;
               });
             },
-            keyboardType: TextInputType.name,
+            keyboardType: TextInputType.multiline,
             autofocus: true,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
