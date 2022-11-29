@@ -33,14 +33,9 @@ class NewResource extends StatefulWidget {
 }
 
 class NewResourceState extends State<NewResource> {
-  final formKey = GlobalKey<FormState>();
-  int currentStep = 0;
-  double listSpacing = 12;
-  final getZip = RegExp(r'^\d{5}(?:[-\s]\d{4})?$');
-
   @override
   void initState() {
-    writeControllers();
+    resourceToTextController();
     super.initState();
   }
 
@@ -54,7 +49,20 @@ class NewResourceState extends State<NewResource> {
     super.dispose();
   }
 
-  void writeControllers() {
+  // VARIABLES
+
+  int currentStep = 0;
+  double listSpacing = 12;
+
+  // FUNCTIONS
+
+  bool isFirstPageComplete() {
+    return ((widget.nameController.text != "") &&
+        (widget.resource!.categories != null &&
+            widget.resource!.categories!.isNotEmpty));
+  }
+
+  void resourceToTextController() {
     if (widget.resource!.name != null) {
       widget.nameController.text = widget.resource!.name!;
     }
@@ -65,7 +73,6 @@ class NewResourceState extends State<NewResource> {
                 TextEditingController.fromValue(TextEditingValue(text: key))] =
             TextEditingController.fromValue(TextEditingValue(text: value));
       });
-      //widget.phoneController = widget.resource!.phoneNumbers!;
     } else {
       widget.phoneController[TextEditingController.fromValue(
           const TextEditingValue(text: 'primary'))] = TextEditingController();
@@ -96,7 +103,7 @@ class NewResourceState extends State<NewResource> {
     }
   }
 
-  Future<void> writeResource() async {
+  Future<void> textControllerToResource() async {
     if (widget.nameController.text != "") {
       widget.resource!.name = widget.nameController.text;
     }
@@ -142,6 +149,152 @@ class NewResourceState extends State<NewResource> {
     }
   }
 
+  Future<bool> checkAddress(String address) async {
+    address = address.replaceAll("#", "Apt ");
+    Map<dynamic, dynamic> data = await widget.geo.parseAddress(address, "");
+    bool ret = (data['lat'] != null && data['lng'] != null);
+    if (ret) {
+      widget.addressController.text.replaceAll(RegExp(r'#'), "Apt ");
+    }
+    return ret;
+  }
+
+  stepTapped(int step) {
+    setState(() {
+      currentStep = step;
+    });
+  }
+
+  stepContinue() {
+    currentStep < 2 ? setState(() => currentStep += 1) : null;
+  }
+
+  stepBack() {
+    currentStep > 0 ? setState(() => currentStep -= 1) : Navigator.pop(context);
+  }
+
+  // FORM STEPS
+
+  Step stepOne() {
+    return Step(
+      title: formStepLabel("Critical Info"),
+      content: ListView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          inputLabel("Resource Name", true),
+          TextField(
+            controller: widget.nameController,
+            onSubmitted: (text) {
+              setState(() {
+                widget.nameController.text = text;
+              });
+            },
+            keyboardType: TextInputType.multiline,
+            autofocus: true,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              hintStyle: TextStyle(color: Colors.black26),
+              hintText: "eg. [organization][service]",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ),
+          ),
+          getSpacer(listSpacing),
+          inputLabel("Pick all applicable Categories", true),
+          categoriesSection(),
+        ],
+      ),
+      isActive: currentStep >= 0,
+      state: currentStep >= 0 ? StepState.complete : StepState.disabled,
+    );
+  }
+
+  Step stepTwo() {
+    return Step(
+      title: formStepLabel("Additional Info"),
+      content: ListView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          inputLabel("Language", false),
+          languageSection(),
+          getSpacer(listSpacing),
+          inputLabel("Eligibility Requirements", false),
+          eligibilitySection(),
+          getSpacer(listSpacing),
+          inputLabel("Wheelchair Accessible", false),
+          accessibilitySection(),
+        ],
+      ),
+      isActive: currentStep >= 1,
+      state: currentStep >= 1 ? StepState.complete : StepState.disabled,
+    );
+  }
+
+  Step stepThree() {
+    return Step(
+      title: formStepLabel("Contact Info"),
+      content: ListView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          phoneSection(),
+          getSpacer(listSpacing),
+          inputLabel("Email", false),
+          TextField(
+            controller: widget.emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              hintStyle: TextStyle(color: Colors.black26),
+              hintText: "eg. email@example.org",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ),
+          ),
+          getSpacer(listSpacing),
+          inputLabel("Website", false),
+          TextField(
+            controller: widget.webController,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              hintStyle: TextStyle(color: Colors.black26),
+              hintText: "eg. example.org",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ),
+          ),
+          getSpacer(listSpacing),
+          inputLabel("Street Address", false),
+          addressBuilder(),
+          getSpacer(listSpacing),
+          inputLabel("Notes", false),
+          TextField(
+            maxLines: null,
+            controller: widget.notesController,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              hintStyle: TextStyle(color: Colors.black26),
+              hintText: "eg. open hours...",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ),
+          ),
+        ],
+      ),
+      isActive: currentStep >= 2,
+      state: currentStep >= 2 ? StepState.complete : StepState.disabled,
+    );
+  }
+
+  // UI WIDGETS
+
   Widget validationPopup(String error, String suggestion) {
     return AlertDialog(
       title: Text(error),
@@ -158,7 +311,7 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget getLabel(String label, bool required) {
+  Widget inputLabel(String label, bool required) {
     List<Widget> children = [];
     children.add(Text(
       label,
@@ -175,17 +328,11 @@ class NewResourceState extends State<NewResource> {
     return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 
-  Widget getStepLabel(String label) {
+  Widget formStepLabel(String label) {
     return Text(
       label,
       style: Theme.of(context).textTheme.headlineSmall,
     );
-  }
-
-  bool isFirstPageComplete() {
-    return ((widget.nameController.text != "") &&
-        (widget.resource!.categories != null &&
-            widget.resource!.categories!.isNotEmpty));
   }
 
   Widget selectionChip(String label, String type, bool value) {
@@ -247,7 +394,7 @@ class NewResourceState extends State<NewResource> {
               ));
   }
 
-  Widget languageBuilder() {
+  Widget languageSection() {
     return Wrap(
       spacing: 4,
       children: [
@@ -258,7 +405,7 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget accessBuilder() {
+  Widget accessibilitySection() {
     widget.resource!.accessibility ??= false;
     return Wrap(
       spacing: 4,
@@ -269,7 +416,7 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget eligibilityBuilder() {
+  Widget eligibilitySection() {
     List<Widget> children = [];
     filters["Eligibility"]!.forEach((key, value) {
       if (widget.eligibilityController.contains(key.toLowerCase())) {
@@ -284,7 +431,7 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget categoriesBuilder() {
+  Widget categoriesSection() {
     List<Widget> children = [];
     filters["Categories"]!.forEach((key, value) {
       widget.resource!.categories ??= [];
@@ -300,7 +447,8 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget phoneInput(TextEditingController name, TextEditingController number) {
+  Widget phoneInputBoxes(
+      TextEditingController name, TextEditingController number) {
     Widget delete = name.text == "primary"
         ? Container()
         : IconButton(
@@ -320,7 +468,7 @@ class NewResourceState extends State<NewResource> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [getLabel("Contact Name", false), delete],
+          children: [inputLabel("Contact Name", false), delete],
         ),
         TextField(
           enabled: name.text == "primary" ? false : true,
@@ -344,7 +492,7 @@ class NewResourceState extends State<NewResource> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
-              child: getLabel("Phone Number", false),
+              child: inputLabel("Phone Number", false),
             ),
             TextField(
               controller: number,
@@ -367,11 +515,11 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget phoneBuilder() {
+  Widget phoneSection() {
     List<Widget> children = [];
     widget.phoneController.forEach((key, value) {
       //String val = value != null ? value : '';
-      children.add(phoneInput(key, value));
+      children.add(phoneInputBoxes(key, value));
     });
     children.add(ElevatedButton(
         onPressed: () {
@@ -391,125 +539,7 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Step stepOne() {
-    return Step(
-      title: getStepLabel("Critical Info"),
-      content: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          getLabel("Resource Name", true),
-          TextField(
-            controller: widget.nameController,
-            onSubmitted: (text) {
-              setState(() {
-                widget.nameController.text = text;
-              });
-            },
-            keyboardType: TextInputType.multiline,
-            autofocus: true,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. [organization][service]",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing),
-          getLabel("Pick all applicable Categories", true),
-          categoriesBuilder(),
-        ],
-      ),
-      isActive: currentStep >= 0,
-      state: currentStep >= 0 ? StepState.complete : StepState.disabled,
-    );
-  }
-
-  Step stepTwo() {
-    return Step(
-      title: getStepLabel("Additional Info"),
-      content: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          getLabel("Language", false),
-          languageBuilder(),
-          getSpacer(listSpacing),
-          getLabel("Eligibility Requirements", false),
-          eligibilityBuilder(),
-          getSpacer(listSpacing),
-          getLabel("Wheelchair Accessible", false),
-          accessBuilder(),
-        ],
-      ),
-      isActive: currentStep >= 1,
-      state: currentStep >= 1 ? StepState.complete : StepState.disabled,
-    );
-  }
-
-  Step stepThree() {
-    return Step(
-      title: getStepLabel("Contact Info"),
-      content: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          phoneBuilder(),
-          getSpacer(listSpacing),
-          getLabel("Email", false),
-          TextField(
-            controller: widget.emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. email@example.org",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing),
-          getLabel("Website", false),
-          TextField(
-            controller: widget.webController,
-            keyboardType: TextInputType.url,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. example.org",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-          getSpacer(listSpacing),
-          getLabel("Street Address", false),
-          addressBuilder(),
-          getSpacer(listSpacing),
-          getLabel("Notes", false),
-          TextField(
-            maxLines: null,
-            controller: widget.notesController,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              hintStyle: TextStyle(color: Colors.black26),
-              hintText: "eg. open hours...",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-            ),
-          ),
-        ],
-      ),
-      isActive: currentStep >= 2,
-      state: currentStep >= 2 ? StepState.complete : StepState.disabled,
-    );
-  }
-
-  Widget addressBox(bool hasError, bool isVerified) {
+  Widget addressInputBox(bool hasError, bool isVerified) {
     bool showIcon = (hasError || isVerified);
     Icon verifiedIcon;
     if (hasError) {
@@ -544,19 +574,9 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Future<bool> checkAddress(String address) async {
-    address = address.replaceAll("#", "Apt ");
-    Map<dynamic, dynamic> data = await widget.geo.parseAddress(address, "");
-    bool ret = (data['lat'] != null && data['lng'] != null);
-    if (ret) {
-      widget.addressController.text.replaceAll(RegExp(r'#'), "Apt ");
-    }
-    return ret;
-  }
-
   Widget addressBuilder() {
     if (widget.addressController.text == "") {
-      return addressBox(false, false);
+      return addressInputBox(false, false);
     } else {
       return FutureBuilder(
         future: widget.geo.parseAddress(
@@ -567,11 +587,11 @@ class NewResourceState extends State<NewResource> {
             if (snapshot.data!['lat'] != null &&
                 snapshot.data!['lng'] != null) {
               widget.addressValid = true;
-              return addressBox(false, true);
+              return addressInputBox(false, true);
             } else {
               widget.addressValid = false;
 
-              return addressBox(true, false);
+              return addressInputBox(true, false);
             }
           } else {
             return LoadingIndicator(
@@ -585,21 +605,7 @@ class NewResourceState extends State<NewResource> {
     }
   }
 
-  tapped(int step) {
-    setState(() {
-      currentStep = step;
-    });
-  }
-
-  continued() {
-    currentStep < 2 ? setState(() => currentStep += 1) : null;
-  }
-
-  cancel() {
-    currentStep > 0 ? setState(() => currentStep -= 1) : Navigator.pop(context);
-  }
-
-  Widget backBuilder(ControlsDetails details) {
+  Widget backButton(ControlsDetails details) {
     String backText = currentStep == 0 ? "Cancel" : "Back";
     Icon backIcon = currentStep == 0
         ? const Icon(Icons.cancel)
@@ -613,7 +619,7 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget nextBuilder(ControlsDetails details) {
+  Widget nextButton(ControlsDetails details) {
     bool firstIncomplete = (currentStep == 0 && !isFirstPageComplete());
 
     Icon nextIcon = currentStep == 2
@@ -636,7 +642,7 @@ class NewResourceState extends State<NewResource> {
                           (widget.emailController.text == ""));
 
                   if (addressValidated && emailValid) {
-                    await writeResource();
+                    await textControllerToResource();
                     if (widget.resource!.id == null ||
                         widget.resource!.id == "") {
                       Haptic.onSuccess();
@@ -673,18 +679,18 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
-  Widget getStepper2() {
+  Widget pageBody() {
     return Stepper(
       steps: [stepOne(), stepTwo(), stepThree()],
       type: StepperType.vertical,
       onStepCancel: () {
-        cancel();
+        stepBack();
       },
       onStepTapped: (step) {
-        tapped(step);
+        stepTapped(step);
       },
       onStepContinue: () {
-        continued();
+        stepContinue();
       },
       currentStep: currentStep,
       controlsBuilder: (BuildContext context, ControlsDetails details) {
@@ -692,9 +698,9 @@ class NewResourceState extends State<NewResource> {
           padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
           child: Row(
             children: <Widget>[
-              backBuilder(details),
+              backButton(details),
               getSpacer(8),
-              nextBuilder(details)
+              nextButton(details)
             ],
           ),
         );
@@ -702,18 +708,20 @@ class NewResourceState extends State<NewResource> {
     );
   }
 
+  PreferredSizeWidget pageHeader() {
+    return AppBar(
+      leading: BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
+      title: Text(
+        widget.resource!.id != null ? "Edit Resource" : "New Resource",
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading:
-            BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
-        title: Text(
-          widget.resource!.id != null ? "Edit Resource" : "New Resource",
-        ),
-      ),
-      body: getStepper2(),
-      //bottomNavigationBar: customNav(context, 3),
+      appBar: pageHeader(),
+      body: pageBody(),
     );
   }
 }

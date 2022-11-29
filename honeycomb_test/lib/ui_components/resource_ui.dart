@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../model/resource.dart';
 
-Widget cardCategoryLabel(BuildContext context, String category) {
+// Category label used on resource card
+Widget compactCategoryLabel(BuildContext context, String category) {
   return Chip(
     labelPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
     labelStyle: Theme.of(context).textTheme.labelSmall,
@@ -13,7 +14,8 @@ Widget cardCategoryLabel(BuildContext context, String category) {
   );
 }
 
-Widget detailsCategoryLabel(BuildContext context, String category) {
+// Category label used on resource details page
+Widget mediumCategoryLabel(BuildContext context, String category) {
   return Chip(
     label: Text(
       category,
@@ -27,7 +29,7 @@ Widget resourceCard(
   List<Widget> categories = [];
   if (resource.categories != null) {
     for (String category in resource.categories!) {
-      categories.add(cardCategoryLabel(context, category));
+      categories.add(compactCategoryLabel(context, category));
     }
   } else {
     categories.add(Container());
@@ -49,7 +51,6 @@ Widget resourceCard(
                     resource.name!,
                     style: const TextStyle(fontSize: 20),
                   ),
-                  //getSpacer(2),
                   Wrap(
                     spacing: 2,
                     children: categories,

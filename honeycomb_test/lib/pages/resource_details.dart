@@ -53,127 +53,82 @@ class ResourceDetailsState extends State<ResourceDetails> {
 
   // FUNCTIONS
 
+  bool isAction(String label) {
+    switch (label) {
+      case "Phone Number":
+        return true;
+      case "Email Address":
+        return true;
+      case "Street Address":
+        return true;
+      case "Website":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   // LOADERS (wait on an asynchronous item, then return a Widget)
 
-  // UI WIDGETS
-
-  Widget sheetBuilder(MPUser user) {
-    return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setSheetState) {
-      Widget clientCheckBox(Client client) {
-        if (widget.clientsList[client]!) {
-          return IconButton(
-              onPressed: () async {
-                await widget.proxyModel.delFromList(client, widget.resource);
-                Haptic.onSelection();
-                showToast(
-                    "${widget.resource.name} removed from ${client.alias}",
-                    Colors.black);
-                setSheetState(() {
-                  widget.clientsList.clear();
-                });
-              },
-              icon: const Icon(Icons.check_box));
-        } else {
-          return IconButton(
-              onPressed: () async {
-                if (client.resources == null) {
-                  client.resources = [];
-                  widget.proxyModel.upsert(client);
-                }
-                await widget.proxyModel.addToList(client, widget.resource);
-                Haptic.onSelection();
-                showToast("${widget.resource.name} added to ${client.alias}",
-                    Colors.black);
-                setSheetState(() {
-                  widget.clientsList.clear();
-                  widget.sheetChildren = [];
-                });
-              },
-              icon: const Icon(Icons.check_box_outline_blank_outlined));
-        }
-      }
-
-      Widget addToClientCard(Client client) {
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  client.alias!,
-                  style: const TextStyle(fontSize: 20),
-                ),
-                clientCheckBox(client)
-              ],
-            ),
-          ),
-        );
-      }
-
-      return FutureBuilder(
-        future: widget.proxyModel.listUserClients(user),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data != null) {
-              List<Widget> children = [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Add this resource to..."),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.close))
-                  ],
-                ),
-                getSpacer(8),
-                resourceCard(context, widget.resource, () {
-                  Navigator.pop(context);
-                }),
-                getDivider(context)
-              ];
-              for (Client client in snapshot.data) {
-                bool isHere = (client.resources != null &&
-                    (client.resources!.contains(widget.resource.id)));
-                widget.clientsList[client] = isHere;
-                children.add(addToClientCard(client));
-              }
-              children.add(getSpacer(8));
-              children.add(ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      "Done",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  )));
-              children.add(getSpacer(24));
-              return ListView(
-                padding: const EdgeInsets.all(16),
-                shrinkWrap: true,
-                children: children,
-              );
-            } else {
-              return helperText("No Clients Found",
-                  "Go to the clients tab to add clients", context, false);
-            }
+  Widget userLoader(String elementContext) {
+    return FutureBuilder(
+      future: widget.proxyModel.getUser(widget.userID),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          widget.user = snapshot.data;
+          if (elementContext == "fav button") {
+            return favoritesButtonLoader(snapshot.data);
+          } else if (elementContext == "client button") {
+            return quickActionButton("Client", "");
           } else {
-            return const SizedBox(
-              height: 48,
-              //child: getLoader(),
-              child: Text("loading"),
+            return const Center(
+              child: Text("Error"),
             );
           }
-        },
-      );
-    });
+        } else {
+          return const Center(
+            child: Text("No user found"),
+          );
+        }
+      },
+    );
   }
+
+  Widget favoritesButtonLoader(MPUser user) {
+    return FutureBuilder(
+      future: widget.proxyModel.listUserFavorites(user),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          Iterable favs = snapshot.data!;
+          bool isFavorite = false;
+          for (var element in favs) {
+            if (element.id == widget.resource.id) {
+              isFavorite = true;
+            }
+          }
+          return favoriteButton(isFavorite, user);
+        } else {
+          return Padding(
+            padding: const EdgeInsets.all(8),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    elevation: 0, backgroundColor: Colors.black12),
+                onPressed: () {},
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.error),
+                  ],
+                )),
+          );
+        }
+      },
+    );
+  }
+
+  // UI WIDGETS
 
   Future filterSheet() {
     return showMaterialModalBottomSheet(
@@ -183,7 +138,124 @@ class ResourceDetailsState extends State<ResourceDetails> {
         isDismissible: true,
         context: context,
         builder: (context) {
-          return sheetBuilder(widget.user!);
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setSheetState) {
+            Widget clientCheckBox(Client client) {
+              if (widget.clientsList[client]!) {
+                return IconButton(
+                    onPressed: () async {
+                      await widget.proxyModel
+                          .delFromList(client, widget.resource);
+                      Haptic.onSelection();
+                      showToast(
+                          "${widget.resource.name} removed from ${client.alias}",
+                          Colors.black);
+                      setSheetState(() {
+                        widget.clientsList.clear();
+                      });
+                    },
+                    icon: const Icon(Icons.check_box));
+              } else {
+                return IconButton(
+                    onPressed: () async {
+                      if (client.resources == null) {
+                        client.resources = [];
+                        widget.proxyModel.upsert(client);
+                      }
+                      await widget.proxyModel
+                          .addToList(client, widget.resource);
+                      Haptic.onSelection();
+                      showToast(
+                          "${widget.resource.name} added to ${client.alias}",
+                          Colors.black);
+                      setSheetState(() {
+                        widget.clientsList.clear();
+                        widget.sheetChildren = [];
+                      });
+                    },
+                    icon: const Icon(Icons.check_box_outline_blank_outlined));
+              }
+            }
+
+            Widget addToClientCard(Client client) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        client.alias!,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      clientCheckBox(client)
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return FutureBuilder(
+              future: widget.proxyModel.listUserClients(widget.user!),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data != null) {
+                    List<Widget> children = [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Add this resource to..."),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.close))
+                        ],
+                      ),
+                      getSpacer(8),
+                      resourceCard(context, widget.resource, () {
+                        Navigator.pop(context);
+                      }),
+                      getDivider(context)
+                    ];
+                    for (Client client in snapshot.data) {
+                      bool isHere = (client.resources != null &&
+                          (client.resources!.contains(widget.resource.id)));
+                      widget.clientsList[client] = isHere;
+                      children.add(addToClientCard(client));
+                    }
+                    children.add(getSpacer(8));
+                    children.add(ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "Done",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        )));
+                    children.add(getSpacer(24));
+                    return ListView(
+                      padding: const EdgeInsets.all(16),
+                      shrinkWrap: true,
+                      children: children,
+                    );
+                  } else {
+                    return helperText("No Clients Found",
+                        "Go to the clients tab to add clients", context, false);
+                  }
+                } else {
+                  return const SizedBox(
+                    height: 48,
+                    //child: getLoader(),
+                    child: Text("loading"),
+                  );
+                }
+              },
+            );
+          });
         });
   }
 
@@ -236,21 +308,6 @@ class ResourceDetailsState extends State<ResourceDetails> {
         {
           return Container();
         }
-    }
-  }
-
-  bool isAction(String label) {
-    switch (label) {
-      case "Phone Number":
-        return true;
-      case "Email Address":
-        return true;
-      case "Street Address":
-        return true;
-      case "Website":
-        return true;
-      default:
-        return false;
     }
   }
 
@@ -352,7 +409,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
     );
   }
 
-  Widget getQuickAction(String label, String value) {
+  Widget quickActionButton(String label, String value) {
     TextStyle labelStyle = Theme.of(context).textTheme.labelMedium!;
     double size = 65.0;
     switch (label) {
@@ -535,14 +592,13 @@ class ResourceDetailsState extends State<ResourceDetails> {
     }
   }
 
-  Widget tagsBuilder(Iterable<dynamic> categories, BuildContext context) {
+  Widget tagList(Iterable<dynamic> categories, BuildContext context) {
     return Wrap(spacing: 4, runSpacing: 0, children: [
-      for (String category in categories)
-        detailsCategoryLabel(context, category)
+      for (String category in categories) mediumCategoryLabel(context, category)
     ]);
   }
 
-  Widget getMisc() {
+  Widget miscDetails() {
     Map<dynamic, dynamic> miscDetails = {};
     if (widget.resource.multilingual != null && widget.resource.multilingual!) {
       miscDetails["Multilingual"] = true;
@@ -558,14 +614,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
       miscDetails["Inactive"] = true;
     }
 
-    return tagsBuilder(miscDetails.keys, context);
-  }
-
-  bool miscTest() {
-    if (widget.resource.multilingual != null && widget.resource.multilingual!) {
-      return true;
-    }
-    return false;
+    return tagList(miscDetails.keys, context);
   }
 
   Widget shareButton() {
@@ -630,63 +679,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
         child: favStar);
   }
 
-  Widget userBuilder(String elementContext) {
-    return FutureBuilder(
-      future: widget.proxyModel.getUser(widget.userID),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          widget.user = snapshot.data;
-          if (elementContext == "fav button") {
-            return favoritesButtonBuilder(snapshot.data);
-          } else if (elementContext == "client button") {
-            return getQuickAction("Client", "");
-          } else {
-            return sheetBuilder(snapshot.data);
-          }
-        } else {
-          return const Center(
-            child: Text("No user found"),
-          );
-        }
-      },
-    );
-  }
-
-  Widget favoritesButtonBuilder(MPUser user) {
-    return FutureBuilder(
-      future: widget.proxyModel.listUserFavorites(user),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          Iterable favs = snapshot.data!;
-          bool isFavorite = false;
-          for (var element in favs) {
-            if (element.id == widget.resource.id) {
-              isFavorite = true;
-            }
-          }
-          return favoriteButton(isFavorite, user);
-        } else {
-          return Padding(
-            padding: const EdgeInsets.all(8),
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    elevation: 0, backgroundColor: Colors.black12),
-                onPressed: () {},
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.error),
-                  ],
-                )),
-          );
-        }
-      },
-    );
-  }
-
-  PreferredSizeWidget topHeader() {
+  PreferredSizeWidget pageHeader() {
     return AppBar(
       leading: BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
       actions: [
@@ -702,28 +695,28 @@ class ResourceDetailsState extends State<ResourceDetails> {
     );
   }
 
-  List<Widget> quickActionsBuilder() {
+  List<Widget> quickActionsBar() {
     List<Widget> ret = [];
     if (widget.resource.address != null) {
-      ret.add(getQuickAction("Directions", widget.resource.address!));
+      ret.add(quickActionButton("Directions", widget.resource.address!));
     } //directions
     if (widget.resource.phoneNumbers != null &&
         widget.resource.phoneNumbers!["primary"] != "") {
-      ret.add(getQuickAction("Call", widget.resource.phoneNumbers!['primary']));
+      ret.add(
+          quickActionButton("Call", widget.resource.phoneNumbers!['primary']));
     } //phone
     if (widget.resource.email != null) {
-      ret.add(getQuickAction("Email", widget.resource.email!));
+      ret.add(quickActionButton("Email", widget.resource.email!));
     } //email
     if (widget.resource.website != null) {
-      ret.add(getQuickAction("Web", widget.resource.website!));
+      ret.add(quickActionButton("Web", widget.resource.website!));
     }
-    ret.add(userBuilder("client button"));
-    //ret.add(getQuickAction("Client", "stuff")); //web
+    ret.add(userLoader("client button"));
     //client
     return ret;
   }
 
-  Widget getMap() {
+  Widget map() {
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -783,7 +776,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
     );
   }
 
-  Widget getRecency() {
+  Widget updatedCreated() {
     String updatedUser = widget.resource.updatedBy != null
         ? widget.resource.updatedBy!.toString()
         : "unknown user";
@@ -834,7 +827,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
             ],
           ),
         ),
-        Expanded(flex: 1, child: userBuilder("fav button")),
+        Expanded(flex: 1, child: userLoader("fav button")),
       ],
     );
   }
@@ -843,23 +836,23 @@ class ResourceDetailsState extends State<ResourceDetails> {
     List<Widget> children = [];
     //MAP
     if (widget.resource.coords != null) {
-      children.add(getMap());
+      children.add(map());
     }
     //HEADER
     children.add(resourceHeader());
     if (widget.resource.categories != null) {
-      children.add(tagsBuilder(widget.resource.categories!, context));
+      children.add(tagList(widget.resource.categories!, context));
     }
     children.add(getDivider(context));
     //QUICK ACTIONS
     children.add(Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
-      children: quickActionsBuilder(),
+      children: quickActionsBar(),
     ));
     //NOTES
     children.add(getDivider(context));
-    children.add(getRecency());
+    children.add(updatedCreated());
     children.add(getDivider(context));
     if (widget.resource.notes != null) {
       children.add(detailItem("Notes", widget.resource.notes!));
@@ -877,13 +870,13 @@ class ResourceDetailsState extends State<ResourceDetails> {
               "Eligibility Requirements",
               style: Theme.of(context).textTheme.labelLarge,
             ),
-            tagsBuilder(widget.resource.eligibility!, context)
+            tagList(widget.resource.eligibility!, context)
           ],
         ),
       ));
       children.add(getDivider(context));
     }
-    if (miscTest()) {
+    if (widget.resource.multilingual != null && widget.resource.multilingual!) {
       children.add(Padding(
         padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
         child: Column(
@@ -894,7 +887,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
               "Misc Details",
               style: Theme.of(context).textTheme.labelLarge,
             ),
-            getMisc()
+            miscDetails()
           ],
         ),
       ));
@@ -928,7 +921,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: topHeader(),
+      appBar: pageHeader(),
       body: listBuilder(),
     );
   }

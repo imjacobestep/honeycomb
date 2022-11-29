@@ -8,46 +8,37 @@ import 'package:honeycomb_test/pages/bottomNav/main_list.dart';
 import 'package:honeycomb_test/pages/bottomNav/map.dart';
 import 'package:honeycomb_test/ui_components/animated_navigator.dart';
 
-List<String> labels = ["Home", "Map", "List", "Favs", "Clients"];
-List<Icon> icons = [
-  const Icon(Icons.home_outlined),
-  const Icon(Icons.map_outlined),
-  const Icon(Icons.list),
-  const Icon(Icons.star_outline),
-  const Icon(Icons.people_alt_outlined)
-];
-
 TextStyle labelStyle = const TextStyle(color: Colors.white54, fontSize: 14);
 Widget customNav(context, currentIndex) {
   List<CustomNavigationBarItem> items = [
     CustomNavigationBarItem(
-        icon: icons[0],
+        icon: const Icon(Icons.home_outlined),
         title: Text(
-          labels[0],
+          "Home",
           style: labelStyle,
         )),
     CustomNavigationBarItem(
-        icon: icons[1],
+        icon: const Icon(Icons.map_outlined),
         title: Text(
-          labels[1],
+          "Map",
           style: labelStyle,
         )),
     CustomNavigationBarItem(
-        icon: icons[2],
+        icon: const Icon(Icons.list),
         title: Text(
-          labels[2],
+          "List",
           style: labelStyle,
         )),
     CustomNavigationBarItem(
-        icon: icons[3],
+        icon: const Icon(Icons.star_outline),
         title: Text(
-          labels[3],
+          "Favs",
           style: labelStyle,
         )),
     CustomNavigationBarItem(
-        icon: icons[4],
+        icon: const Icon(Icons.people_alt_outlined),
         title: Text(
-          labels[4],
+          "Clients",
           style: labelStyle,
         )),
   ];
@@ -56,8 +47,6 @@ Widget customNav(context, currentIndex) {
     Haptic.onSelection();
     switch (index) {
       case 0:
-        /* Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomePage())); */
         Navigator.pushReplacement(
           context,
           FadeInRoute(
@@ -67,8 +56,6 @@ Widget customNav(context, currentIndex) {
         );
         break;
       case 1:
-        /* Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MapPage())); */
         Navigator.pushReplacement(
           context,
           FadeInRoute(
@@ -78,8 +65,6 @@ Widget customNav(context, currentIndex) {
         );
         break;
       case 2:
-        /* Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => ResourcesPage())); */
         Navigator.pushReplacement(
           context,
           FadeInRoute(
@@ -89,8 +74,6 @@ Widget customNav(context, currentIndex) {
         );
         break;
       case 3:
-        /* Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => FavsPage())); */
         Navigator.pushReplacement(
           context,
           FadeInRoute(
@@ -100,8 +83,6 @@ Widget customNav(context, currentIndex) {
         );
         break;
       case 4:
-        /* Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => ClientsPage())); */
         Navigator.pushReplacement(
           context,
           FadeInRoute(
@@ -120,7 +101,6 @@ Widget customNav(context, currentIndex) {
       scaleFactor: 0.44,
       items: items,
       blurEffect: false,
-      //opacity: 1,
       iconSize: 28,
       isFloating: true,
       selectedColor: Theme.of(context).colorScheme.primary,

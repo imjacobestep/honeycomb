@@ -42,6 +42,8 @@ Map<String, Map<String, bool>> filters = {
     "Employment": false,
     "Childcare": false,
     "Community": false,
+    "Transportation": false,
+    "Re-entry": false,
     "Other": false,
   },
   "Eligibility": {
