@@ -24,16 +24,18 @@ class ClientsPage extends StatefulWidget {
 class ClientsPageState extends State<ClientsPage> {
   @override
   void initState() {
-    resetFilters();
+    resetFilters(); // resets any filters (just in case)
     super.initState();
   }
 
-  Widget userBuilder() {
+  // LOADERS (wait on an asynchronous item, then return a Widget)
+
+  Widget userLoader() {
     return FutureBuilder(
       future: widget.proxyModel.getUser(widget.userID),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          return clientsBuilder(snapshot.data);
+          return clientsLoader(snapshot.data);
         } else {
           return const Center(
             child: Text("No user found"),
@@ -43,7 +45,7 @@ class ClientsPageState extends State<ClientsPage> {
     );
   }
 
-  Widget clientsBuilder(MPUser user) {
+  Widget clientsLoader(MPUser user) {
     return FutureBuilder(
       future: widget.proxyModel.listUserClients(user),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -93,6 +95,8 @@ class ClientsPageState extends State<ClientsPage> {
     );
   }
 
+  // UI WIDGETS
+
   Widget addButton() {
     return ElevatedButton(
         onPressed: () async {
@@ -116,23 +120,27 @@ class ClientsPageState extends State<ClientsPage> {
         ));
   }
 
+  PreferredSizeWidget pageHeader() {
+    return AppBar(
+      leading: null,
+      title: const Text(
+        "My Clients",
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: addButton(),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
-        leading: null,
-        title: const Text(
-          "My Clients",
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: addButton(),
-          ),
-        ],
-      ),
-      body: userBuilder(),
+      appBar: pageHeader(),
+      body: userLoader(),
       bottomNavigationBar: customNav(context, 4),
     );
   }

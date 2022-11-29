@@ -16,9 +16,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class MapPage extends StatefulWidget {
   @override
   MapPageState createState() => MapPageState();
-  //BitmapDescriptor? resourceIcon;
-  BitmapDescriptor resourceIcon =
-      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
   Proxy proxyModel = Proxy();
   GeoHelper geo = GeoHelper();
   Future<Iterable>? resourceList;
@@ -40,14 +37,7 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   @override
   void initState() {
-    BitmapDescriptor.fromAssetImage(
-            const ImageConfiguration(devicePixelRatio: 2.5),
-            'lib/assets/map_pins/resource_pin.bmp')
-        .then((onValue) {
-      widget.resourceIcon = onValue;
-    });
     resetFilters();
-    setResourceIcon();
     widget.resourceList = widget.proxyModel.list("resources");
     widget.currentLocation = widget.location.getLocation();
     widget.typedLocation =
@@ -73,16 +63,11 @@ class MapPageState extends State<MapPage> {
     super.dispose();
   }
 
+  // VARIABLES
+
   LatLng lastLocation = const LatLng(0, 0);
 
-// FUNCTIONS
-
-  void setResourceIcon() async {
-    widget.resourceIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(devicePixelRatio: 2.5),
-        'assets/map_pins/resource_pin.bmp');
-    setState(() {});
-  }
+  // FUNCTIONS
 
   void clearMarkers() {
     widget.markers = {
@@ -90,7 +75,7 @@ class MapPageState extends State<MapPage> {
     };
   }
 
-  void currentMarker(LatLng position) {
+  void typedLocationMarker(LatLng position) {
     widget.markers.add(Marker(
         onTap: () {},
         markerId: const MarkerId("current"),
@@ -100,17 +85,13 @@ class MapPageState extends State<MapPage> {
             BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange)));
   }
 
-  Marker newMarker(Resource resource) {
+  Marker newResourceMarker(Resource resource) {
     return (Marker(
         markerId: MarkerId(resource.name!),
         position: resource.coords!,
-        /* onTap: () {
-          widget.infoController.addInfoWindow!(
-              resourceWindow(context, resource), resource.coords!);
-        }, */
         infoWindow: InfoWindow(
           title: resource.name!,
-          snippet: getCategories(resource),
+          snippet: categoriesToString(resource),
           onTap: () {
             Navigator.push(
                 context,
@@ -120,11 +101,10 @@ class MapPageState extends State<MapPage> {
                         )));
           },
         ),
-        icon: widget.resourceIcon));
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)));
   }
 
-  String getCategories(Resource resource) {
-    //String ret = "";
+  String categoriesToString(Resource resource) {
     if (resource.categories != null) {
       return resource.categories!.toString();
     } else {
@@ -132,202 +112,19 @@ class MapPageState extends State<MapPage> {
     }
   }
 
-  Set<Marker> buildList(Iterable resourceList) {
+  Set<Marker> generateResourceMarkers(Iterable resourceList) {
     Set<Marker> ret = {};
     for (Resource resource in resourceList) {
       if (resource.coords != null) {
-        ret.add(newMarker(resource));
+        ret.add(newResourceMarker(resource));
       }
     }
     return ret;
   }
 
-// UI WIDGETS
+  // LOADERS (wait on an asynchronous item, then return a Widget)
 
-  List<Widget> getFilters(Map map) {
-    List<Widget> ret = [];
-    ret.add(
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          ElevatedButton(
-              onPressed: () {
-                resetFilters();
-              },
-              child: const Text("clear filters")),
-          IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.close))
-        ],
-      ),
-    );
-    ret.add(getSpacer(8));
-
-    ret.add(ElevatedButton(
-        onPressed: () {
-          setState(() {});
-          Navigator.pop(context);
-        },
-        child: const Text("Apply Filters")));
-    return ret;
-  }
-
-  Widget sheetBuilder() {
-    return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setSheetState) {
-      Widget filterChip(String label, bool value) {
-        return InkWell(
-            borderRadius: BorderRadius.circular(35),
-            enableFeedback: true,
-            onTap: () {
-              setFilter(label, !value);
-              setSheetState(() {});
-            },
-            child: !value
-                ? Chip(
-                    label: Text(
-                      label,
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    backgroundColor: Colors.transparent,
-                    side: const BorderSide(color: Colors.black12, width: 1),
-                  )
-                : Chip(
-                    side: const BorderSide(color: Colors.transparent, width: 1),
-                    backgroundColor: Colors.black,
-                    label: Text(
-                      label,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize:
-                              Theme.of(context).textTheme.labelLarge!.fontSize),
-                    ),
-                  ));
-      }
-
-      List<Widget> filterSection(Map map) {
-        List<Widget> ret = [];
-        for (var key in map.keys) {
-          if (map[key] != null) {
-            ret.add(filterChip(key, map[key]));
-          }
-        }
-        return ret;
-      }
-
-      Widget filterHeader() {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ElevatedButton(
-                onPressed: () {
-                  filters.forEach(
-                    (key, value) {
-                      value.forEach((key, value) {
-                        setFilter(key, false);
-                      });
-                    },
-                  );
-                  setSheetState(() {});
-                },
-                child: const Text("clear filters")),
-            IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.close))
-          ],
-        );
-      }
-
-      Widget applyButton() {
-        return ElevatedButton(
-            onPressed: () {
-              setState(() {
-                widget.markers.clear();
-              });
-
-              widget.markers.clear();
-              Navigator.pop(context);
-            },
-            child: const Text("Apply Filters"));
-      }
-
-      List<Widget> buildList() {
-        List<Widget> children = [];
-        children.add(filterHeader());
-        children.add(getSpacer(0));
-        filters.forEach((key, value) {
-          children.add(getDivider(context));
-          children.add(Text(key));
-          children.add(Wrap(
-            spacing: 4,
-            children: filterSection(value),
-          ));
-        });
-        children.add(getSpacer(16));
-        children.add(applyButton());
-        return children;
-      }
-
-      return ListView(
-        shrinkWrap: true,
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        children: buildList(),
-      );
-    });
-  }
-
-  Future filterSheet() {
-    return showMaterialModalBottomSheet(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-        expand: false,
-        isDismissible: false,
-        context: context,
-        builder: (context) {
-          return sheetBuilder();
-        });
-  }
-
-  Widget noResources() {
-    return const Padding(
-      padding: EdgeInsets.all(16),
-      child: Text("No Results"),
-    );
-  }
-
-  Widget getMap(CameraPosition cam, Iterable resources) {
-    return GoogleMap(
-      myLocationEnabled: true,
-      myLocationButtonEnabled: false,
-      mapType: MapType.normal,
-      markers: buildList(resources),
-      initialCameraPosition: cam,
-      mapToolbarEnabled: false,
-      buildingsEnabled: true,
-      compassEnabled: false,
-      liteModeEnabled: false,
-      trafficEnabled: false,
-      /* onTap: (position) {
-        widget.infoController.hideInfoWindow!();
-      }, */
-      /* onCameraMove: ((position) {
-        widget.infoController.hideInfoWindow!();
-      }), */
-      onMapCreated: (GoogleMapController controller) {
-        //widget.infoController.googleMapController = controller;
-        widget.mapController = controller;
-        /* setState(() {
-          widget.mapController = controller;
-        }); */
-      },
-    );
-  }
-
-  Widget buildCurrentLocation(Iterable resources) {
+  Widget userLocationLoader(Iterable resources) {
     return FutureBuilder(
         future: widget.currentLocation,
         builder: (BuildContext context, AsyncSnapshot loc) {
@@ -341,7 +138,7 @@ class MapPageState extends State<MapPage> {
               target: location,
               zoom: 17.5,
             );
-            return getMap(cam, resources);
+            return map(cam, resources);
           } else {
             return LoadingIndicator(
               size: 50,
@@ -352,7 +149,7 @@ class MapPageState extends State<MapPage> {
         });
   }
 
-  Widget buildClientLocation(Iterable resources) {
+  Widget typedLocationLoader(Iterable resources) {
     return FutureBuilder(
         future:
             widget.geo.parseAddress(widget.typedAddress!, widget.typedZipCode),
@@ -366,8 +163,8 @@ class MapPageState extends State<MapPage> {
                 target: location,
                 zoom: 17.5,
               );
-              currentMarker(location);
-              return getMap(cam, resources);
+              typedLocationMarker(location);
+              return map(cam, resources);
             } else {
               return const Center(
                   child: Text(
@@ -384,21 +181,162 @@ class MapPageState extends State<MapPage> {
         });
   }
 
-  Widget buildMap() {
+  Widget resourcesLoader() {
     return FutureBuilder(
-      future: !ifAnyFilters()
+      future: howManyFilters() == 0
           ? widget.resourceList
           : widget.proxyModel.filter("resources", getFilterQuery()),
       builder: (BuildContext context, AsyncSnapshot<Iterable> resourceResults) {
         if (resourceResults.hasData && resourceResults.data != null) {
           if (widget.typedAddress != "") {
-            return buildClientLocation(resourceResults.data!);
+            return typedLocationLoader(resourceResults.data!);
           } else {
-            return buildCurrentLocation(resourceResults.data!);
+            return userLocationLoader(resourceResults.data!);
           }
         } else {
-          return noResources();
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text("No Results"),
+          );
         }
+      },
+    );
+  }
+
+  // UI WIDGETS
+
+  Future filterSheet() {
+    return showMaterialModalBottomSheet(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+        expand: false,
+        isDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setSheetState) {
+            Widget filterChip(String label, bool value) {
+              return InkWell(
+                  borderRadius: BorderRadius.circular(35),
+                  enableFeedback: true,
+                  onTap: () {
+                    setFilter(label, !value);
+                    setSheetState(() {});
+                  },
+                  child: !value
+                      ? Chip(
+                          label: Text(
+                            label,
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          side:
+                              const BorderSide(color: Colors.black12, width: 1),
+                        )
+                      : Chip(
+                          side: const BorderSide(
+                              color: Colors.transparent, width: 1),
+                          backgroundColor: Colors.black,
+                          label: Text(
+                            label,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge!
+                                    .fontSize),
+                          ),
+                        ));
+            }
+
+            List<Widget> filterSection(Map map) {
+              List<Widget> ret = [];
+              for (var key in map.keys) {
+                if (map[key] != null) {
+                  ret.add(filterChip(key, map[key]));
+                }
+              }
+              return ret;
+            }
+
+            Widget filterHeader() {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        filters.forEach(
+                          (key, value) {
+                            value.forEach((key, value) {
+                              setFilter(key, false);
+                            });
+                          },
+                        );
+                        setSheetState(() {});
+                      },
+                      child: const Text("clear filters")),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.close))
+                ],
+              );
+            }
+
+            Widget applyButton() {
+              return ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      widget.markers.clear();
+                    });
+
+                    widget.markers.clear();
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Apply Filters"));
+            }
+
+            List<Widget> buildList() {
+              List<Widget> children = [];
+              children.add(filterHeader());
+              children.add(getSpacer(0));
+              filters.forEach((key, value) {
+                children.add(getDivider(context));
+                children.add(Text(key));
+                children.add(Wrap(
+                  spacing: 4,
+                  children: filterSection(value),
+                ));
+              });
+              children.add(getSpacer(16));
+              children.add(applyButton());
+              return children;
+            }
+
+            return ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              children: buildList(),
+            );
+          });
+        });
+  }
+
+  Widget map(CameraPosition cam, Iterable resources) {
+    return GoogleMap(
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false,
+      mapType: MapType.normal,
+      markers: generateResourceMarkers(resources),
+      initialCameraPosition: cam,
+      mapToolbarEnabled: false,
+      buildingsEnabled: true,
+      compassEnabled: false,
+      liteModeEnabled: false,
+      trafficEnabled: false,
+      onMapCreated: (GoogleMapController controller) {
+        widget.mapController = controller;
       },
     );
   }
@@ -419,18 +357,6 @@ class MapPageState extends State<MapPage> {
             showToast("Moving to $text", Theme.of(context).primaryColor);
           } else {
             showToast("ERROR: invalid address", Theme.of(context).primaryColor);
-
-            /* setState(() {
-            //widget.typedAddress = widget.searchController.text;
-            widget.typedAddress = text;
-            widget.useCurrentLocation = false;
-            widget.markers.clear();
-          });
-        } else {
-          setState(() {
-            widget.markers.clear();
-            widget.useCurrentLocation = true;
-          }); */
           }
         }
       },
@@ -472,25 +398,6 @@ class MapPageState extends State<MapPage> {
     );
   }
 
-  Widget getBody() {
-    return FutureBuilder(
-      future: BitmapDescriptor.fromAssetImage(
-          const ImageConfiguration(devicePixelRatio: 2.5),
-          'assets/map_pins/resource_pin.bmp'),
-      builder:
-          (BuildContext context, AsyncSnapshot<BitmapDescriptor> mapPinIcon) {
-        if (mapPinIcon.hasData) {
-          if (mapPinIcon.data != null) {
-            widget.resourceIcon = mapPinIcon.data!;
-          }
-          return buildMap();
-        } else {
-          return getLoader();
-        }
-      },
-    );
-  }
-
   Widget headerButton() {
     return ElevatedButton(
         onPressed: () {
@@ -518,7 +425,7 @@ class MapPageState extends State<MapPage> {
         ));
   }
 
-  PreferredSizeWidget topHeader() {
+  PreferredSizeWidget pageHeader() {
     return AppBar(
       backgroundColor: Colors.transparent,
       leading: Navigator.canPop(context) ? const BackButton() : null,
@@ -541,45 +448,50 @@ class MapPageState extends State<MapPage> {
     );
   }
 
+  Widget filtersButton() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(
+          height: 40,
+        ),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: howManyFilters() == 0
+                    ? Colors.white
+                    : const Color(0xFFFFC700),
+                side: const BorderSide(width: 2, color: Colors.black26)
+                /* side: !ifAnyFilters()
+                        ? null
+                        : const BorderSide(color: Colors.black, width: 4) */
+                ),
+            onPressed: () async {
+              await filterSheet();
+              setState(() {
+                widget.markers.clear();
+              });
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("Filters"),
+                getSpacer(4),
+                const Icon(Icons.filter_list_outlined)
+              ],
+            )),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: topHeader(),
-      body: getBody(),
+      appBar: pageHeader(),
+      body: resourcesLoader(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(
-            height: 40,
-          ),
-          ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      !ifAnyFilters() ? Colors.white : const Color(0xFFFFC700),
-                  side: const BorderSide(width: 2, color: Colors.black26)
-                  /* side: !ifAnyFilters()
-                        ? null
-                        : const BorderSide(color: Colors.black, width: 4) */
-                  ),
-              onPressed: () async {
-                await filterSheet();
-                setState(() {
-                  widget.markers.clear();
-                });
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text("Filters"),
-                  getSpacer(4),
-                  const Icon(Icons.filter_list_outlined)
-                ],
-              )),
-        ],
-      ),
+      floatingActionButton: filtersButton(),
       bottomNavigationBar: customNav(context, 1),
     );
   }

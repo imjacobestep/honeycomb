@@ -1,31 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../model/resource.dart';
-import '../pages/resource_details.dart';
-import '../utilities.dart';
-
-Widget showRecency(BuildContext context, Resource resource) {
-  int diff = resource.updatedStamp!.difference(DateTime.now()).inDays;
-  Color recencyColor;
-
-  if (diff < 14) {
-    recencyColor = Colors.greenAccent;
-  } else if ((diff > 14) && (diff < 30)) {
-    recencyColor = Colors.orangeAccent;
-  } else {
-    recencyColor = Colors.redAccent;
-  }
-
-  return Chip(
-    labelPadding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-    labelStyle: Theme.of(context).textTheme.labelSmall,
-    visualDensity: VisualDensity.compact,
-    backgroundColor: recencyColor,
-    label: Text(
-      "$diff days",
-    ),
-  );
-}
 
 Widget cardCategoryLabel(BuildContext context, String category) {
   return Chip(
@@ -43,68 +18,6 @@ Widget detailsCategoryLabel(BuildContext context, String category) {
     label: Text(
       category,
       style: Theme.of(context).textTheme.labelMedium,
-    ),
-  );
-}
-
-Widget mapCategoryLabel(BuildContext context, String category) {
-  return cardCategoryLabel(context, category);
-}
-
-Widget resourceWindow(BuildContext context, Resource resource) {
-  List<Widget> categories = [];
-  if (resource.categories != null) {
-    for (var element in resource.categories!) {
-      categories.add(mapCategoryLabel(context, element));
-    }
-  }
-  return InkWell(
-    onTap: () {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ResourceDetails(
-                    resource: resource,
-                  )));
-    },
-    child: Column(
-      children: [
-        Container(
-          padding: const EdgeInsetsDirectional.all(8),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context).cardColor,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 1,
-                    spreadRadius: 2,
-                    offset: Offset.fromDirection(1, 1))
-              ]),
-          child: Row(children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  resource.name!,
-                  style: const TextStyle(fontSize: 20),
-                ),
-                Wrap(children: categories)
-              ],
-            ),
-            getSpacer(4),
-            const Icon(Icons.arrow_forward_ios)
-          ]),
-        ),
-        /* Triangle.isosceles(
-          edge: Edge.BOTTOM,
-          child: Container(
-            color: Colors.blue,
-            width: 20.0,
-            height: 10.0,
-          ),
-        ), */
-      ],
     ),
   );
 }

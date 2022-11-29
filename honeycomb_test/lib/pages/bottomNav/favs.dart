@@ -27,12 +27,16 @@ class FavsPageState extends State<FavsPage> {
     super.initState();
   }
 
-  Widget userBuilder() {
+  // FUNCTIONS
+
+  // LOADERS (wait on an asynchronous item, then return a Widget)
+
+  Widget userLoader() {
     return FutureBuilder(
       future: widget.proxyModel.getUser(widget.userID),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          return favoritesBuilder(snapshot.data);
+          return favoritesLoader(snapshot.data);
         } else {
           return const Center(
             child: Text("No user found"),
@@ -42,7 +46,7 @@ class FavsPageState extends State<FavsPage> {
     );
   }
 
-  Widget favoritesBuilder(MPUser user) {
+  Widget favoritesLoader(MPUser user) {
     return FutureBuilder(
       future: widget.proxyModel.listUserFavorites(user),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -93,6 +97,8 @@ class FavsPageState extends State<FavsPage> {
     );
   }
 
+  // UI WIDGETS
+
   Widget addButton() {
     return ElevatedButton(
         onPressed: () {
@@ -111,22 +117,26 @@ class FavsPageState extends State<FavsPage> {
         ));
   }
 
+  PreferredSizeWidget pageHeader() {
+    return AppBar(
+      title: const Text(
+        "My Favorites",
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: addButton(),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
-        title: const Text(
-          "My Favorites",
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: addButton(),
-          ),
-        ],
-      ),
-      body: userBuilder(),
+      appBar: pageHeader(),
+      body: userLoader(),
       bottomNavigationBar: customNav(context, 3),
     );
   }

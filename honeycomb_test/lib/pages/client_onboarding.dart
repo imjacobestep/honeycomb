@@ -33,7 +33,7 @@ class NewClientState extends State<NewClient> {
 
   @override
   void initState() {
-    writeControllers();
+    clientToTextControllers();
     super.initState();
   }
 
@@ -46,7 +46,11 @@ class NewClientState extends State<NewClient> {
     super.dispose();
   }
 
-  void writeControllers() {
+  // VARIABLES
+
+  // FUNCTIONS
+
+  void clientToTextControllers() {
     if (widget.client!.alias != null) {
       widget.nameController.text = widget.client!.alias!;
     }
@@ -61,7 +65,7 @@ class NewClientState extends State<NewClient> {
     }
   }
 
-  void writeClient() {
+  void textControllersToClient() {
     if (widget.nameController.text != "") {
       widget.client!.alias = widget.nameController.text;
     }
@@ -75,30 +79,6 @@ class NewClientState extends State<NewClient> {
       widget.client!.notes = widget.notesController.text;
     }
     widget.client!.updatedStamp = DateTime.now();
-  }
-
-  Widget getLabel(String label, bool required) {
-    List<Widget> children = [];
-    children.add(Text(
-      label,
-      style: Theme.of(context).textTheme.titleSmall,
-    ));
-    if (required) {
-      children.add(getSpacer(8));
-      children.add(const Text(
-        "required",
-        style: TextStyle(
-            color: Colors.red, fontWeight: FontWeight.w700, fontSize: 12),
-      ));
-    }
-    return Row(mainAxisSize: MainAxisSize.min, children: children);
-  }
-
-  Widget getStepLabel(String label) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.headlineSmall,
-    );
   }
 
   confirmDelete() {
@@ -122,11 +102,55 @@ class NewClientState extends State<NewClient> {
         });
   }
 
-  Widget buildForm() {
+  // LOADERS (wait on an asynchronous item, then return a Widget)
+
+  Widget userLoader(String buttonType) {
+    return FutureBuilder(
+      future: widget.proxyModel.getUser(widget.userID),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          widget.user = snapshot.data;
+          if (buttonType == "save") {
+            return saveButton();
+          } else {
+            return Padding(
+              padding: const EdgeInsets.all(8),
+              child: deleteButton(),
+            );
+          }
+        } else {
+          return const Center(
+            child: LoadingIndicator(size: 40, borderWidth: 3),
+          );
+        }
+      },
+    );
+  }
+
+  // UI WIDGETS
+
+  Widget inputLabel(String label, bool required) {
+    List<Widget> children = [];
+    children.add(Text(
+      label,
+      style: Theme.of(context).textTheme.titleSmall,
+    ));
+    if (required) {
+      children.add(getSpacer(8));
+      children.add(const Text(
+        "required",
+        style: TextStyle(
+            color: Colors.red, fontWeight: FontWeight.w700, fontSize: 12),
+      ));
+    }
+    return Row(mainAxisSize: MainAxisSize.min, children: children);
+  }
+
+  Widget clientOnboardingForm() {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       children: [
-        getLabel("Client Alias", true),
+        inputLabel("Client Alias", true),
         TextField(
           controller: widget.nameController,
           onSubmitted: (text) {
@@ -146,7 +170,7 @@ class NewClientState extends State<NewClient> {
           ),
         ),
         getSpacer(listSpacing),
-        getLabel("Agency ID", false),
+        inputLabel("Agency ID", false),
         TextField(
           controller: widget.agencyController,
           keyboardType: TextInputType.number,
@@ -161,7 +185,7 @@ class NewClientState extends State<NewClient> {
           ),
         ),
         getSpacer(listSpacing),
-        getLabel("Family Size", false),
+        inputLabel("Family Size", false),
         TextField(
           controller: widget.sizeController,
           keyboardType: TextInputType.number,
@@ -176,7 +200,7 @@ class NewClientState extends State<NewClient> {
           ),
         ),
         getSpacer(listSpacing),
-        getLabel("Notes", false),
+        inputLabel("Notes", false),
         TextField(
           maxLines: null,
           controller: widget.notesController,
@@ -212,35 +236,12 @@ class NewClientState extends State<NewClient> {
     );
   }
 
-  Widget userBuilder(String buttonType) {
-    return FutureBuilder(
-      future: widget.proxyModel.getUser(widget.userID),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          widget.user = snapshot.data;
-          if (buttonType == "save") {
-            return saveButton();
-          } else {
-            return Padding(
-              padding: const EdgeInsets.all(8),
-              child: deleteButton(),
-            );
-          }
-        } else {
-          return const Center(
-            child: LoadingIndicator(size: 40, borderWidth: 3),
-          );
-        }
-      },
-    );
-  }
-
   Widget saveButton() {
     return ElevatedButton(
       onPressed: widget.nameController.text == ''
           ? null
           : () async {
-              writeClient();
+              textControllersToClient();
               if (widget.client!.id == null) {
                 dynamic newClient =
                     await widget.proxyModel.upsert(widget.client);
@@ -335,26 +336,28 @@ class NewClientState extends State<NewClient> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        children: [cancelButton(), getSpacer(8), userBuilder("save")],
+        children: [cancelButton(), getSpacer(8), userLoader("save")],
       ),
+    );
+  }
+
+  PreferredSizeWidget pageHeader() {
+    return AppBar(
+      leading: BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
+      title: Text(
+        widget.client!.id != null ? "Edit Client" : "New Client",
+      ),
+      actions: widget.client!.id != null ? [userLoader("delete")] : null,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading:
-            BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
-        title: Text(
-          widget.client!.id != null ? "Edit Client" : "New Client",
-        ),
-        actions: widget.client!.id != null ? [userBuilder("delete")] : null,
-      ),
-      body: buildForm(),
+      appBar: pageHeader(),
+      body: clientOnboardingForm(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: bottomButtons(),
-      //bottomNavigationBar: customNav(context, 3),
     );
   }
 }

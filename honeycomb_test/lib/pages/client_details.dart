@@ -39,9 +39,209 @@ class ClientDetailsState extends State<ClientDetails> {
     super.initState();
   }
 
+  // VARIABLES
+
   double quickActionSize = 70.0;
 
-  Widget detailListing(String label, String value) {
+  // FUNCTIONS
+
+  Future<void> printToPDF(List<dynamic> resources) async {
+    // Centralized styles for the shared PDF
+    pw.TextStyle nameStyle =
+        pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold);
+    pw.TextStyle labelStyle =
+        pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.normal);
+    pw.TextStyle bodyStyle =
+        pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal);
+    pw.TextStyle headerStyle =
+        pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal);
+
+    final pdf = pw.Document();
+
+    pdf.addPage(pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          List<pw.Widget> data = [
+            pw.Text("Here are some resources we thought you might find useful!",
+                style: headerStyle)
+          ];
+
+          for (Resource resource in resources) {
+            data.addAll(
+                [pw.SizedBox(height: 2), pw.Text(" "), pw.SizedBox(height: 2)]);
+            List<pw.Widget> children = [];
+            //HEADER
+            children.add(pw.Text(resource.name!, style: nameStyle));
+            //CATEGORIES
+            if (resource.categories != null) {
+              children.add(pw.Text("services offered:", style: labelStyle));
+              children.add(pw.Wrap(spacing: 4, children: [
+                for (var text in resource.categories!)
+                  pw.Text("$text,", style: bodyStyle)
+              ]));
+            }
+            //PHONE
+            if (resource.phoneNumbers != null) {
+              children.add(pw.Text("phone numbers:", style: labelStyle));
+              children.add(pw.Column(children: [
+                for (String key in resource.phoneNumbers!.keys)
+                  pw.Text("$key: ${resource.phoneNumbers![key]}",
+                      style: bodyStyle)
+              ]));
+            }
+            //EMAIL
+            if (resource.email != null) {
+              children.add(pw.Text("email:", style: labelStyle));
+              children.add(pw.Text(resource.email!, style: bodyStyle));
+            }
+            //ADDRESS
+            if (resource.address != null) {
+              children.add(pw.Text("address:", style: labelStyle));
+              children.add(pw.Text(resource.address!, style: bodyStyle));
+            }
+            //WEBSITE
+            if (resource.website != null) {
+              children.add(pw.Text("website:", style: labelStyle));
+              children.add(pw.Text(resource.website!, style: bodyStyle));
+            }
+            //NOTES
+            if (resource.notes != null) {
+              children.add(pw.Text("notes:", style: labelStyle));
+              children.add(pw.Text(resource.notes!, style: bodyStyle));
+            }
+            //ELIGIBILITY
+            if (resource.eligibility != null) {
+              children.add(pw.Wrap(spacing: 8, children: [
+                for (var text in resource.eligibility!)
+                  pw.Text("$text,", style: bodyStyle)
+              ]));
+            }
+            //MISC HEADER
+            if (resource.multilingual != null ||
+                resource.accessibility != null) {
+              children.add(pw.Text("misc:", style: labelStyle));
+            }
+            //LANGUAGE
+            if (resource.multilingual != null) {
+              children.add(pw.Text(
+                  "This resource is${resource.multilingual! ? " " : " not "}multilingual",
+                  style: bodyStyle));
+            }
+            //ACCESSIBILITY
+            if (resource.accessibility != null) {
+              children.add(pw.Text(
+                  "This resource is${resource.accessibility! ? " " : " not "}wheelchair accessible",
+                  style: bodyStyle));
+            }
+
+            data.add(pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: children));
+          }
+          return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start, children: data);
+        }));
+    final output = await getTemporaryDirectory();
+    final file = File(
+        "${output.path}/${widget.client.alias}_${DateTime.now()}_resources.pdf");
+    await file.writeAsBytes(await pdf.save());
+    Share.shareXFiles([XFile(file.path)]);
+  }
+
+  // LOADERS (wait on an asynchronous item, then return a Widget)
+
+  Widget resourcesLoader(String elementContext) {
+    return FutureBuilder(
+      future: widget.proxyModel.listClientResources(widget.client),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          if (snapshot.data != null && snapshot.data.isNotEmpty) {
+            widget.resources = snapshot.data;
+            if (elementContext == "resourceList") {
+              return resourcesList(snapshot.data);
+            } else if (elementContext == "shareButton") {
+              List<Resource> resources = [];
+              Iterable<dynamic> data = snapshot.data;
+              for (var element in data) {
+                resources.add(element);
+              }
+              String toShare = widget.proxyModel.serialize(resources);
+              return quickActionButton("Share", toShare);
+            } else {
+              List<Resource> resources = [];
+              Iterable<dynamic> data = snapshot.data;
+              for (var element in data) {
+                resources.add(element);
+              }
+              String toShare = widget.proxyModel.serialize(resources);
+              return quickActionButton("Print", toShare);
+            }
+          } else {
+            if (elementContext == "resourceList") {
+              return helperText("This Client has no resources",
+                  "Try adding some from the List page", context, true);
+            } else if (elementContext == "shareButton") {
+              return SizedBox(
+                height: quickActionSize,
+                width: quickActionSize * 1.6,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.ios_share_outlined,
+                      color: Colors.black26,
+                      size: 30,
+                    ),
+                    getSpacer(8),
+                    Text(
+                      "Share",
+                      style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelLarge!.fontSize,
+                          fontStyle:
+                              Theme.of(context).textTheme.labelLarge!.fontStyle,
+                          color: Colors.black26),
+                    )
+                  ],
+                ),
+              );
+            } else {
+              return SizedBox(
+                height: quickActionSize,
+                width: quickActionSize * 1.6,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.print_disabled_outlined,
+                      color: Colors.black26,
+                      size: 30,
+                    ),
+                    getSpacer(8),
+                    Text(
+                      "Print",
+                      style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelLarge!.fontSize,
+                          fontStyle:
+                              Theme.of(context).textTheme.labelLarge!.fontStyle,
+                          color: Colors.black26),
+                    )
+                  ],
+                ),
+              );
+            }
+          }
+        } else {
+          return const LoadingIndicator(size: 50, borderWidth: 4);
+        }
+      },
+    );
+  }
+
+  // UI WIDGETS
+
+  Widget clientElement(String label, String value) {
     List<Widget> children = [
       Expanded(
         flex: 9,
@@ -143,105 +343,7 @@ class ClientDetailsState extends State<ClientDetails> {
     return Container();
   }
 
-  Future<void> printToPDF(List<dynamic> resources) async {
-    pw.TextStyle nameStyle =
-        pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold);
-    pw.TextStyle labelStyle =
-        pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.normal);
-    pw.TextStyle bodyStyle =
-        pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal);
-    pw.TextStyle headerStyle =
-        pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal);
-
-    final pdf = pw.Document();
-
-    pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          List<pw.Widget> data = [
-            pw.Text("Here are some resources we thought you might find useful!",
-                style: headerStyle)
-          ];
-
-          for (Resource resource in resources) {
-            data.addAll(
-                [pw.SizedBox(height: 2), pw.Text(" "), pw.SizedBox(height: 2)]);
-            List<pw.Widget> children = [];
-            //HEADER
-            children.add(pw.Text(resource.name!, style: nameStyle));
-            //CATEGORIES
-            if (resource.categories != null) {
-              children.add(pw.Text("services offered:", style: labelStyle));
-              children.add(pw.Wrap(spacing: 4, children: [
-                for (var text in resource.categories!)
-                  pw.Text("$text,", style: bodyStyle)
-              ]));
-            }
-            //PHONE////////////////////
-            if (resource.phoneNumbers != null) {
-              children.add(pw.Text("phone numbers:", style: labelStyle));
-              children.add(pw.Column(children: [
-                for (String key in resource.phoneNumbers!.keys)
-                  pw.Text("$key: ${resource.phoneNumbers![key]}",
-                      style: bodyStyle)
-              ]));
-            }
-            //EMAIL
-            if (resource.email != null) {
-              children.add(pw.Text("email:", style: labelStyle));
-              children.add(pw.Text(resource.email!, style: bodyStyle));
-            }
-            //ADDRESS
-            if (resource.address != null) {
-              children.add(pw.Text("address:", style: labelStyle));
-              children.add(pw.Text(resource.address!, style: bodyStyle));
-            }
-            //WEBSITE
-            if (resource.website != null) {
-              children.add(pw.Text("website:", style: labelStyle));
-              children.add(pw.Text(resource.website!, style: bodyStyle));
-            }
-            //NOTES
-            if (resource.notes != null) {
-              children.add(pw.Text("notes:", style: labelStyle));
-              children.add(pw.Text(resource.notes!, style: bodyStyle));
-            }
-            //ELIGIBILITY
-            if (resource.eligibility != null) {
-              children.add(pw.Wrap(spacing: 8, children: [
-                for (var text in resource.eligibility!)
-                  pw.Text("$text,", style: bodyStyle)
-              ]));
-            }
-            if (resource.multilingual != null ||
-                resource.accessibility != null) {
-              children.add(pw.Text("misc:", style: labelStyle));
-            }
-            if (resource.multilingual != null) {
-              children.add(pw.Text(
-                  "This resource is${resource.multilingual! ? " " : " not "}multilingual",
-                  style: bodyStyle));
-            }
-            if (resource.accessibility != null) {
-              children.add(pw.Text(
-                  "This resource is${resource.accessibility! ? " " : " not "}wheelchair accessible",
-                  style: bodyStyle));
-            }
-
-            data.add(pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: children));
-          }
-          return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start, children: data);
-        }));
-    final output = await getTemporaryDirectory();
-    final file = File("${output.path}/${widget.client.alias}_resources.pdf");
-    await file.writeAsBytes(await pdf.save());
-    Share.shareXFiles([XFile(file.path)]); // P
-  }
-
-  Widget getQuickAction(String label, String value) {
+  Widget quickActionButton(String label, String value) {
     switch (label) {
       case "Open Agency":
         {
@@ -286,16 +388,14 @@ class ClientDetailsState extends State<ClientDetails> {
     }
   }
 
-  Widget quickActionsBuilder() {
+  Widget quickActionsBar() {
     List<Widget> actions = [];
     if (widget.client.agencyId != null) {
-      actions.add(getQuickAction("Open Agency", widget.client.agencyId!));
+      actions.add(quickActionButton("Open Agency", widget.client.agencyId!));
     } //agency
     actions.addAll([
-      resourcesBuilder("printButton"),
-      resourcesBuilder("shareButton")
-      //getQuickAction("Print", "stuff"),
-      //getQuickAction("Share", "stuff")
+      resourcesLoader("printButton"),
+      resourcesLoader("shareButton")
     ]); //share
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -303,35 +403,38 @@ class ClientDetailsState extends State<ClientDetails> {
         children: actions);
   }
 
-  Widget detailsBuilder() {
-    List<Widget> children = [];
-    children.addAll([
+  Widget pageBody() {
+    List<Widget> bodyElements = [];
+    bodyElements.addAll([
       clientHeader(),
       getDivider(context),
-      quickActionsBuilder(),
+      quickActionsBar(),
       getDivider(context),
     ]);
 
     if (widget.client.agencyId != null) {
-      children.add(detailListing("Agency ID", widget.client.agencyId!));
+      bodyElements.add(clientElement("Agency ID", widget.client.agencyId!));
     }
     if (widget.client.familySize != null) {
-      children.add(
-          detailListing("Family Size", widget.client.familySize!.toString()));
+      bodyElements.add(
+          clientElement("Family Size", widget.client.familySize!.toString()));
     }
     if (widget.client.notes != null) {
-      children.add(detailListing("Notes", widget.client.notes!));
+      bodyElements.add(clientElement("Notes", widget.client.notes!));
     }
-    children.addAll([
+    bodyElements.addAll([
       getDivider(context),
-      resourceHeader(),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [const Text("Resources"), addResourcesButton()],
+      ),
       getSpacer(8),
-      resourcesBuilder("resourceList")
+      resourcesLoader("resourceList")
     ]);
 
     return ListView(
       padding: const EdgeInsets.all(16),
-      children: children,
+      children: bodyElements,
     );
   }
 
@@ -344,97 +447,8 @@ class ClientDetailsState extends State<ClientDetails> {
           widget.client.alias!,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        editButton()
+        editClientButton()
       ],
-    );
-  }
-
-  Widget resourcesBuilder(String elementContext) {
-    return FutureBuilder(
-      future: widget.proxyModel.listClientResources(widget.client),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          if (snapshot.data != null && snapshot.data.isNotEmpty) {
-            widget.resources = snapshot.data;
-            if (elementContext == "resourceList") {
-              return resourcesList(snapshot.data);
-            } else if (elementContext == "shareButton") {
-              List<Resource> resources = [];
-              Iterable<dynamic> data = snapshot.data;
-              for (var element in data) {
-                resources.add(element);
-              }
-              String toShare = widget.proxyModel.serialize(resources);
-              return getQuickAction("Share", toShare);
-            } else {
-              List<Resource> resources = [];
-              Iterable<dynamic> data = snapshot.data;
-              for (var element in data) {
-                resources.add(element);
-              }
-              String toShare = widget.proxyModel.serialize(resources);
-              return getQuickAction("Print", toShare);
-            }
-          } else {
-            if (elementContext == "resourceList") {
-              return helperText("This Client has no resources",
-                  "Try adding some from the List page", context, true);
-            } else if (elementContext == "shareButton") {
-              return SizedBox(
-                height: quickActionSize,
-                width: quickActionSize * 1.6,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.ios_share_outlined,
-                      color: Colors.black26,
-                      size: 30,
-                    ),
-                    getSpacer(8),
-                    Text(
-                      "Share",
-                      style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelLarge!.fontSize,
-                          fontStyle:
-                              Theme.of(context).textTheme.labelLarge!.fontStyle,
-                          color: Colors.black26),
-                    )
-                  ],
-                ),
-              );
-            } else {
-              return SizedBox(
-                height: quickActionSize,
-                width: quickActionSize * 1.6,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.print_disabled_outlined,
-                      color: Colors.black26,
-                      size: 30,
-                    ),
-                    getSpacer(8),
-                    Text(
-                      "Print",
-                      style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelLarge!.fontSize,
-                          fontStyle:
-                              Theme.of(context).textTheme.labelLarge!.fontStyle,
-                          color: Colors.black26),
-                    )
-                  ],
-                ),
-              );
-            }
-          }
-        } else {
-          return const LoadingIndicator(size: 50, borderWidth: 4);
-        }
-      },
     );
   }
 
@@ -456,14 +470,7 @@ class ClientDetailsState extends State<ClientDetails> {
     );
   }
 
-  Widget resourceHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [const Text("Resources"), addButton()],
-    );
-  }
-
-  Widget editButton() {
+  Widget editClientButton() {
     return ElevatedButton(
         onPressed: () async {
           await Navigator.push(
@@ -484,7 +491,7 @@ class ClientDetailsState extends State<ClientDetails> {
         ));
   }
 
-  Widget addButton() {
+  Widget addResourcesButton() {
     return ElevatedButton(
         onPressed: () async {
           await Navigator.pushReplacement(context,
@@ -503,16 +510,15 @@ class ClientDetailsState extends State<ClientDetails> {
         ));
   }
 
+  PreferredSizeWidget pageHeader() {
+    return AppBar(
+      leading: BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
+      title: const Text("Client Details"),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          leading:
-              BackButton(color: Theme.of(context).appBarTheme.foregroundColor),
-          title: const Text("Client Details"),
-        ),
-        body: detailsBuilder()
-        //bottomNavigationBar: BottomNavigationBar(items: [],),
-        );
+    return Scaffold(appBar: pageHeader(), body: pageBody());
   }
 }

@@ -49,27 +49,17 @@ class ResourceDetailsState extends State<ResourceDetails> {
     super.dispose();
   }
 
+  // VARIABLES
+
+  // FUNCTIONS
+
+  // LOADERS (wait on an asynchronous item, then return a Widget)
+
+  // UI WIDGETS
+
   Widget sheetBuilder(MPUser user) {
     return StatefulBuilder(
         builder: (BuildContext context, StateSetter setSheetState) {
-      List<Widget> children = [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Add this resource to..."),
-            IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.close))
-          ],
-        ),
-        getSpacer(8),
-        resourceCard(context, widget.resource, () {
-          Navigator.pop(context);
-        }),
-        getDivider(context)
-      ];
       Widget clientCheckBox(Client client) {
         if (widget.clientsList[client]!) {
           return IconButton(
@@ -127,6 +117,24 @@ class ResourceDetailsState extends State<ResourceDetails> {
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data != null) {
+              List<Widget> children = [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Add this resource to..."),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(Icons.close))
+                  ],
+                ),
+                getSpacer(8),
+                resourceCard(context, widget.resource, () {
+                  Navigator.pop(context);
+                }),
+                getDivider(context)
+              ];
               for (Client client in snapshot.data) {
                 bool isHere = (client.resources != null &&
                     (client.resources!.contains(widget.resource.id)));
@@ -323,7 +331,7 @@ class ResourceDetailsState extends State<ResourceDetails> {
                 },
                 child: Text(
                   value,
-                  maxLines: 10,
+                  maxLines: null,
                   //softWrap: true,
                   textWidthBasis: TextWidthBasis.parent,
                   //overflow: TextOverflow.ellipsis,

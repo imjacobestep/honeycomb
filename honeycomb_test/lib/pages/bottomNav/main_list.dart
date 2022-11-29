@@ -54,207 +54,11 @@ class ResourcesPageState extends State<ResourcesPage> {
 
   // FUNCTIONS
 
-  // WIDGETS
+  // LOADERS (wait on an asynchronous item, then return a Widget)
 
-  List<Widget> getFilters(Map map) {
-    List<Widget> ret = [];
-    ret.add(
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          ElevatedButton(
-              onPressed: () {
-                resetFilters();
-              },
-              child: const Text("clear filters")),
-          IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.close))
-        ],
-      ),
-    );
-    ret.add(getSpacer(8));
-
-    ret.add(ElevatedButton(
-        onPressed: () {
-          setState(() {});
-          Navigator.pop(context);
-        },
-        child: const Text("Apply Filters")));
-    return ret;
-  }
-
-  Widget sheetBuilder() {
-    return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setSheetState) {
-      Widget filterChip(String label, bool value) {
-        return InkWell(
-            borderRadius: BorderRadius.circular(35),
-            enableFeedback: true,
-            onTap: () {
-              Haptic.onSelection;
-              setFilter(label, !value);
-              setSheetState(() {});
-            },
-            child: !value
-                ? Chip(
-                    label: Text(
-                      label,
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    backgroundColor: Colors.transparent,
-                    side: const BorderSide(color: Colors.black12, width: 1),
-                  )
-                : Chip(
-                    side: const BorderSide(color: Colors.transparent, width: 1),
-                    backgroundColor: Colors.black,
-                    label: Text(
-                      label,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize:
-                              Theme.of(context).textTheme.labelLarge!.fontSize,
-                          fontStyle: Theme.of(context)
-                              .textTheme
-                              .labelLarge!
-                              .fontStyle),
-                    ),
-                  ));
-      }
-
-      List<Widget> filterSection(Map map) {
-        List<Widget> ret = [];
-        for (var key in map.keys) {
-          if (map[key] != null) {
-            ret.add(filterChip(key, map[key]));
-          }
-        }
-        return ret;
-      }
-
-      Widget filterHeader() {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ElevatedButton(
-                onPressed: () {
-                  filters.forEach(
-                    (key, value) {
-                      value.forEach((key, value) {
-                        setFilter(key, false);
-                      });
-                    },
-                  );
-                  setSheetState(() {});
-                },
-                child: const Text("clear filters")),
-            IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.close))
-          ],
-        );
-      }
-
-      Widget applyButton() {
-        return ElevatedButton(
-            onPressed: () {
-              setState(() {});
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Apply Filters",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ));
-      }
-
-      List<Widget> buildList() {
-        List<Widget> children = [];
-        children.add(filterHeader());
-        children.add(getSpacer(0));
-        filters.forEach((key, value) {
-          children.add(getDivider(context));
-          children.add(Text(key));
-          children.add(Wrap(
-            spacing: 4,
-            children: filterSection(value),
-          ));
-        });
-        children.add(getSpacer(16));
-        children.add(applyButton());
-        return children;
-      }
-
-      return ListView(
-        shrinkWrap: true,
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        children: buildList(),
-      );
-    });
-  }
-
-  Future filterSheet() {
-    return showMaterialModalBottomSheet(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-        expand: false,
-        isDismissible: false,
-        context: context,
-        builder: (context) {
-          return sheetBuilder();
-        });
-  }
-
-  Widget showActiveFilters(List<String> activeFilters) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Wrap(
-        spacing: 8,
-        children: [
-          for (String label in activeFilters)
-            Chip(
-              padding: const EdgeInsets.fromLTRB(0, 2, 2, 2),
-              label: Text(label),
-              deleteIcon: const Icon(Icons.close),
-              onDeleted: () {
-                filters.forEach((key, value) {
-                  value.forEach((key, value) {
-                    if (key == label) {
-                      value = !value;
-                    }
-                  });
-                });
-                activeFilters.removeWhere((element) => element == label);
-                setState(() {});
-              },
-            )
-        ],
-      ),
-    );
-  }
-
-  List<String> getActiveFilters() {
-    List<String> activeFilters = [];
-
-    filters.forEach((key, value) {
-      value.forEach((key, value) {
-        if (value) {
-          activeFilters.add(key);
-        }
-      });
-    });
-    return activeFilters;
-  }
-
-  Widget getResourceList() {
+  Widget resourceListLoader() {
     return FutureBuilder(
-      future: !ifAnyFilters()
+      future: howManyFilters() == 0
           ? widget.resourceList
           : widget.proxyModel.filter("resources", getFilterQuery()),
       builder: (BuildContext context, AsyncSnapshot<Iterable> snapshot) {
@@ -265,7 +69,7 @@ class ResourcesPageState extends State<ResourcesPage> {
           Iterable testList = widget.proxyModel
               .sort(snapshot.data!, defaultSortCriteria, sortOrder);
           if (testList.isEmpty) {
-            String helper = ifAnyFilters() ? "filters" : "search terms";
+            String helper = howManyFilters() != 0 ? "filters" : "search terms";
             children.addAll([
               getSpacer(16),
               helperText(
@@ -317,6 +121,150 @@ class ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
+  Widget userLoader() {
+    return FutureBuilder(
+      future: widget.proxyModel.getUser(widget.userID),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          MPUser user = snapshot.data!;
+          return newResourceButton(user);
+        } else {
+          return Center(
+            child: ElevatedButton(
+                onPressed: () {}, child: const Icon(Icons.error)),
+          );
+        }
+      },
+    );
+  }
+
+  // UI WIDGETS
+
+  Future filterSheet() {
+    return showMaterialModalBottomSheet(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+        expand: false,
+        isDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setSheetState) {
+            Widget filterChip(String label, bool value) {
+              return InkWell(
+                  borderRadius: BorderRadius.circular(35),
+                  enableFeedback: true,
+                  onTap: () {
+                    Haptic.onSelection;
+                    setFilter(label, !value);
+                    setSheetState(() {});
+                  },
+                  child: !value
+                      ? Chip(
+                          label: Text(
+                            label,
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          side:
+                              const BorderSide(color: Colors.black12, width: 1),
+                        )
+                      : Chip(
+                          side: const BorderSide(
+                              color: Colors.transparent, width: 1),
+                          backgroundColor: Colors.black,
+                          label: Text(
+                            label,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge!
+                                    .fontSize,
+                                fontStyle: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge!
+                                    .fontStyle),
+                          ),
+                        ));
+            }
+
+            List<Widget> filterSection(Map map) {
+              List<Widget> ret = [];
+              for (var key in map.keys) {
+                if (map[key] != null) {
+                  ret.add(filterChip(key, map[key]));
+                }
+              }
+              return ret;
+            }
+
+            Widget filterHeader() {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        filters.forEach(
+                          (key, value) {
+                            value.forEach((key, value) {
+                              setFilter(key, false);
+                            });
+                          },
+                        );
+                        setSheetState(() {});
+                      },
+                      child: const Text("clear filters")),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.close))
+                ],
+              );
+            }
+
+            Widget applyButton() {
+              return ElevatedButton(
+                  onPressed: () {
+                    setState(() {});
+                    Navigator.pop(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      "Apply Filters",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ));
+            }
+
+            List<Widget> buildList() {
+              List<Widget> children = [];
+              children.add(filterHeader());
+              children.add(getSpacer(0));
+              filters.forEach((key, value) {
+                children.add(getDivider(context));
+                children.add(Text(key));
+                children.add(Wrap(
+                  spacing: 4,
+                  children: filterSection(value),
+                ));
+              });
+              children.add(getSpacer(16));
+              children.add(applyButton());
+              return children;
+            }
+
+            return ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              children: buildList(),
+            );
+          });
+        });
+  }
+
   Widget searchBar() {
     return TextField(
       controller: widget.searchController,
@@ -358,24 +306,7 @@ class ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
-  Widget userBuilder() {
-    return FutureBuilder(
-      future: widget.proxyModel.getUser(widget.userID),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          MPUser user = snapshot.data!;
-          return headerButton(user);
-        } else {
-          return Center(
-            child: ElevatedButton(
-                onPressed: () {}, child: const Icon(Icons.error)),
-          );
-        }
-      },
-    );
-  }
-
-  Widget headerButton(MPUser user) {
+  Widget newResourceButton(MPUser user) {
     return ElevatedButton(
         onPressed: () async {
           Resource res =
@@ -400,7 +331,7 @@ class ResourcesPageState extends State<ResourcesPage> {
         ));
   }
 
-  PreferredSizeWidget topHeader() {
+  PreferredSizeWidget pageHeader() {
     return AppBar(
       automaticallyImplyLeading: false,
       toolbarHeight: 80,
@@ -413,13 +344,13 @@ class ResourcesPageState extends State<ResourcesPage> {
             flex: 1,
             child: getSpacer(4),
           ),
-          Expanded(flex: 8, child: userBuilder())
+          Expanded(flex: 8, child: userLoader())
         ],
       ),
     );
   }
 
-  Widget fabButtons() {
+  Widget filterAndSortOptions() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -478,7 +409,7 @@ class ResourcesPageState extends State<ResourcesPage> {
             ),
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: !ifAnyFilters()
+                    backgroundColor: howManyFilters() == 0
                         ? Theme.of(context).cardTheme.color
                         : const Color(0xFFFFC700),
                     side: const BorderSide(width: 2, color: Color(0xFFE7E7E7))
@@ -512,9 +443,9 @@ class ResourcesPageState extends State<ResourcesPage> {
     return Scaffold(
       extendBody: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
-      appBar: topHeader(),
-      body: getResourceList(),
-      floatingActionButton: fabButtons(),
+      appBar: pageHeader(),
+      body: resourceListLoader(),
+      floatingActionButton: filterAndSortOptions(),
       bottomNavigationBar: customNav(context, 2),
     );
   }

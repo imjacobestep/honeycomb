@@ -1,40 +1,13 @@
-import 'dart:io';
-
-import 'package:cross_file/cross_file.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:honeycomb_test/model/resource.dart';
-import 'package:share_plus/share_plus.dart';
 
 Widget getSpacer(double size) {
   return SizedBox(
     width: size,
     height: size,
   );
-}
-
-void shareContact(String contact) {
-  Share.share(contact);
-}
-
-void serviceToContact(Resource resource, int index) async {
-  final newContact = Contact()
-    ..name.first = resource.name!
-    ..addresses = [Address(resource.address!)]
-    ..emails = [
-      Email(resource.email!),
-    ]
-    ..phones = [Phone(resource.phoneNumbers!["primary"])];
-  await newContact.insert();
-
-  String filename = "${resource.name}.vcf";
-
-  var file = File(filename);
-  await file.writeAsString(newContact.toVCard(includeDate: true));
-
-  await Share.shareXFiles([XFile(file.path)]);
 }
 
 Widget getDivider(BuildContext context) {
@@ -142,18 +115,6 @@ Map<String, dynamic> getFilterQuery() {
     query["eligibility"] = eligibilitySelected;
   }
   return query;
-}
-
-bool ifAnyFilters() {
-  bool ret = false;
-  filters.forEach((key, value) {
-    value.forEach((key2, value2) {
-      if (value2) {
-        ret = true;
-      }
-    });
-  });
-  return ret;
 }
 
 String getPlural(int num) {
