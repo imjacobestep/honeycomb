@@ -335,20 +335,23 @@ class ResourceDetailsState extends State<ResourceDetails> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    "$contactName:",
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                  getSpacer(8),
-                  Text(
-                    number,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  )
-                ],
+              Expanded(
+                flex: 7,
+                child: Wrap(
+                  children: [
+                    Text(
+                      "$contactName:",
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    getSpacer(8),
+                    Text(
+                      number,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    )
+                  ],
+                ),
               ),
-              getAction("Phone Number", number)
+              Expanded(flex: 1, child: getAction("Phone Number", number))
             ],
           ),
         ),
