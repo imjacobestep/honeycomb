@@ -57,7 +57,6 @@ class MyApp extends StatelessWidget {
                 foregroundColor: Colors.black,
                 backgroundColor: const Color(0xFFFFC700)),
           )),
-
       initialRoute:
           FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
@@ -76,7 +75,6 @@ class MyApp extends StatelessWidget {
         },
         '/map': (context) {
           return MapPage("");
-          //return MapPage(useCurrentLocation: true, typedAddress: "");
         },
         '/list': (context) {
           return ResourcesPage();
@@ -112,8 +110,6 @@ class MyApp extends StatelessWidget {
           );
         },
       },
-
-      //home: const MyHomePage(title: 'Honeycomb'),
     );
   }
 }

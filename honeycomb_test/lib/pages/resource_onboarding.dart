@@ -562,6 +562,7 @@ class NewResourceState extends State<NewResource> {
       controller: widget.addressController,
       keyboardType: TextInputType.streetAddress,
       decoration: InputDecoration(
+        helperText: "Include city and state or zip code",
         prefixIcon: showIcon ? verifiedIcon : null,
         errorText: hasError ? "Improper Address" : null,
         contentPadding: const EdgeInsets.all(8),
