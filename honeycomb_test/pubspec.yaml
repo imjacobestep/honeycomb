@@ -57,6 +57,7 @@ dependencies:
   pdf: ^3.8.4
   path_provider: ^2.0.11
   dart_code_metrics: ^5.0.1
+  about: ^2.1.1
 
 dev_dependencies:
   flutter_test:

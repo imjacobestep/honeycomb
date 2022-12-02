@@ -38,6 +38,44 @@ class HomePageState extends State<HomePage> {
 
   // FUNCTIONS
 
+  // void about() {
+  //   showLicensePage(context: context);
+
+  //   showAboutPage(
+  //     context: context,
+  //     values: {
+  //       'version': '1.5.5',
+  //       'year': DateTime.now().year.toString(),
+  //     },
+  //     applicationLegalese: 'Copyright © David PHAM-VAN, {{ year }}',
+  //     applicationDescription: const Text(
+  //         'Displays an About dialog, which describes the application.'),
+  //     children: [
+  //       InkWell(
+  //           child: Card(
+  //         child: Row(children: [Icon(Icons.account_circle_outlined)]),
+  //       )),
+  //       MarkdownPageListTile(
+  //         icon: Icon(Icons.list),
+  //         title: Text('Changelog'),
+  //         filename: 'CHANGELOG.md',
+  //       ),
+  //       LicensesPageListTile(
+  //         icon: Icon(Icons.favorite),
+  //       ),
+  //     ],
+  //     applicationIcon: SizedBox(
+  //       width: 100,
+  //       height: 100,
+  //       child: Image.asset(
+  //         "lib/assets/icon/icon.png",
+  //         width: 80,
+  //         height: 80,
+  //       ),
+  //     ),
+  //   );
+  // }
+
   // LOADERS (wait on an asynchronous item, then return a Widget)
 
   Widget clientsLoader(MPUser user) {
@@ -194,10 +232,11 @@ class HomePageState extends State<HomePage> {
           padding: const EdgeInsets.all(16),
           child: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/profile');
+                //about();
+                Navigator.pushNamed(context, '/about');
               },
               icon: const Icon(
-                Icons.account_circle_outlined,
+                Icons.settings_outlined,
                 color: Colors.white,
               )),
         )

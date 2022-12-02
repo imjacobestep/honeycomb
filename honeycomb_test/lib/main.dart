@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:honeycomb_test/pages/about.dart';
 import 'package:honeycomb_test/pages/bottomNav/clients.dart';
 import 'package:honeycomb_test/pages/bottomNav/favs.dart';
 import 'package:honeycomb_test/pages/bottomNav/home.dart';
@@ -81,6 +82,9 @@ class MyApp extends StatelessWidget {
         },
         '/favs': (context) {
           return FavsPage();
+        },
+        '/about': (context) {
+          return AboutPage();
         },
         '/clients': (context) {
           return ClientsPage();
