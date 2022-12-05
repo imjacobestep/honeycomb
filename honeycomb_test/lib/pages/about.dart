@@ -1,4 +1,3 @@
-import 'package:about/about.dart' as prefix;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:honeycomb_test/utilities.dart';
