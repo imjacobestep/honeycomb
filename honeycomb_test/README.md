@@ -1,15 +1,44 @@
-Install:
-Firebase CLI - https://firebase.google.com/docs/cli
-Flutter - https://docs.flutter.dev/get-started/install
-XCode
+# How to build Honeycomb
 
-Before building:
-Make sure to get the AndroidManifext.xml, secrets.dart, and AppDelegate.swift files from the "sensitive dev files" folder on our shared drive
-make sure you have the repo cloned to your computer
-copy the xml to honeycomb/honeycomb_test/android/app/src/main
-copy secrets.dart into honeycomb/honeycomb_test/lib
-copy the swift to honeycomb/honeycomb_test/ios/Runner
-these are kept off the github because they contain api keys
+### 1. [Install Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12)
+Make sure to agree to the licensing and install the iOS emulator <br>
+If you plan on distributing your build, add an iCloud account and add that team to the Runner's signing settings
 
-THEN: delete ios/podfile and podfile.lock
-run 'flutter clean'
+### 2. [Install Flutter](https://docs.flutter.dev/get-started/install/macos)
+Download the SDK and [add it to your path](https://docs.flutter.dev/get-started/install/macos#update-your-path) <br>
+#### If using zsh shell ⤵
+  1. Open terminal and run the following line:
+
+    nano ~/.zshrc
+    
+  2. Add this line:
+
+    export PATH="$PATH:[PATH_OF_FLUTTER_GIT_DIRECTORY]/bin"
+
+<br>
+Close and re-open terminal to reset the terminal instance <br>
+Run flutter doctor to make sure it is installed properly
+
+    flutter doctor
+    
+#### Note: You won't need a Chrome executable, Android SDK, or Android Studio for this
+
+### 3. [Install CocoaPods](https://guides.cocoapods.org/using/getting-started.html#installation)
+Run the following:
+
+    sudo gem install cocoapods
+
+I would recommend running ' flutter doctor ' again here to make sure CocoaPods installed properly
+
+### 4. Add secret files
+We've kept files containing API keys hidden from our repo <br>
+  #### [For our UW advisors](https://drive.google.com/drive/folders/1VkhKXAiUUY4NAtTsSqyQHP_2u-uILRXT?usp=share_link)
+  #### [For anyone else](https://docs.google.com/document/d/1ooxucpN9Rs00RZR5-KUoYvsUqDr4HpwHSPbNU7v0DsA/edit?usp=share_link)
+  
+### 4. Pub Get and Build!
+Open terminal at honeycomb_test and run the following:
+
+    flutter pub get
+
+Open ios/runner.xcodeproj in Xcode <br>
+#### Build!
