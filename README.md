@@ -5,3 +5,5 @@
 
 Honeycomb is an app created for a project by graduate students at University of Washington's GIX
 Our app was designed to assist Mary's Place Seattle's Outreach and Diversion team in collecting resource information, identifying resources nearby, and sharing this info with the families they help.
+
+! See honeycomb_test README for instructions !
