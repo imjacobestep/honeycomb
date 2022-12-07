@@ -34,11 +34,22 @@ I would recommend running ' flutter doctor ' again here to make sure CocoaPods i
 We've kept files containing API keys hidden from our repo <br>
   #### [For our UW advisors](https://drive.google.com/drive/folders/1VkhKXAiUUY4NAtTsSqyQHP_2u-uILRXT?usp=share_link)
   #### [For anyone else](https://drive.google.com/drive/folders/1--5c8sVqeD1T9PjwUEeIeOzYvnfSHHgO?usp=share_link)
-  
-### 4. Pub Get and Build!
+
+### 5. Install dependencies with pub get
 Open terminal at honeycomb_test and run the following:
 
     flutter pub get
+    
+### 6. Setup backend APIs with Firestore
+
+```bash
+# Install the CLI if not already done so
+dart pub global activate flutterfire_cli
+
+# Run the `configure` command, select a Firebase project and platforms
+flutterfire configure
+``` 
+
+### 7. Build!
 
 Open ios/runner.xcodeproj in Xcode <br>
-#### Build!
